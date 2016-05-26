@@ -1,0 +1,5 @@
+---
+ # Meteor EC2 Settings
+   METEOR_IMAGE: ami-2051294a
+   METEOR_INSTANCE_TYPE: t2.medium
+   METEOR_MAX_INSTANCES: 10

@@ -1,0 +1,25 @@
+---
+  - include: aws/vars/ec2.yml
+
+  - name: Create SSH Key Folder
+    file: path=aws/keys/ state=directory
+
+  - name: Check if SSH Keys Exist
+    stat:
+      path: "aws/keys/ssh"
+    register: sshkey_result
+
+  - name: Generate SSH Keys
+    shell: "ssh-keygen -q -b 2048 -t rsa -N '' -f aws/keys/ssh"
+    when: sshkey_result.stat.exists == False
+
+  - name: Create EC2 Key
+    ec2_key:
+      name: tuxlab
+      state: present
+      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+      aws_secret_key: "{{ AWS_SECRET_KEY }}"
+      region: "{{ EC2_REGION }}"
+      key_material: "{{ item }}"
+    with_file: aws/keys/ssh.pub
+    when: sshkey_result.stat.exists == False

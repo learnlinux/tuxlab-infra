@@ -1,0 +1,14 @@
+---
+# TuxLab Settings
+# Installation Settings
+root_url: http://cmu.tuxlab.org
+mongo_url: http://mongo.cmu.tuxlab.org
+
+# Github Settings
+# If you wish to use the latest from the master branch, use repo_url.
+# if instead you want to use a pre-compiled binary, use binary_url.
+repo_url: https://github.com/learnlinux/tuxlab-app.git
+
+# Meteor Settings
+deploy_dir: /var/www
+deploy_app_dir: /var/www/tuxlab

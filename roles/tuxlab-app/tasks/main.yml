@@ -1,0 +1,62 @@
+---
+  - name: Create {{ deploy_dir }}
+    sudo: yes
+    file: name={{ item }} owner=root group=root
+    with_items:
+      - "{{ deploy_dir }}"
+      - "{{ deploy_app_dir }}"
+
+  - name: remove current build
+    sudo: yes
+    file: path={{ deploy_app_dir }}/build state=absent recurse=no
+
+  - name: create build directory
+    sudo: yes
+    file: name={{ item }} state=directory owner=root group=root
+    with_items:
+      - "{{deploy_app_dir}}/build"
+
+  - name: download binary
+    get_url: url={{ release_url }} dest={{deploy_app_dir}}/tuxlab-app.tar.gz
+    when: binary_url is defined
+
+  - name: unzip binary
+    unarchive: src={{deploy_app_dir}}/tuxlab-app.tar.gz dest={{deploy_app_dir}}/build
+    when: binary_url is defined
+
+  - name: add github.com to known hosts
+    sudo: yes
+    known_hosts: host=github.com state=present
+    when: repo_url is defined
+
+  - name: clone tuxlab source
+    sudo: yes
+    git: repo={{repo_url}}
+         dest={{deploy_app_dir}}
+    when: repo_url is defined
+
+  - name: install npm dependencies
+    npm: path={{deploy_app_dir}} production=yes
+    when: repo_url is defined
+
+  - name: build tuxlab app
+    sudo: yes
+    shell: meteor build --directory {{deploy_app_dir}}/build chdir={{deploy_app_dir}}
+    when: repo_url is defined
+
+  - name: restart nginx
+    sudo: yes
+    service: name=nginx state=restarted
+
+  - name: install forvever
+    npm: name=forever global=yes state=present
+
+  - name: start tuxlab app
+    sudo: yes
+    shell:  >
+      PORT=80
+      MONGO_URL={{ mongo_url }}
+      ROOT_URL={{ root_url }}
+      forever start "{{ deploy_app_dir }}"/build/main.js
+    async: 10
+    poll: 1

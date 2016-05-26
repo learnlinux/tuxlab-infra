@@ -1,0 +1,121 @@
+---
+  - include: aws/vars/ec2.yml
+
+# Creates an HTTP Load Balancer for Meteor
+  - name: Create Meteor ELB
+    ec2_elb_lb:
+      name: "TuxLab Meteor"
+      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+      aws_secret_key: "{{ AWS_SECRET_KEY }}"
+      subnets: "{{ vpc.subnets[0].id }}"
+      region: "{{ EC2_REGION }}"
+      state: present
+      security_group_names: "meteor"
+      connection_draining_timeout: 60
+      listeners:
+        - protocol: http
+          load_balancer_port: 80
+          instance_port: 80
+      health_check:
+          ping_protocol: http
+          ping_port: 80
+          ping_path: "/"
+          response_timeout: 5
+          interval: 30
+          unhealthy_threshold: 5
+          healthy_threshold: 5
+
+# Creates a Launch Confgiguration for Meteor
+  - name: Create Meteor Launch Configuration
+    ec2_lc:
+        name: "TuxLab Meteor"
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        image_id: "{{ METEOR_IMAGE }}"
+        instance_type: "{{ METEOR_INSTANCE_TYPE }}"
+        key_name: "tuxlab"
+        region: "{{ EC2_REGION }}"
+        security_groups: ["{{docker_sec_group.group_id}}", "{{ansible_sec_group.group_id}}"]
+
+# Creates an Autoscale Group for Meteor
+  - name: Create Meteor Autoscale Group
+    ec2_asg:
+        name: "TuxLab Meteor"
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        load_balancers: "TuxLab Meteor"
+        launch_config_name: "TuxLab Meteor"
+        region: "{{ EC2_REGION }}"
+        vpc_zone_identifier: "{{ vpc.subnets[0].id }}"
+        min_size: 1
+        max_size: "{{ METEOR_MAX_INSTANCES }}"
+        health_check_type: EC2
+        health_check_period: 300
+
+# Creates a Scale Down Policy for Meteor
+  - name: Create Meteor Scale Down Policy
+    ec2_scaling_policy:
+        name: "meteor-scale-down"
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        region: "{{ EC2_REGION }}"
+        asg_name: "TuxLab Meteor"
+        adjustment_type: ChangeInCapacity
+        scaling_adjustment: -1
+        min_adjustment_step: -1
+        cooldown: 300
+    register: scale_down_policy
+
+# Creates a Scale Up Policy for Meteor
+  - name: Create Meteor Scale Up Policy
+    ec2_scaling_policy:
+        name: "meteor-scale-up"
+        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        region: "{{ EC2_REGION }}"
+        asg_name: "TuxLab Meteor"
+        adjustment_type: ChangeInCapacity
+        scaling_adjustment: 1
+        min_adjustment_step: 1
+        cooldown: 300
+    register: scale_up_policy
+
+# Create a Scale Down Alarm
+  - name: Create Meteor Scale Down Alarm
+    ec2_metric_alarm:
+      state: present
+      region: "{{ EC2_REGION }}"
+      name: "meteor-cpu-low"
+      metric: CPUUtilization
+      namespace: "AWS/EC2"
+      statistic: Average
+      comparison: "<="
+      threshold: 5
+      period: 300
+      evaluation_periods: 3
+      unit: "Percent"
+      description: "This will alarm when cpu usage average is lower than 5% for 15 minutes "
+      dimensions:
+        AutoScalingGroupName: "TuxLab Meteor"
+      alarm_actions:
+      - "{{ scale_down_policy.arn }}"
+
+# Create a Scale Up Alarm
+  - name: Create Meteor Scale Up Alarm
+    ec2_metric_alarm:
+      state: present
+      region: "{{ EC2_REGION }}"
+      name: "meteor-cpu-high"
+      metric: CPUUtilization
+      namespace: "AWS/EC2"
+      statistic: Average
+      comparison: "<="
+      threshold: 90.0
+      period: 300
+      evaluation_periods: 3
+      unit: "Percent"
+      description: "This will alarm when cpu usage average is higher than 90% for 15 minutes "
+      dimensions:
+        AutoScalingGroupName: "TuxLab Meteor"
+      alarm_actions:
+        - "{{ scale_up_policy.arn }}"

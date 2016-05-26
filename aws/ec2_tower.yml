@@ -1,0 +1,87 @@
+---
+
+ - include: aws/vars/ec2.yml
+
+ - name: Configure Tower Security Group
+   ec2_group:
+      name: ansible_tower
+      description: Security Group for Ansible Tower
+      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+      aws_secret_key: "{{ AWS_SECRET_KEY }}"
+      region: "{{ EC2_REGION }}"
+      vpc_id: "{{ vpc.vpc_id }}"
+      state: present
+      rules:
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 8080
+        to_port: 8080
+        cidr_ip: 0.0.0.0/0
+      rules_egress:
+      - proto: all
+        from_port: all
+        to_port: all
+        cidr_ip: 0.0.0.0/0
+   register: tower_server_sec_group
+
+ - name: Launch Tower Server
+   ec2:
+     aws_access_key: "{{ AWS_ACCESS_KEY }}"
+     aws_secret_key: "{{ AWS_SECRET_KEY }}"
+     keypair: "tuxlab"
+     image: "{{ TOWER_IMAGE }}"
+     instance_type: "{{ TOWER_INSTANCE_TYPE }}"
+     region: "{{ EC2_REGION }}"
+     vpc_subnet_id: "{{ vpc.subnets[0].id }}"
+     assign_public_ip: yes
+     group: ansible_tower
+     instance_tags:
+         Name: Ansible Tower
+     wait: yes
+   register: tower_instance
+
+ - name: Wait for Tower Server to Start
+   wait_for:
+      host: "{{ item.public_dns_name }}"
+      state: started
+      timeout: 320
+      port: 22
+   with_items: "{{ tower_instance.instances }}"
+
+ - name: Add Tower to Hosts
+   add_host:
+        name="ansible_tower"
+        group="ansible_tower"
+        ansible_ssh_user=ubuntu
+        ansible_ssh_host="{{ item.public_ip }}"
+        ansible_ssh_private_key_file="aws/keys/ssh"
+        ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+   with_items: "{{ tower_instance.instances }}"
+
+ - name: Configure Ansible Managment Group
+   ec2_group:
+      name: ansible_managment
+      description: Security Group for Ansible Managment
+      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+      aws_secret_key: "{{ AWS_SECRET_KEY }}"
+      region: "{{ EC2_REGION }}"
+      vpc_id: "{{ vpc.vpc_id }}"
+      state: present
+      rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        group_id: "{{ tower_server_sec_group.group_id }}"
+      rules_egress:
+      - proto: all
+        from_port: all
+        to_port: all
+        cidr_ip: 0.0.0.0/0
+   register: ansible_sec_group
