@@ -1,0 +1,4 @@
+---
+- name: install mongodb
+  sudo: yes
+  yum: name=mongodb state=latest

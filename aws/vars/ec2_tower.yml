@@ -1,0 +1,3 @@
+---
+  TOWER_IMAGE: ami-a013f9cd
+  TOWER_INSTANCE_TYPE: m3.medium

@@ -1,0 +1,12 @@
+---
+- name: restart docker
+  sudo: true
+  service: >
+    name=docker
+    state=restarted
+
+- name: restart remote api
+  sudo: true
+  service: >
+    name=docker-tcp.socket
+    state=restrarted

@@ -1,0 +1,3 @@
+---
+- name: start swarm-manager
+  shell: docker run -d --name swarm-manager --net=host swarm:latest manage etcd://127.0.0.1:2379

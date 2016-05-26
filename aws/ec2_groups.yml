@@ -1,0 +1,39 @@
+---
+ - include: aws/vars/ec2.yml
+
+ - name: Configure Meteor Group
+   ec2_group:
+      name: meteor
+      description: Security Group for Meteor networking
+      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+      aws_secret_key: "{{ AWS_SECRET_KEY }}"
+      region: "{{ EC2_REGION }}"
+      vpc_id: "{{ vpc.vpc_id }}"
+      state: present
+      rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      rules_egress:
+      - proto: all
+        from_port: all
+        to_port: all
+        cidr_ip: 0.0.0.0/0
+   register: meteor_sec_group
+
+ - name: Configure Docker Group
+   ec2_group:
+      name: docker
+      description: Security Group for Docker Networking
+      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+      aws_secret_key: "{{ AWS_SECRET_KEY }}"
+      region: "{{ EC2_REGION }}"
+      vpc_id: "{{ vpc.vpc_id }}"
+      state: present
+      rules_egress:
+      - proto: all
+        from_port: all
+        to_port: all
+        cidr_ip: 0.0.0.0/0
+   register: docker_sec_group

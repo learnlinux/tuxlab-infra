@@ -1,0 +1,32 @@
+---
+  # This playbook is executed by Vagrant or  Ansible Tower to configure
+  # new hosts once they have been provisioned.
+
+  - name: Configure Meteor Hosts
+    hosts: tuxlab-meteor
+    sudo: yes
+    roles:
+      - rhel
+      - nodejs
+      - meteor
+      - tuxlab-app
+
+  - name: Configure Swarm Hosts
+    hosts: tuxlab-swarm-host:tuxlab-swarm-manager
+    gather_facts: no
+    vars:
+      ansible_ssh_user: core
+      ansible_python_interpreter: "PATH=/home/core/bin:$PATH python"
+    roles:
+      - defunctzombie.coreos-bootstrap
+      - coreos
+      - dockerhost
+
+  - name: Configure Swarm Manager
+    hosts: tuxlab-swarm-manager
+    gather_facts: no
+    vars:
+      ansible_ssh_user: core
+      ansible_python_interpreter: "PATH=/home/core/bin:$PATH python"
+    roles:
+    - dockerswarm

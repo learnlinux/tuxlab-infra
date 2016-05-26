@@ -1,0 +1,11 @@
+# TuxLab Git Ignore
+
+  # AWS Credentials
+    aws/keys/*
+    aws/vars/aws_credentials.yml
+
+  # Ansible
+    *.retry
+
+  # Vagrant
+    .vagrant/

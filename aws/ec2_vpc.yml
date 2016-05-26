@@ -1,0 +1,23 @@
+---
+
+ - include: aws/vars/ec2.yml
+
+ - name: Configure VPC
+   ec2_vpc:
+     aws_access_key: "{{ AWS_ACCESS_KEY }}"
+     aws_secret_key: "{{ AWS_SECRET_KEY }}"
+     region: "{{ EC2_REGION }}"
+     cidr_block: 10.100.0.0/20
+     resource_tags: {"Name" : "tuxlab_vpc"}
+     state: present
+     wait: yes
+     subnets:
+        - cidr : 10.100.0.0/20
+     internet_gateway: True
+     route_tables:
+        - subnets:
+            - 10.100.0.0/20
+          routes:
+            - dest: 0.0.0.0/0
+              gw: igw
+   register: vpc
