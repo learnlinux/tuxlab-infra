@@ -4,8 +4,6 @@
 
  - name: Configure VPC
    ec2_vpc:
-
-     aws_secret_key: "{{ AWS_SECRET_KEY }}"
      region: "{{ EC2_REGION }}"
      cidr_block: 10.100.0.0/20
      resource_tags: {"Name" : "tuxlab_vpc"}

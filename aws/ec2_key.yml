@@ -17,8 +17,6 @@
     ec2_key:
       name: tuxlab
       state: present
-      
-      aws_secret_key: "{{ AWS_SECRET_KEY }}"
       region: "{{ EC2_REGION }}"
       key_material: "{{ item }}"
     with_file: aws/keys/ssh.pub
