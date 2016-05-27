@@ -4,9 +4,11 @@
 # Creates an HTTP Load Balancer for Meteor
   - name: Create Meteor ELB
     ec2_elb_lb:
-      name: "TuxLab Meteor"
+      name: "tuxlab-meteor"
       subnets: "{{ vpc.subnets[0].id }}"
       region: "{{ EC2_REGION }}"
+      zones:
+        - "{{ EC2_AZ }}"
       state: present
       security_group_names: "meteor"
       connection_draining_timeout: 60
@@ -26,7 +28,7 @@
 # Creates a Launch Confgiguration for Meteor
   - name: Create Meteor Launch Configuration
     ec2_lc:
-        name: "TuxLab Meteor"
+        name: "tuxlab-meteor"
         image_id: "{{ METEOR_IMAGE }}"
         instance_type: "{{ METEOR_INSTANCE_TYPE }}"
         key_name: "tuxlab"
@@ -36,10 +38,11 @@
 # Creates an Autoscale Group for Meteor
   - name: Create Meteor Autoscale Group
     ec2_asg:
-        name: "TuxLab Meteor"
-        load_balancers: "TuxLab Meteor"
-        launch_config_name: "TuxLab Meteor"
+        name: "tuxlab-meteor"
+        load_balancers: "tuxlab-meteor"
+        launch_config_name: "tuxlab-meteor"
         region: "{{ EC2_REGION }}"
+        availability_zones: "{{ EC2_AZ }}"
         vpc_zone_identifier: "{{ vpc.subnets[0].id }}"
         min_size: 1
         max_size: "{{ METEOR_MAX_INSTANCES }}"
@@ -51,7 +54,7 @@
     ec2_scaling_policy:
         name: "meteor-scale-down"
         region: "{{ EC2_REGION }}"
-        asg_name: "TuxLab Meteor"
+        asg_name: "tuxlab-meteor"
         adjustment_type: ChangeInCapacity
         scaling_adjustment: -1
         min_adjustment_step: -1
@@ -63,7 +66,7 @@
     ec2_scaling_policy:
         name: "meteor-scale-up"
         region: "{{ EC2_REGION }}"
-        asg_name: "TuxLab Meteor"
+        asg_name: "tuxlab-meteor"
         adjustment_type: ChangeInCapacity
         scaling_adjustment: 1
         min_adjustment_step: 1
@@ -86,7 +89,7 @@
       unit: "Percent"
       description: "This will alarm when cpu usage average is lower than 5% for 15 minutes "
       dimensions:
-        AutoScalingGroupName: "TuxLab Meteor"
+        AutoScalingGroupName: "tuxlab-meteor"
       alarm_actions:
       - "{{ scale_down_policy.arn }}"
 
@@ -106,6 +109,6 @@
       unit: "Percent"
       description: "This will alarm when cpu usage average is higher than 90% for 15 minutes "
       dimensions:
-        AutoScalingGroupName: "TuxLab Meteor"
+        AutoScalingGroupName: "tuxlab-meteor"
       alarm_actions:
         - "{{ scale_up_policy.arn }}"

@@ -11,6 +11,7 @@
      wait: yes
      subnets:
         - cidr : 10.100.0.0/20
+          az: "{{ EC2_AZ }}"
      internet_gateway: True
      route_tables:
         - subnets:

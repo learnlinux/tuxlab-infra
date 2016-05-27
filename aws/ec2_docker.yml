@@ -4,9 +4,7 @@
 # Creates a Launch Confgiguration for Docker Host
   - name: Create Docker Launch Configuration
     ec2_lc:
-        name: "TuxLab Docker"
-        
-        aws_secret_key: "{{ AWS_SECRET_KEY }}"
+        name: "tuxlab-docker"
         image_id: "{{ DOCKER_IMAGE }}"
         instance_type: "{{ DOCKER_INSTANCE_TYPE }}"
         key_name: "tuxlab"
@@ -16,11 +14,10 @@
 # Creates an Autoscale Group for Docker
   - name: Create Docker Autoscale Group
     ec2_asg:
-        name: "TuxLab Docker"
-
-        aws_secret_key: "{{ AWS_SECRET_KEY }}"
-        launch_config_name: "TuxLab Docker"
+        name: "tuxlab-docker"
+        launch_config_name: "tuxlab-docker"
         region: "{{ EC2_REGION }}"
+        availability_zones: "{{ EC2_AZ }}"
         vpc_zone_identifier: "{{ vpc.subnets[0].id }}"
         min_size: 1
         max_size: "{{ DOCKER_MAX_INSTANCES }}"
@@ -31,10 +28,8 @@
   - name: Create Docker Scale Down Policy
     ec2_scaling_policy:
         name: "docker-scale-down"
-
-        aws_secret_key: "{{ AWS_SECRET_KEY }}"
         region: "{{ EC2_REGION }}"
-        asg_name: "TuxLab Docker"
+        asg_name: "tuxlab-docker"
         adjustment_type: ChangeInCapacity
         scaling_adjustment: -1
         min_adjustment_step: -1
@@ -45,10 +40,8 @@
   - name: Create Docker Scale Up Policy
     ec2_scaling_policy:
         name: "docker-scale-up"
-
-        aws_secret_key: "{{ AWS_SECRET_KEY }}"
         region: "{{ EC2_REGION }}"
-        asg_name: "TuxLab Docker"
+        asg_name: "tuxlab-docker"
         adjustment_type: ChangeInCapacity
         scaling_adjustment: 1
         min_adjustment_step: 1
@@ -71,6 +64,6 @@
       unit: "Percent"
       description: "This will alarm when cpu usage average is higher than 90% for 15 minutes "
       dimensions:
-        AutoScalingGroupName: "TuxLab Docker"
+        AutoScalingGroupName: "tuxlab-docker"
       alarm_actions:
         - "{{ scale_up_policy.arn }}"
