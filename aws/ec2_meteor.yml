@@ -5,7 +5,7 @@
   - name: Create Meteor ELB
     ec2_elb_lb:
       name: "TuxLab Meteor"
-      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+      
       aws_secret_key: "{{ AWS_SECRET_KEY }}"
       subnets: "{{ vpc.subnets[0].id }}"
       region: "{{ EC2_REGION }}"
@@ -29,7 +29,7 @@
   - name: Create Meteor Launch Configuration
     ec2_lc:
         name: "TuxLab Meteor"
-        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        
         aws_secret_key: "{{ AWS_SECRET_KEY }}"
         image_id: "{{ METEOR_IMAGE }}"
         instance_type: "{{ METEOR_INSTANCE_TYPE }}"
@@ -41,7 +41,7 @@
   - name: Create Meteor Autoscale Group
     ec2_asg:
         name: "TuxLab Meteor"
-        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        
         aws_secret_key: "{{ AWS_SECRET_KEY }}"
         load_balancers: "TuxLab Meteor"
         launch_config_name: "TuxLab Meteor"
@@ -56,7 +56,7 @@
   - name: Create Meteor Scale Down Policy
     ec2_scaling_policy:
         name: "meteor-scale-down"
-        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        
         aws_secret_key: "{{ AWS_SECRET_KEY }}"
         region: "{{ EC2_REGION }}"
         asg_name: "TuxLab Meteor"
@@ -70,7 +70,7 @@
   - name: Create Meteor Scale Up Policy
     ec2_scaling_policy:
         name: "meteor-scale-up"
-        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        
         aws_secret_key: "{{ AWS_SECRET_KEY }}"
         region: "{{ EC2_REGION }}"
         asg_name: "TuxLab Meteor"

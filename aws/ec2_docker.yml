@@ -5,7 +5,7 @@
   - name: Create Docker Launch Configuration
     ec2_lc:
         name: "TuxLab Docker"
-        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+        
         aws_secret_key: "{{ AWS_SECRET_KEY }}"
         image_id: "{{ DOCKER_IMAGE }}"
         instance_type: "{{ DOCKER_INSTANCE_TYPE }}"
@@ -17,7 +17,7 @@
   - name: Create Docker Autoscale Group
     ec2_asg:
         name: "TuxLab Docker"
-        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+
         aws_secret_key: "{{ AWS_SECRET_KEY }}"
         launch_config_name: "TuxLab Docker"
         region: "{{ EC2_REGION }}"
@@ -31,7 +31,7 @@
   - name: Create Docker Scale Down Policy
     ec2_scaling_policy:
         name: "docker-scale-down"
-        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+
         aws_secret_key: "{{ AWS_SECRET_KEY }}"
         region: "{{ EC2_REGION }}"
         asg_name: "TuxLab Docker"
@@ -45,7 +45,7 @@
   - name: Create Docker Scale Up Policy
     ec2_scaling_policy:
         name: "docker-scale-up"
-        aws_access_key: "{{ AWS_ACCESS_KEY }}"
+
         aws_secret_key: "{{ AWS_SECRET_KEY }}"
         region: "{{ EC2_REGION }}"
         asg_name: "TuxLab Docker"
