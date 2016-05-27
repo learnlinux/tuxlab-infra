@@ -22,48 +22,41 @@
       - name: Create Security Groups
         include: aws/ec2_groups.yml
 
-# Change Ansible Tower Password
-   - name: Change Ansible Tower Password
-     hosts: ansible_tower
-     remote_user: ubuntu
-     gather_facts: no
-     vars_prompt:
-       - name: "ANSIBLE_ADMIN_PASS"
-         prompt: "Create an Ansible Tower Admin Password:"
-         private: yes
-         confirm: yes
-     tasks:
-      - name: Change Ansible Tower Admin Password
+# Configure Ansible Tower
+  - name: Configure Ansible Tower
+    hosts: ansible_tower
+    remote_user: ubuntu
+    gather_facts: no
+    vars_prompt:
+
+      - name: "ANSIBLE_TOWER_PASS"
+        prompt: "Create an Ansible Tower admin password:"
+        private: yes
+        confirm: yes
+
+      - name: "ANSIBLE_LICENSE"
+        prompt: "Paste your Ansible Tower license key:"
+
+    tasks:
+      - name: Create Ansible Tower Admin Password
         expect:
             command: sudo tower-manage changepassword admin
             responses:
-              "Password:" : "{{ ANSIBLE_ADMIN_PASS }}"
-              "Password (again):" : "{{ ANSIBLE_ADMIN_PASS }}"
+              "Password:" : "{{ ANSIBLE_TOWER_PASS }}"
+              "Password (again):" : "{{ ANSIBLE_TOWER_PASS }}"
 
-# Configure Ansible Tower to Configure newly created instances
-- name: Configure Ansible Tower Callback Provisioning
-  hosts: localhost
-  connection: local
-  remote_user: root
-  gather_facts: no
-  tasks:
-
-    - name: Create Docker EC2 Enviornment
-      include: aws/ec2_docker.yml
-
-    - name: Create Meteor EC2 Enviornment
-      include: aws/ec2_meteor.yml
+      - name: Configue Ansible Tower for AWS
+        include: aws/ec2_tower_config.yml
 
 # Launch Autoscaling Groups
-- name: Launch Autoscaling Groups
-  hosts: localhost
-  connection: local
-  remote_user: root
-  gather_facts: no
-  tasks:
+  - name: Launch Autoscaling Groups
+    hosts: localhost
+    connection: local
+    remote_user: root
+    gather_facts: no
+    tasks:
+      - name: Create Docker EC2 Enviornment
+        include: aws/ec2_docker.yml
 
-    - name: Create Docker EC2 Enviornment
-      include: aws/ec2_docker.yml
-
-    - name: Create Meteor EC2 Enviornment
-      include: aws/ec2_meteor.yml
+      - name: Create Meteor EC2 Enviornment
+        include: aws/ec2_meteor.yml

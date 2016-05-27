@@ -1,8 +1,7 @@
 # TuxLab Git Ignore
 
-  # AWS Credentials
+  # AWS SSH Keys
     aws/keys/*
-    aws/vars/aws_credentials.yml
 
   # Ansible
     *.retry
