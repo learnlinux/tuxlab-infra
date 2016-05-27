@@ -4,7 +4,7 @@
   # ./vars/aws_vars.yml file prior to execution.
 
   # Create AWS Enviornment
-  - name: Create EC2 Enviornment
+  - name: Configure EC2
     hosts: localhost
     connection: local
     remote_user: root
@@ -22,11 +22,47 @@
       - name: Create Security Groups
         include: aws/ec2_groups.yml
 
-      - name: Create Docker EC2 Enviornment
-        include: aws/ec2_docker.yml
+# Change Ansible Tower Password
+   - name: Change Ansible Tower Password
+     hosts: ansible_tower
+     remote_user: ubuntu
+     gather_facts: no
+     vars_prompt:
+       - name: "ANSIBLE_ADMIN_PASS"
+         prompt: "Create an Ansible Tower Admin Password:"
+         private: yes
+         confirm: yes
+     tasks:
+      - name: Change Ansible Tower Admin Password
+        expect:
+            command: sudo tower-manage changepassword admin
+            responses:
+              "Password:" : "{{ ANSIBLE_ADMIN_PASS }}"
+              "Password (again):" : "{{ ANSIBLE_ADMIN_PASS }}"
 
-      - name: Create Meteor EC2 Enviornment
-        include: aws/ec2_meteor.yml
+# Configure Ansible Tower to Configure newly created instances
+- name: Configure Ansible Tower Callback Provisioning
+  hosts: localhost
+  connection: local
+  remote_user: root
+  gather_facts: no
+  tasks:
 
-      - name: Configure AWS Tower Playbooks
-        include: aws/ec2_tower_config.yml
+    - name: Create Docker EC2 Enviornment
+      include: aws/ec2_docker.yml
+
+    - name: Create Meteor EC2 Enviornment
+      include: aws/ec2_meteor.yml
+
+- name: Launch Autoscaling Groups
+  hosts: localhost
+  connection: local
+  remote_user: root
+  gather_facts: no
+  tasks:
+
+    - name: Create Docker EC2 Enviornment
+      include: aws/ec2_docker.yml
+
+    - name: Create Meteor EC2 Enviornment
+      include: aws/ec2_meteor.yml
