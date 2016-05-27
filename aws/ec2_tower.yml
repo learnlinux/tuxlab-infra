@@ -6,7 +6,7 @@
    ec2_group:
       name: ansible_tower
       description: Security Group for Ansible Tower
-      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+
       aws_secret_key: "{{ AWS_SECRET_KEY }}"
       region: "{{ EC2_REGION }}"
       vpc_id: "{{ vpc.vpc_id }}"
@@ -33,7 +33,7 @@
 
  - name: Launch Tower Server
    ec2:
-     aws_access_key: "{{ AWS_ACCESS_KEY }}"
+
      aws_secret_key: "{{ AWS_SECRET_KEY }}"
      keypair: "tuxlab"
      image: "{{ TOWER_IMAGE }}"
@@ -69,7 +69,7 @@
    ec2_group:
       name: ansible_managment
       description: Security Group for Ansible Managment
-      aws_access_key: "{{ AWS_ACCESS_KEY }}"
+
       aws_secret_key: "{{ AWS_SECRET_KEY }}"
       region: "{{ EC2_REGION }}"
       vpc_id: "{{ vpc.vpc_id }}"

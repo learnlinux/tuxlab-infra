@@ -26,9 +26,11 @@ visible at `10.100.0.10:8080`.
 
 ## Running on AWS Cloud
 You need the following things:
- * Edit the `ansible/aws/vars/` based on your configuration.
- * Python, pip
+ * python, pip
  * `sudo pip install -U boto`
+ * Add your AWS Credentials to you boto configuration
  * Ansible
+ * Edit the `ansible/aws/vars/` based on your configuration.
+
 
  Then simply run: `ansible-playbook ./ansible/site.yml`
