@@ -27,7 +27,7 @@ visible at `10.100.0.10:8080`.
 ## Running on AWS Cloud
 You need the following things:
  * Install python and pip using your package manager
- * Install boto (`sudo pip install -U boto`)
+ * Install boto and tower-cli (`sudo pip install -U boto ansible-tower-cli`)
  * Create a boto profile including your access credentials (for example ~/.boto):
 
 ```

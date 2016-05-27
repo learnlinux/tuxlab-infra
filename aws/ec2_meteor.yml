@@ -7,8 +7,6 @@
       name: "tuxlab-meteor"
       subnets: "{{ vpc.subnets[0].id }}"
       region: "{{ EC2_REGION }}"
-      zones:
-        - "{{ EC2_AZ }}"
       state: present
       security_group_names: "meteor"
       connection_draining_timeout: 60
