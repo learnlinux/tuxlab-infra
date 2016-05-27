@@ -24,11 +24,6 @@
     unarchive: src={{deploy_app_dir}}/tuxlab-app.tar.gz dest={{deploy_app_dir}}/build
     when: binary_url is defined
 
-  - name: add github.com to known hosts
-    sudo: yes
-    known_hosts: host=github.com state=present
-    when: repo_url is defined
-
   - name: clone tuxlab source
     sudo: yes
     git: repo={{repo_url}}

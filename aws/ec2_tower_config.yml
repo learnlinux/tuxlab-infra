@@ -1,2 +1,5 @@
 ---
   - name: Install Ansible Tower License
+    pause: prompt="Navigate to  https://{{hostvars.ansible_tower.ansible_ssh_host }} and install license using username 'admin' and the password you set previously."
+
+  - 

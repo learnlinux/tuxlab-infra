@@ -54,6 +54,7 @@
     - name: Create Meteor EC2 Enviornment
       include: aws/ec2_meteor.yml
 
+# Launch Autoscaling Groups
 - name: Launch Autoscaling Groups
   hosts: localhost
   connection: local
