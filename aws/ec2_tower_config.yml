@@ -1,5 +1,27 @@
 ---
-  - name: Install Ansible Tower License
-    pause: prompt="Navigate to  https://{{hostvars.ansible_tower.ansible_ssh_host }} and install license using username 'admin' and the password you set previously."
+  - name: Get Ansible Tower Auth Token
+    uri:
+      url: "https://127.0.0.1//api/v1/authtoken"
+      method: POST
+      body: "{\"username\":\"admin\",\"password\":\"{{ANSIBLE_TOWER_PASS}}\"}"
+      body_format: json
+    register: access_token
 
-  - 
+  - name: Install Ansible Tower License
+    uri:
+      url: "https://127.0.0.1/api/v1/config/"
+      HEADER_Authorization: "Token {{access_token.token}}"
+      method: POST
+      body: "{\"license_info\":{{ANSIBLE_LICENSE}}, \"eula_accepted\" : true}"
+
+  #- name: Install AWS Credentials
+
+  #- name: Install SSH Credentials
+
+  #- name: Create TuxLab Inventory
+
+  #- name: Create TuxLab Inventory Group
+
+  #- name: Pull Project from Github
+
+  #- name: Create the Configuration Job Template

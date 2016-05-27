@@ -28,16 +28,12 @@ visible at `10.100.0.10:8080`.
 You need the following things:
  * Install python and pip using your package manager
  * Install boto and tower-cli (`sudo pip install -U boto ansible-tower-cli`)
- * Create a boto profile including your access credentials (for example ~/.boto):
-
-```
-[Credentials]
-aws_access_key_id = <your_access_key_here>
-aws_secret_access_key = <your_secret_key_here>
-```
-
  * Install Ansible
  * Edit the `aws/vars/` files based on your configuration.
+ * Set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY Enviornment Variables, and run the ansible playbook:
 
-
- Then simply run: `ansible-playbook ./ansible/site.yml`
+```
+export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXX
+export AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXX
+ansible-playbook ./ansible/site.yml
+```
