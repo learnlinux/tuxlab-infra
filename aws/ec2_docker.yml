@@ -9,7 +9,7 @@
         instance_type: "{{ DOCKER_INSTANCE_TYPE }}"
         key_name: "tuxlab"
         region: "{{ EC2_REGION }}"
-        security_groups: ["{{docker_sec_group.group_id}}", "{{ansible_sec_group.group_id}}"]
+        security_groups: ["{{docker_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]]
 
 # Creates an Autoscale Group for Docker
   - name: Create Docker Autoscale Group
