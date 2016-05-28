@@ -26,14 +26,14 @@ visible at `10.100.0.10:8080`.
 
 ## Running on AWS Cloud
 You need the following things:
- * Install python and pip using your package manager
- * Install boto and tower-cli (`sudo pip install -U boto ansible-tower-cli`)
- * Install Ansible
+ * Install Python, pip and Ansible via your package manager.
+ * Install boto and tower-cli using pip (`sudo pip install -U boto ansible-tower-cli`)
+ * Place your Ansible Tower license in /aws/keys/tower.txt, and add the JSON property `"eula_accepted" : true`, indicating you have read and accepted the Ansible Tower EULA.
  * Edit the `aws/vars/` files based on your configuration.
  * Set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY Enviornment Variables, and run the ansible playbook:
 
 ```
 export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXX
 export AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXX
-ansible-playbook ./ansible/site.yml
+ansible-playbook site.yml
 ```

@@ -1,27 +1,93 @@
 ---
-  - name: Get Ansible Tower Auth Token
-    uri:
-      url: "https://127.0.0.1//api/v1/authtoken"
+ - include: aws/vars/ec2.yml
+
+ - name: update apt
+   sudo: true
+   apt: update_cache=yes cache_valid_time=3600
+
+ - name: install pip
+   sudo: yes
+   apt: name=python-pip state=present
+
+ - name: install pexpect
+   sudo: yes
+   pip: name=pexpect
+
+ - name: create Ansible Tower admin password
+   expect:
+      command: sudo tower-manage changepassword admin
+      responses:
+        'Password: ' : '{{ ANSIBLE_TOWER_PASS }}'
+        'Password \(again\): ' : '{{ ANSIBLE_TOWER_PASS }}'
+
+ - name: get Ansible Tower auth token
+   uri:
+      url: "https://127.0.0.1/api/v1/authtoken/"
       method: POST
-      body: "{\"username\":\"admin\",\"password\":\"{{ANSIBLE_TOWER_PASS}}\"}"
+      validate_certs: False
       body_format: json
-    register: access_token
+      body: "{\"username\":\"admin\",\"password\":\"{{ANSIBLE_TOWER_PASS}}\"}"
+   register: access_token
 
-  - name: Install Ansible Tower License
-    uri:
+ - name: install Ansible tower license
+   uri:
       url: "https://127.0.0.1/api/v1/config/"
-      HEADER_Authorization: "Token {{access_token.token}}"
+      body_format: json
+      validate_certs: False
+      HEADER_Authorization: "Token {{access_token.json.token}}"
       method: POST
-      body: "{\"license_info\":{{ANSIBLE_LICENSE}}, \"eula_accepted\" : true}"
+      body: "{{ lookup('file', './aws/keys/tower.txt') }}"
+   register: tower_license
 
-  #- name: Install AWS Credentials
+ - name: Install AWS Credentials
+   uri:
+      url: "https://127.0.0.1/api/v1/credentials/"
+      body_format: json
+      method: POST
+      validate_certs: False
+      HEADER_Authorization: "Token {{access_token.json.token}}"
+      body: |
+            '{
+              "name" : "AWS Creds",
+              "description" : "AWS Credentials",
+              "user" : 1,
+              "kind" : "aws",
+              "username" : "{{ AWS_ACCESS_KEY_ID }}",
+              "password" : "{{ AWS_SECRET_ACCESS_KEY }}"
+            }'
 
-  #- name: Install SSH Credentials
+ - name: Install SSH Credentials
+   uri:
+      url: "https://127.0.0.1/api/v1/credentials/"
+      body_format: json
+      method: POST
+      validate_certs: False
+      HEADER_Authorization: "Token {{access_token.json.token}}"
+      body: |
+            '{
+              "name" : "EC2 SSH Key",
+              "description" : "SSH Key used to connect to TuxLab nodes",
+              "user" : 1,
+              "kind" : "ssh",
+              "ssh_key_data" : "{{ lookup('file', './aws/keys/ssh') }}"
+             }'
 
-  #- name: Create TuxLab Inventory
+ - name: Create TuxLab Inventory
+   uri:
+      url: "https://127.0.0.1/api/v1/inventories/"
+      body_format: json
+      method: POST
+      validate_certs: False
+      HEADER_Authorization: "Token {{access_token.json.token}}"
+      body: |
+            '{
+              "name" : "TuxLab Inventory",
+              "description" : "Inventory for TuxLab nodes",
+              "organization" : 1
+             }'
 
-  #- name: Create TuxLab Inventory Group
+ - name: Create TuxLab Inventory Group
 
-  #- name: Pull Project from Github
+ - name: Pull Project from Github
 
-  #- name: Create the Configuration Job Template
+ - name: Create the Configuration Job Template
