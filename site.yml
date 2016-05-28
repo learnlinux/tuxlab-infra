@@ -30,22 +30,12 @@
     vars_prompt:
 
       - name: "ANSIBLE_TOWER_PASS"
-        prompt: "Create an Ansible Tower admin password:"
+        prompt: "Ansible Tower password"
         private: yes
         confirm: yes
 
-      - name: "ANSIBLE_LICENSE"
-        prompt: "Paste your Ansible Tower license key:"
-
     tasks:
-      - name: Create Ansible Tower Admin Password
-        expect:
-            command: sudo tower-manage changepassword admin
-            responses:
-              "Password:" : "{{ ANSIBLE_TOWER_PASS }}"
-              "Password (again):" : "{{ ANSIBLE_TOWER_PASS }}"
-
-      - name: Configue Ansible Tower for AWS
+      - name: Configure Ansible Tower for AWS
         include: aws/ec2_tower_config.yml
 
 # Launch Autoscaling Groups
