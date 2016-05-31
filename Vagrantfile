@@ -33,9 +33,12 @@ Vagrant.configure(2) do |vagrant|
       # Add to Network
       dswarm.vm.network "private_network", ip: "10.100.1.10"
       dswarm.vm.network "forwarded_port", guest: 2375, host: 2375
+      dswarm.vm.network "forwarded_port", guest: 2379, host: 2379
+      dswarm.vm.network "forwarded_port", guest: 4001, host: 4001
+      dswarm.vm.network "forwarded_port", guest: 9000, host: 9000
 
       # Create Container Forwarded Ports
-      for i in 32768..32867
+      for i in 32768..32799
         dswarm.vm.network "forwarded_port", guest: i, host: i
       end
 
