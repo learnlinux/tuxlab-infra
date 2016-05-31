@@ -26,10 +26,11 @@
   service: name=docker-tcp.socket state=started
 
 - name: start swarm-agent
-  shell: docker run -d --name swarm-agent --net=host swarm:latest join --addr={{ swarm_node_ip }}:2376 etcd://127.0.0.1:2379
+  shell: docker run -d --name swarm-agent --net=host swarm:latest join --addr={{ swarm_node_ip }}:2375 etcd://127.0.0.1:2379
 
 - name: pull alpine container images with sshd
-  shell: git clone https://github.com/learnlinux/docker-sshd.git
+  sudo: true
+  git: repo=https://github.com/learnlinux/docker-sshd.git dest=docker-sshd
 
 - name: create tuxlab_sshd image
   shell: cd docker-sshd; docker build -t tuxlab_sshd .
