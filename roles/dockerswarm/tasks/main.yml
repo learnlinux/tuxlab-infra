@@ -4,12 +4,3 @@
 
 - name: start etcd
   shell: sudo systemctl start etcd
-
-- name: pull dns repo
-  shell: git clone https://github.com/learnlinux/helixdns.git
-
-- name: create dns image from binary
-  shell: cd ~/helixdns/docker; docker build -t tuxlab_dns .
-
-- name: start dns container
-  shell: docker run -d --name swarm-dns tuxlab_dns ./hdns

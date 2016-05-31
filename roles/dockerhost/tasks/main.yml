@@ -1,5 +1,9 @@
 ---
 
+- name: install docker-py
+  sudo: true
+  pip: name=docker-py
+
 - name: copy docker conf
   sudo: true
   template: >
@@ -32,5 +36,7 @@
   sudo: true
   git: repo=https://github.com/learnlinux/docker-sshd.git dest=docker-sshd
 
-- name: create tuxlab_sshd image
-  shell: cd docker-sshd; docker build -t tuxlab_sshd .
+- name: build tuxlab_sshd image
+  docker_image:
+    path: ~/docker-sshd
+    name: tuxlab_sshd
