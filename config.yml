@@ -2,11 +2,35 @@
   # This playbook is executed by Vagrant or  Ansible Tower to configure
   # new hosts once they have been provisioned.
 
+  - name: Setup ETCD Discovery
+    hosts: all
+    gather_facts: no
+    tasks:
+       - name: Check if Swarm URL is Set
+         local_action: stat path=~/.tuxlab/discovery_url
+         ignore_errors: true
+         register: etcd_discovery_file
+
+       - name: Create ETCD Discovery URL
+         local_action: uri url=https://discovery.etcd.io/new?size=2 return_content=yes
+         register: etcd_discovery_web
+         when: not etcd_discovery_file.stat.exists
+
+       - name: Save to TuxLab Config Folder
+         local_action: copy content="{{etcd_discovery_web.content}}" dest=~/.tuxlab/discovery_url
+         when: not etcd_discovery_file.stat.exists
+
+       - name: Load Discovery URL
+         local_action: set_fact etcd_discovery="{{ lookup('file', '~/.tuxlab/discovery_url') }}"
+
   - name: Configure Meteor Hosts
     hosts: tuxlab-meteor
     sudo: yes
+    vars:
+        etcd_interface: eth0
     roles:
       - rhel
+      - etcd
       - nodejs
       - meteor
       - tuxlab-app
@@ -17,9 +41,16 @@
     vars:
       ansible_ssh_user: core
       ansible_python_interpreter: "PATH=/home/core/bin:$PATH python"
+
+      etcd_user: etcd
+      etcd_interface: "eth1"
+      etcd_dir: "/usr/bin"
+      etcd_cmd: "{{ etcd_dir }}/etcd2"
+      etcd_data_dir: "/var/lib/etcd2"
     roles:
       - defunctzombie.coreos-bootstrap
       - coreos
+      - etcd
       - dockerhost
 
   - name: Configure Swarm Manager

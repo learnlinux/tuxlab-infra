@@ -18,3 +18,11 @@
   rpm_key:
     key: "{{ epel_repo_gpg_key_url }}"
     state: present
+
+- name: Install git
+  sudo: true
+  yum: name=git state=latest
+
+- name: Install etcd
+  sudo: true
+  yum: name=etcd state=latest

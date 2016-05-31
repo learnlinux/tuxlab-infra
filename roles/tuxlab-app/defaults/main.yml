@@ -11,4 +11,4 @@ repo_url: https://github.com/learnlinux/tuxlab-app.git
 
 # Meteor Settings
 deploy_dir: /var/www
-deploy_app_dir: /var/www/tuxlab
+deploy_app_dir: /var/www/build

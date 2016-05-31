@@ -14,7 +14,7 @@ Vagrant.configure(2) do |vagrant|
       v.cpus = 1
     end
 
-  # Docker Swarm Controller
+  # TuxLab Swarm Controller
     vagrant.vm.define "dswarm" do |dswarm|
       dswarm.vm.box = "coreos-stable"
       dswarm.vm.box_url = "https://storage.googleapis.com/stable.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
@@ -43,7 +43,6 @@ Vagrant.configure(2) do |vagrant|
       dswarm.vm.provision :ansible do |ansible|
         ansible.playbook = "./config.yml"
         ansible.groups = {
-           'tuxlab-swarm-host' => ["dswarm"],
            'tuxlab-swarm-manager' => ["dswarm"]
          }
         ansible.extra_vars = {
@@ -51,6 +50,43 @@ Vagrant.configure(2) do |vagrant|
         }
       end
     end
+
+    # TuxLab Swarm Host
+      vagrant.vm.define "dhost" do |dswarm|
+        dswarm.vm.box = "coreos-stable"
+        dswarm.vm.box_url = "https://storage.googleapis.com/stable.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
+
+        # Disable Guest Additions Installing on CoreOS
+            dswarm.vm.provider :virtualbox do |v|
+              # On VirtualBox, we don't have guest additions or a functional vboxsf
+              # in CoreOS, so tell Vagrant that so it can be smarter.
+              v.check_guest_additions = false
+              v.functional_vboxsf     = false
+            end
+            if Vagrant.has_plugin?("vagrant-vbguest") then
+              dswarm.vbguest.auto_update = false
+            end
+
+        # Add to Network
+        dswarm.vm.network "private_network", ip: "10.100.1.10"
+        dswarm.vm.network "forwarded_port", guest: 2375, host: 2375
+
+        # Create Container Forwarded Ports
+        for i in 32768..32867
+          dswarm.vm.network "forwarded_port", guest: i, host: i
+        end
+
+        # Configure via Ansible
+        dswarm.vm.provision :ansible do |ansible|
+          ansible.playbook = "./config.yml"
+          ansible.groups = {
+             'tuxlab-swarm-host' => ["dhost"]
+           }
+          ansible.extra_vars = {
+            swarm_node_ip: "10.100.1.10"
+          }
+        end
+      end
 
   # MongoDB Host
     vagrant.vm.define "mongodb" do |mongodb|

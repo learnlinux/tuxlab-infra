@@ -1,0 +1,16 @@
+---
+
+- name: add etcd systemd service
+  sudo: true
+  template: src=etc/systemd/system/etcd.j2
+            dest=/etc/systemd/system/etcd.service
+            mode=0644
+
+- name: Reload systemctl
+  sudo: true
+  shell: systemctl daemon-reload
+
+- name: Restart etcd
+  sudo: true
+  service: name=etcd
+           enabled=yes
