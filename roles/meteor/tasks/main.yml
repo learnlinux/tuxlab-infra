@@ -1,5 +1,6 @@
 ---
 # Install meteor
 - name: install meteor
-  sudo: yes
+  become: yes
+  become_method: sudo
   shell: curl https://install.meteor.com | /bin/sh

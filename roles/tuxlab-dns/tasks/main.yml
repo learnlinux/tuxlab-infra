@@ -1,0 +1,16 @@
+- name: pull dns repo
+  git: repo=https://github.com/learnlinux/helixdns.git
+       dest=~/helixdns
+
+- name: build tuxlab_dns image from binary
+  docker_image:
+    path: ~/helixdns/docker
+    name: tuxlab_dns
+
+- name: start dns container
+  docker:
+    name: swarm-dns
+    image: tuxlab_dns
+    ports:
+    - "53"
+    command: ./hdns
