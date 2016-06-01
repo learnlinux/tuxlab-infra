@@ -29,3 +29,6 @@
 - name: Install pip launcher
   copy: src=runner dest=~/bin/pip mode=0755
   when: need_pip | failed
+
+- name: Gather Facts
+  setup:

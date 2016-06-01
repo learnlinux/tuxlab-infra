@@ -1,42 +1,45 @@
 ---
   - name: Create {{ deploy_dir }}
     sudo: yes
-    file: name={{ item }} owner=root group=root
+    file: name={{ item }} state=directory owner=root group=root recurse=yes
     with_items:
       - "{{ deploy_dir }}"
-      - "{{ deploy_app_dir }}"
 
   - name: remove current build
     sudo: yes
-    file: path={{ deploy_app_dir }}/build state=absent recurse=no
+    file: path={{ deploy_app_dir }} state=absent
 
   - name: create build directory
     sudo: yes
     file: name={{ item }} state=directory owner=root group=root
     with_items:
-      - "{{deploy_app_dir}}/build"
+      - "{{ deploy_dir }}"
 
   - name: download binary
-    get_url: url={{ release_url }} dest={{deploy_app_dir}}/tuxlab-app.tar.gz
+    get_url: url={{ release_url }} dest={{deploy_dir}}/tuxlab-app.tar.gz
     when: binary_url is defined
 
   - name: unzip binary
-    unarchive: src={{deploy_app_dir}}/tuxlab-app.tar.gz dest={{deploy_app_dir}}/build
+    unarchive: src={{deploy_dir}}/tuxlab-app.tar.gz dest={{deploy_app_dir}}
     when: binary_url is defined
 
-  - name: clone tuxlab source
+  - name: add github.com to known hosts
     sudo: yes
+    known_hosts: host=github.com state=present
+    when: repo_url is defined
+
+  - name: clone tuxlab source
     git: repo={{repo_url}}
-         dest={{deploy_app_dir}}
+         dest={{deploy_dir}}
     when: repo_url is defined
 
   - name: install npm dependencies
-    npm: path={{deploy_app_dir}} production=yes
+    npm: path={{deploy_dir}} production=yes
     when: repo_url is defined
 
   - name: build tuxlab app
     sudo: yes
-    shell: meteor build --directory {{deploy_app_dir}}/build chdir={{deploy_app_dir}}
+    shell: meteor build --directory {{deploy_app_dir}} chdir={{deploy_dir}}
     when: repo_url is defined
 
   - name: restart nginx
@@ -52,6 +55,6 @@
       PORT=80
       MONGO_URL={{ mongo_url }}
       ROOT_URL={{ root_url }}
-      forever start "{{ deploy_app_dir }}"/build/main.js
+      forever start "{{ deploy_app_dir }}"/main.js
     async: 10
     poll: 1

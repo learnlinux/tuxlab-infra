@@ -1,5 +1,10 @@
 ---
+
+- name: Reload systemctl
+  sudo: true
+  shell: systemctl daemon-reload
+
 - name: Restart etcd
+  sudo: true
   service: name=etcd
-           state=restarted
            enabled=yes

@@ -1,7 +1,7 @@
 ---
 etcd_dir: /usr/local/sbin
 etcd_data_dir: /var/cache/etcd/state
-etcd_cmd: "etcd"
+etcd_cmd: "{{ etcd_dir }}/etcd"
 
 # The user only applies to EL distros
 etcd_user: root
