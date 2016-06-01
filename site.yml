@@ -38,6 +38,9 @@
       - name: Configure Ansible Tower for AWS
         include: aws/ec2_tower_config.yml
 
+# Launch Swarm Master
+
+
 # Launch Autoscaling Groups
   - name: Launch Autoscaling Groups
     hosts: localhost
@@ -46,7 +49,7 @@
     gather_facts: no
     tasks:
       - name: Create Docker EC2 Enviornment
-        include: aws/ec2_docker.yml
+        include: aws/ec2_dockerhost.yml
 
       - name: Create Meteor EC2 Enviornment
         include: aws/ec2_meteor.yml

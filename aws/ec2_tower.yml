@@ -47,7 +47,7 @@
    wait_for:
       host: "{{ item.public_dns_name }}"
       state: started
-      timeout: 320
+      timeout: 640
       port: 22
    with_items: "{{ tower_instance.instances }}"
 

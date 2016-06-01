@@ -27,7 +27,7 @@
     hosts: tuxlab-meteor
     sudo: yes
     vars:
-        etcd_interface: eth0
+        etcd_interface: "eth0"
     roles:
       - rhel
       - etcd
@@ -35,7 +35,7 @@
       - meteor
       - tuxlab-app
 
-  - name: Configure Swarm Hosts
+  - name: Configure Swarm Engine
     hosts: tuxlab-swarm-host:tuxlab-swarm-manager
     gather_facts: no
     vars:
@@ -51,8 +51,8 @@
       - defunctzombie.coreos-bootstrap
       - coreos
       - etcd
-      - dockerhost
-
+      - dockerengine
+  
   - name: Configure Swarm Manager
     hosts: tuxlab-swarm-manager
     gather_facts: no

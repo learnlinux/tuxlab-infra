@@ -23,8 +23,8 @@
  - name: get Ansible Tower auth token
    uri:
       url: "https://127.0.0.1/api/v1/authtoken/"
-      method: POST
       validate_certs: False
+      method: POST
       body_format: json
       body: "{\"username\":\"admin\",\"password\":\"{{ANSIBLE_TOWER_PASS}}\"}"
    register: access_token
@@ -32,12 +32,14 @@
  - name: install Ansible tower license
    uri:
       url: "https://127.0.0.1/api/v1/config/"
-      body_format: json
       validate_certs: False
+      body_format: json
       HEADER_Authorization: "Token {{access_token.json.token}}"
       method: POST
       body: "{{ lookup('file', './aws/keys/tower.txt') }}"
    register: tower_license
+
+ - debug: var=tower_license
 
  - name: Install AWS Credentials
    uri:
@@ -59,9 +61,9 @@
  - name: Install SSH Credentials
    uri:
       url: "https://127.0.0.1/api/v1/credentials/"
+      validate_certs: False
       body_format: json
       method: POST
-      validate_certs: False
       HEADER_Authorization: "Token {{access_token.json.token}}"
       body: |
             '{
@@ -75,9 +77,9 @@
  - name: Create TuxLab Inventory
    uri:
       url: "https://127.0.0.1/api/v1/inventories/"
+      validate_certs: False
       body_format: json
       method: POST
-      validate_certs: False
       HEADER_Authorization: "Token {{access_token.json.token}}"
       body: |
             '{
@@ -87,7 +89,74 @@
              }'
 
  - name: Create TuxLab Inventory Group
+   uri:
+     url: "https://127.0.0.1/api/v1/groups/"
+     validate_certs: False
+     body_format: json
+     method: POST
+     HEADER_Authorization: "Token {{access_token.json.token}}"
+     body: |
+           '{
+             "name":"EC2 Inventory",
+             "description": "TuxLab EC2 Inventory",
+             "inventory": 1,
+             "variables":"",
+           }'
+
+ - name: Create EC2 Inventory Source
+   uri:
+     url: "https://127.0.0.1/api/v1/inventory_sources/1/"
+     validate_certs: False
+     body_format: json
+     method: PUT
+     HEADER_Authorization: "Token {{access_token.json.token}}"
+     body: |
+           '{
+             "group" : 1,
+             "credential" : 1,
+             "group_by" : "",
+             "instance_filters" : ""
+             "overwrite": false,
+             "overwrite_vars": false,
+             "source":"ec2",
+             "source_path":""
+             "source_regions":"{{EC2_REGION}}"
+             "source_script":null
+             "source_vars":""
+             update_cache_timeout:0
+             update_on_launch: false
+           }'
 
  - name: Pull Project from Github
+   uri:
+       url: "https://127.0.0.1/api/v1/projects/"
+       validate_certs: False
+       body_format: json
+       method: POST
+       HEADER_Authorization: "Token {{access_token.json.token}}"
+       body: |
+             '{
+               "name" : "tuxlab-infra",
+               "description" : "",
+               "scm_type" : "git",
+               "scm_url" : "https://github.com/learnlinux/tuxlab-infra.git",
+               "scm_branch" : "master"
+             }'
 
  - name: Create the Configuration Job Template
+   uri:
+       url: "https://127.0.0.1/api/v1/job_templates/"
+       validate_certs: False
+       body_format: json
+       method: POST
+       HEADER_Authorization: "Token {{access_token.json.token}}"
+       body: |
+            '{
+              "name" : "TuxLab Configuration",
+              "description" : "Automatically configures new EC2 servers to run the TuxLab app.",
+              "job_type" : "run",
+              "inventory" : 1,
+              "project" : 1,
+              "playbook" : "config.yml",
+              "credential" : 2
+            }'
