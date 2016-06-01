@@ -43,7 +43,8 @@ After bootstrap, you can use ansible as usual to manage system services, install
 ```yaml
 - name: Nginx Example
   hosts: web
-  sudo: true
+  become: yes
+  become_method: sudo
   tasks:
     - name: Start etcd
       service: name=etcd.service state=started

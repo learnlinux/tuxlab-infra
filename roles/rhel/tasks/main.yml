@@ -1,6 +1,7 @@
 ---
 - name: update packages
-  sudo: true
+  become: yes
+  become_method: sudo
   yum: name=* state=latest
 
 - name: Install EPEL repo.
@@ -8,13 +9,15 @@
     name: "{{ epel_repo_url }}"
     state: present
   register: result
-  sudo: true
+  become: yes
+  become_method: sudo
   until: '"failed" not in result'
   retries: 5
   delay: 10
 
 - name: Import EPEL GPG key.
-  sudo: true
+  become: yes
+  become_method: sudo
   rpm_key:
     key: "{{ epel_repo_gpg_key_url }}"
     state: present
