@@ -45,7 +45,16 @@
       - coreos
       - etcd
       - dockerengine
-  
+
+  - name: Configure Swarm Hosts
+    hosts: tuxlab-swarm-host
+    gather_facts: no
+    vars:
+      ansible_ssh_user: core
+      ansible_python_interpreter: "/home/core/bin/python"
+    roles:
+      - tuxlab-sshd
+
   - name: Configure Swarm Manager
     hosts: tuxlab-swarm-manager
     gather_facts: no
@@ -54,3 +63,4 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
     - dockerswarm
+    - tuxlab-dns
