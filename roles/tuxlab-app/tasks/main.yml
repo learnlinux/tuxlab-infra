@@ -1,17 +1,20 @@
 ---
   - name: Create {{ deploy_dir }}
-    sudo: yes
+    become: yes
+    become_method: sudo
     file: name={{ item }} owner=root group=root
     with_items:
       - "{{ deploy_dir }}"
       - "{{ deploy_app_dir }}"
 
   - name: remove current build
-    sudo: yes
+    become: yes
+    become_method: sudo
     file: path={{ deploy_app_dir }}/build state=absent recurse=no
 
   - name: create build directory
-    sudo: yes
+    become: yes
+    become_method: sudo
     file: name={{ item }} state=directory owner=root group=root
     with_items:
       - "{{deploy_app_dir}}/build"
@@ -25,7 +28,8 @@
     when: binary_url is defined
 
   - name: clone tuxlab source
-    sudo: yes
+    become: yes
+    become_method: sudo
     git: repo={{repo_url}}
          dest={{deploy_app_dir}}
     when: repo_url is defined
@@ -35,19 +39,22 @@
     when: repo_url is defined
 
   - name: build tuxlab app
-    sudo: yes
+    become: yes
+    become_method: sudo
     shell: meteor build --directory {{deploy_app_dir}}/build chdir={{deploy_app_dir}}
     when: repo_url is defined
 
   - name: restart nginx
-    sudo: yes
+    become: yes
+    become_method: sudo
     service: name=nginx state=restarted
 
   - name: install forvever
     npm: name=forever global=yes state=present
 
   - name: start tuxlab app
-    sudo: yes
+    become: yes
+    become_method: sudo
     shell:  >
       PORT=80
       MONGO_URL={{ mongo_url }}

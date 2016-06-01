@@ -1,11 +1,14 @@
 ---
 
 - name: install docker-py
-  sudo: true
-  pip: name=docker-py
+  become: yes
+  become_method: sudo
+  become_user: core
+  pip: name=docker-py executable=~/bin/pip
 
 - name: copy docker conf
-  sudo: true
+  become: yes
+  become_method: sudo
   template: >
     src=docker-tcp-socket.j2
     dest=/etc/systemd/system/docker-tcp.socket
@@ -14,26 +17,31 @@
     mode=0644
 
 - name: enable remote api socket
-  sudo: true
+  become: yes
+  become_method: sudo
   service: name=docker-tcp.socket enabled=yes
 
 - name: stop docker service
-  sudo: true
+  become: yes
+  become_method: sudo
   service: name=docker-tcp.socket state=stopped
 
 - name: start remote api socket
-  sudo: true
+  become: yes
+  become_method: sudo
   service: name=docker-tcp.socket state=started
 
 - name: start docker service
-  sudo: true
+  become: yes
+  become_method: sudo
   service: name=docker-tcp.socket state=started
 
 - name: start swarm-agent
   shell: docker run -d --name swarm-agent --net=host swarm:latest join --addr={{ swarm_node_ip }}:2375 etcd://127.0.0.1:2379
 
 - name: pull alpine container images with sshd
-  sudo: true
+  become: yes
+  become_method: sudo
   git: repo=https://github.com/learnlinux/docker-sshd.git dest=docker-sshd
 
 - name: build tuxlab_sshd image

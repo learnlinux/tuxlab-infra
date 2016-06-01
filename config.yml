@@ -4,7 +4,8 @@
 
   - name: Configure Meteor Hosts
     hosts: tuxlab-meteor
-    sudo: yes
+    become: yes
+    become_method: sudo
     roles:
       - rhel
       - nodejs
@@ -16,7 +17,7 @@
     gather_facts: no
     vars:
       ansible_ssh_user: core
-      ansible_python_interpreter: "PATH=/home/core/bin:$PATH python"
+      ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - defunctzombie.coreos-bootstrap
       - coreos
@@ -27,6 +28,6 @@
     gather_facts: no
     vars:
       ansible_ssh_user: core
-      ansible_python_interpreter: "PATH=/home/core/bin:$PATH python"
+      ansible_python_interpreter: "/home/core/bin/python"
     roles:
     - dockerswarm

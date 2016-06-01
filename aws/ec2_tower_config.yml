@@ -2,15 +2,18 @@
  - include: aws/vars/ec2.yml
 
  - name: update apt
-   sudo: true
+   become: yes
+   become_method: sudo
    apt: update_cache=yes cache_valid_time=3600
 
  - name: install pip
-   sudo: yes
+   become: yes
+   become_method: sudo
    apt: name=python-pip state=present
 
  - name: install pexpect
-   sudo: yes
+   become: yes
+   become_method: sudo
    pip: name=pexpect
 
  - name: create Ansible Tower admin password

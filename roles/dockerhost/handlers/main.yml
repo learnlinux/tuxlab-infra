@@ -1,12 +1,14 @@
 ---
 - name: restart docker
-  sudo: true
+  become: yes
+  become_method: sudo
   service: >
     name=docker
     state=restarted
 
 - name: restart remote api
-  sudo: true
+  become: yes
+  become_method: sudo
   service: >
     name=docker-tcp.socket
     state=restrarted

@@ -2,9 +2,11 @@
 
 # Install meteor
 - name: install nodejs
-  sudo: yes
+  become: yes
+  become_method: sudo
   yum: name=nodejs enablerepo=epel state=latest
 
 - name: install npm
-  sudo: yes
+  become: yes
+  become_method: sudo
   yum: name=npm enablerepo=epel state=latest
