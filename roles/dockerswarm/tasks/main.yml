@@ -3,4 +3,6 @@
   shell: docker run -d --name swarm-manager --net=host swarm:latest manage etcd://127.0.0.1:2379
 
 - name: start etcd
-  shell: sudo systemctl start etcd
+  become: yes
+  become_method: sudo
+  shell: systemctl start etcd
