@@ -42,7 +42,7 @@
       body: "{{ lookup('file', './aws/keys/tower.txt') }}"
    register: tower_license
 
- - debug: var=tower_license
+ - debug: var=tower_license verbosity=3
 
  - name: Install AWS Credentials
    uri:
@@ -51,15 +51,18 @@
       method: POST
       validate_certs: False
       HEADER_Authorization: "Token {{access_token.json.token}}"
-      body: |
-            '{
-              "name" : "AWS Creds",
-              "description" : "AWS Credentials",
-              "user" : 1,
-              "kind" : "aws",
-              "username" : "{{ AWS_ACCESS_KEY_ID }}",
-              "password" : "{{ AWS_SECRET_ACCESS_KEY }}"
-            }'
+      body: {
+              name : "AWS Creds",
+              description : "AWS Credentials",
+              user : 1,
+              kind : "aws",
+              username :  "{{ lookup('env','AWS_ACCESS_KEY_ID') }}",
+              password :  "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
+            }
+      status_code: 201
+   register: ec2_aws_credentials
+
+ - debug: var=ec2_aws_credentials verbosity=3
 
  - name: Install SSH Credentials
    uri:
@@ -68,14 +71,17 @@
       body_format: json
       method: POST
       HEADER_Authorization: "Token {{access_token.json.token}}"
-      body: |
-            '{
-              "name" : "EC2 SSH Key",
-              "description" : "SSH Key used to connect to TuxLab nodes",
-              "user" : 1,
-              "kind" : "ssh",
-              "ssh_key_data" : "{{ lookup('file', './aws/keys/ssh') }}"
-             }'
+      body: {
+              name : "EC2 SSH Key",
+              description : "SSH Key used to connect to TuxLab nodes",
+              user : 1,
+              kind : "ssh",
+              ssh_key_data : "{{ lookup('file', './aws/keys/ssh') }}",
+             }
+      status_code: 201
+   register: ec2_ssh_credentials
+
+ - debug: var=ec2_ssh_credentials verbosity=3
 
  - name: Create TuxLab Inventory
    uri:
@@ -84,12 +90,15 @@
       body_format: json
       method: POST
       HEADER_Authorization: "Token {{access_token.json.token}}"
-      body: |
-            '{
-              "name" : "TuxLab Inventory",
-              "description" : "Inventory for TuxLab nodes",
-              "organization" : 1
-             }'
+      body: {
+              name : "TuxLab Inventory",
+              description : "Inventory for TuxLab nodes",
+              organization : 1
+             }
+      status_code: 201
+   register: ec2_inventory
+
+ - debug: var=ec2_inventory verbosity=3
 
  - name: Create TuxLab Inventory Group
    uri:
@@ -98,68 +107,103 @@
      body_format: json
      method: POST
      HEADER_Authorization: "Token {{access_token.json.token}}"
-     body: |
-           '{
-             "name":"EC2 Inventory",
-             "description": "TuxLab EC2 Inventory",
-             "inventory": 1,
-             "variables":"",
-           }'
+     body: {
+             name: "EC2 Inventory",
+             description: "TuxLab EC2 Inventory",
+             inventory: "{{ ec2_inventory.json.id }}",
+             variables: ""
+           }
+     status_code: 201
+   register: ec2_inventory_group
+
+ - debug: var=ec2_inventory_group verbosity=3
 
  - name: Create EC2 Inventory Source
    uri:
-     url: "https://127.0.0.1/api/v1/inventory_sources/1/"
+     url: "https://127.0.0.1{{ ec2_inventory_group.json.related.inventory_source }}"
      validate_certs: False
      body_format: json
      method: PUT
      HEADER_Authorization: "Token {{access_token.json.token}}"
-     body: |
-           '{
-             "group" : 1,
-             "credential" : 1,
-             "group_by" : "",
-             "instance_filters" : ""
-             "overwrite": false,
-             "overwrite_vars": false,
-             "source":"ec2",
-             "source_path":""
-             "source_regions":"{{EC2_REGION}}"
-             "source_script":null
-             "source_vars":""
-             update_cache_timeout:0
-             update_on_launch: false
-           }'
+     body: {
+             group : "{{ ec2_inventory_group.json.id }}",
+             credential : "{{ ec2_aws_credentials.json.id }}",
+             group_by : "",
+             instance_filters : "",
+             overwrite : false,
+             overwrite_vars : false,
+             source : "ec2",
+             source_path : "",
+             source_regions : "{{EC2_REGION}}",
+             source_vars : "",
+             update_cache_timeout : 0,
+             update_on_launch : false
+           }
+     status_code: 200
+   register: ec2_inventory_source
+
+ - debug: var=ec2_inventory_source verbosity=3
 
  - name: Pull Project from Github
    uri:
-       url: "https://127.0.0.1/api/v1/projects/"
-       validate_certs: False
-       body_format: json
-       method: POST
-       HEADER_Authorization: "Token {{access_token.json.token}}"
-       body: |
-             '{
-               "name" : "tuxlab-infra",
-               "description" : "",
-               "scm_type" : "git",
-               "scm_url" : "https://github.com/learnlinux/tuxlab-infra.git",
-               "scm_branch" : "master"
-             }'
+     url: "https://127.0.0.1/api/v1/projects/"
+     validate_certs: False
+     body_format: json
+     method: POST
+     HEADER_Authorization: "Token {{access_token.json.token}}"
+     body: {
+             name : "tuxlab-infra",
+             description : "",
+             scm_type : "git",
+             scm_url : "https://github.com/learnlinux/tuxlab-infra.git",
+             scm_branch : "master"
+            }
+     status_code: 201
+   register: ec2_project
+
+ - debug: var=ec2_project verbosity=3
+
+ - name: Wait for Git to Pull
+   uri:
+     url: "https://127.0.0.1{{ ec2_project.json.url }}"
+     validate_certs: False
+     body_format: json
+     method: GET
+     HEADER_Authorization: "Token {{access_token.json.token}}"
+     status_code: 200
+   register: ec2_project_status
+   until: ec2_project_status.json.status == "successful"
+   retries: 10
+   delay: 10
+
+ - name: Generate Config Key
+   set_fact:
+     host_config_key : "{{ lookup('pipe',;date +%s) | hash('md5') }}"
 
  - name: Create the Configuration Job Template
    uri:
-       url: "https://127.0.0.1/api/v1/job_templates/"
-       validate_certs: False
-       body_format: json
-       method: POST
-       HEADER_Authorization: "Token {{access_token.json.token}}"
-       body: |
-            '{
-              "name" : "TuxLab Configuration",
-              "description" : "Automatically configures new EC2 servers to run the TuxLab app.",
-              "job_type" : "run",
-              "inventory" : 1,
-              "project" : 1,
-              "playbook" : "config.yml",
-              "credential" : 2
-            }'
+     url: "https://127.0.0.1/api/v1/job_templates/"
+     validate_certs: False
+     body_format: json
+     method: POST
+     HEADER_Authorization: "Token {{access_token.json.token}}"
+     body: {
+             name : "TuxLab Configuration",
+             description : "Automatically configures new EC2 servers to run the TuxLab app.",
+             job_type : "run",
+             inventory : "{{ ec2_inventory.json.id }}",
+             project : "{{ ec2_project.json.id }}",
+             credential : "{{ ec2_ssh_credentials.json.id }}",
+             cloud_credential: "{{ ec2_aws_credentials.json.id }}",
+             playbook : "config.yml",
+             host_config_key: "{{ host_config_key }}",
+             forks: 0
+            }
+     status_code: 201
+   register: ec2_job_template
+
+ - debug: var=ec2_job_template verbosity=3
+
+ - name: Generate Config Key
+   set_fact:
+     job_template_id: "{{ ec2_job_template.json.id}}"
