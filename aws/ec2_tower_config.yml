@@ -178,7 +178,7 @@
 
  - name: Generate Config Key
    set_fact:
-     host_config_key : "{{ lookup('pipe',;date +%s) | hash('md5') }}"
+     host_config_key : "{{ lookup('pipe','date +%s') | hash('md5') }}"
 
  - name: Create the Configuration Job Template
    uri:
@@ -204,6 +204,6 @@
 
  - debug: var=ec2_job_template verbosity=3
 
- - name: Generate Config Key
+ - name: Save Job Template ID
    set_fact:
      job_template_id: "{{ ec2_job_template.json.id}}"

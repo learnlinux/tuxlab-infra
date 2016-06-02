@@ -24,7 +24,7 @@
          local_action: set_fact etcd_discovery="{{ lookup('file', '~/.tuxlab/discovery_url') }}"
 
   - name: Configure Meteor Hosts
-    hosts: tuxlab-meteor
+    hosts: tuxlab-meteor:security_group_meteor
     become: yes
     become_method: sudo
     vars:
@@ -37,7 +37,7 @@
       - tuxlab-app
 
   - name: Configure Swarm Engine
-    hosts: tuxlab-swarm-host:tuxlab-swarm-manager
+    hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
     gather_facts: no
     vars:
       ansible_ssh_user: core
@@ -55,7 +55,7 @@
       - dockerengine
 
   - name: Configure Swarm Hosts
-    hosts: tuxlab-swarm-host
+    hosts: tuxlab-swarm-host:security_group_docker_host
     gather_facts: no
     vars:
       ansible_ssh_user: core
@@ -64,7 +64,7 @@
       - tuxlab-sshd
 
   - name: Configure Swarm Manager
-    hosts: tuxlab-swarm-manager
+    hosts: tuxlab-swarm-manager:security_group_docker_manager
     gather_facts: no
     vars:
       ansible_ssh_user: core

@@ -39,10 +39,10 @@
         cidr_ip: 0.0.0.0/0
    register: meteor_sec_group
 
- - name: Configure Docker Group
+ - name: Configure Docker Host Group
    ec2_group:
-      name: docker
-      description: Security Group for Docker Networking
+      name: docker_host
+      description: Security Group for Docker Host Networking
       region: "{{ EC2_REGION }}"
       vpc_id: "{{ vpc.vpc_id }}"
       state: present
@@ -51,4 +51,18 @@
         from_port: all
         to_port: all
         cidr_ip: 0.0.0.0/0
-   register: docker_sec_group
+   register: docker_host_sec_group
+
+ - name: Configure Docker Manager Group
+   ec2_group:
+      name: docker_manager
+      description: Security Group for Docker Manager Networking
+      region: "{{ EC2_REGION }}"
+      vpc_id: "{{ vpc.vpc_id }}"
+      state: present
+      rules_egress:
+      - proto: all
+        from_port: all
+        to_port: all
+        cidr_ip: 0.0.0.0/0
+   register: docker_manager_sec_group
