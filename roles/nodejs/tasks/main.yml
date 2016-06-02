@@ -10,3 +10,8 @@
   become: yes
   become_method: sudo
   yum: name=npm enablerepo=epel state=latest
+
+- name: update npm
+  become: yes
+  become_method: sudo
+  npm: name=npm global=yes state=latest

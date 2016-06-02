@@ -30,7 +30,7 @@
     vars_prompt:
 
       - name: "ANSIBLE_TOWER_PASS"
-        prompt: "Ansible Tower password"
+        prompt: "New Ansible Tower password"
         private: yes
         confirm: yes
 

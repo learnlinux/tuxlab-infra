@@ -1,22 +1,16 @@
 ---
-  - name: Create {{ deploy_dir }}
-    become: yes
-    become_method: sudo
-    file: name={{ item }} owner=root group=root
-    with_items:
-      - "{{ deploy_dir }}"
-
   - name: remove current build
     become: yes
     become_method: sudo
-    file: path={{ deploy_app_dir }}/build state=absent recurse=no
+    file: path={{ deploy_dir }} state=absent
 
-  - name: create build directory
+  - name: Create {{ deploy_dir }}
     become: yes
     become_method: sudo
-    file: name={{ item }} state=directory owner=root group=root
+    file: name={{ item }} state=directory owner=root group=root recurse=yes
     with_items:
       - "{{ deploy_dir }}"
+    when: binary_url is defined
 
   - name: download binary
     get_url: url={{ release_url }} dest={{deploy_dir}}/tuxlab-app.tar.gz
@@ -31,22 +25,20 @@
     become_method: sudo
     git: repo={{repo_url}}
          dest={{deploy_dir}}
+         accept_hostkey=yes
     when: repo_url is defined
 
   - name: install npm dependencies
-    npm: path={{deploy_dir}} production=yes
+    become: yes
+    become_method: sudo
+    npm: path={{deploy_dir}}
     when: repo_url is defined
 
   - name: build tuxlab app
     become: yes
     become_method: sudo
-    shell: meteor build --directory {{deploy_app_dir}}/build chdir={{deploy_app_dir}}
+    shell: /usr/local/bin/meteor build --directory {{deploy_dir}} chdir={{deploy_dir}}
     when: repo_url is defined
-
-  - name: restart nginx
-    become: yes
-    become_method: sudo
-    service: name=nginx state=restarted
 
   - name: install forvever
     npm: name=forever global=yes state=present

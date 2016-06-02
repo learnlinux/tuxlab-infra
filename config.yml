@@ -6,6 +6,10 @@
     hosts: all
     gather_facts: no
     tasks:
+
+       - name: Create TuxLab directory
+         local_action: file path=~/.tuxlab state=directory mode=0755
+
        - name: Check if Swarm URL is Set
          local_action: stat path=~/.tuxlab/discovery_url
          ignore_errors: true
@@ -24,7 +28,7 @@
          local_action: set_fact etcd_discovery="{{ lookup('file', '~/.tuxlab/discovery_url') }}"
 
   - name: Configure Meteor Hosts
-    hosts: tuxlab-meteor
+    hosts: tuxlab-meteor:security_group_meteor
     become: yes
     become_method: sudo
     roles:
@@ -35,7 +39,7 @@
       - tuxlab-app
 
   - name: Configure Swarm Engine
-    hosts: tuxlab-swarm-host:tuxlab-swarm-manager
+    hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
     gather_facts: no
     vars:
       ansible_ssh_user: core
@@ -47,20 +51,22 @@
       - dockerengine
 
   - name: Configure Swarm Hosts
-    hosts: tuxlab-swarm-host
+    hosts: tuxlab-swarm-host:security_group_docker_host
     gather_facts: no
     vars:
       ansible_ssh_user: core
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
+      - dockerhost
       - tuxlab-sshd
+      - tuxlab-proxy
 
   - name: Configure Swarm Manager
-    hosts: tuxlab-swarm-manager
+    hosts: tuxlab-swarm-manager:security_group_docker_manager
     gather_facts: no
     vars:
       ansible_ssh_user: core
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
-    - dockerswarm
-    - tuxlab-dns
+      - dockerswarm
+      - tuxlab-dns

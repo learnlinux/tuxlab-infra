@@ -12,13 +12,12 @@ The TuxLab infrastructure is configured as follows:
 
 ![TuxLab Infrastructure Diagram](https://docs.google.com/drawings/d/1jLnkbWYxgBlfEEc6eldGdA_ONhBRTjJ6KmwGvpoFXkY/pub?w=960&h=720)
 
-
 ## Running the Development Environment
 In order to make development easier, we have created a Vagrant Enviornment to simulate the servers needed to run the TuxLab Site. You can get this up and running by first installing the following pre-requisites:
  * Vagrant
  * Vagrant Hosts Plugin
  * VirtualBox
- * Ansible
+ * Ansible (>2.2)
  * SSHPass
 
 You can then initialize this environment by running `vagrant up`.  The TuxLab site will be
@@ -26,7 +25,7 @@ visible at `10.100.0.10:8080`.
 
 ## Running on AWS Cloud
 You need the following things:
- * Install Python, pip and Ansible via your package manager.
+ * Install Python, pip and Ansible (>2.2) via your package manager.
  * Install boto and tower-cli using pip (`sudo pip install -U boto ansible-tower-cli`)
  * Place your Ansible Tower license in /aws/keys/tower.txt, and add the JSON property `"eula_accepted" : true`, indicating you have read and accepted the Ansible Tower EULA.
  * Edit the `aws/vars/` files based on your configuration.

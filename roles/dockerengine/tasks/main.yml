@@ -35,6 +35,3 @@
   become: yes
   become_method: sudo
   service: name=docker-tcp.socket state=started
-
-- name: start swarm-agent
-  shell: docker run -d --name swarm-agent --net=host swarm:latest join --addr={{ swarm_node_ip }}:2375 etcd://127.0.0.1:2379

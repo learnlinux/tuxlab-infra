@@ -1,6 +1,8 @@
 ---
   - include: aws/vars/ec2.yml
 
+  - debug: var=vpc
+
 # Creates an HTTP Load Balancer for Meteor
   - name: Create Meteor ELB
     ec2_elb_lb:
@@ -14,6 +16,7 @@
         - protocol: http
           load_balancer_port: 80
           instance_port: 80
+          proxy_protocol: False
       health_check:
           ping_protocol: http
           ping_port: 80
@@ -31,7 +34,8 @@
         instance_type: "{{ METEOR_INSTANCE_TYPE }}"
         key_name: "tuxlab"
         region: "{{ EC2_REGION }}"
-        security_groups: ["{{docker_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
+        security_groups: ["{{meteor_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
+        user_data: "{{ phone_home }}"
 
 # Creates an Autoscale Group for Meteor
   - name: Create Meteor Autoscale Group
@@ -81,7 +85,7 @@
       namespace: "AWS/EC2"
       statistic: Average
       comparison: "<="
-      threshold: 5
+      threshold: 5.0
       period: 300
       evaluation_periods: 3
       unit: "Percent"
