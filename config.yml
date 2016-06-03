@@ -6,6 +6,10 @@
     hosts: all
     gather_facts: no
     tasks:
+
+       - name: Create TuxLab directory
+         local_action: file path=~/.tuxlab state=directory mode=0755
+
        - name: Check if Swarm URL is Set
          local_action: stat path=~/.tuxlab/discovery_url
          ignore_errors: true

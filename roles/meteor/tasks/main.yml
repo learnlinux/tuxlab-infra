@@ -3,4 +3,4 @@
 - name: install meteor
   become: yes
   become_method: sudo
-  shell: curl https://install.meteor.com | /bin/sh
+  shell: curl https://install.meteor.com/ | sh
