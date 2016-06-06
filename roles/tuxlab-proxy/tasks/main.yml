@@ -1,0 +1,19 @@
+---
+
+- name: pull alpine container images with redbird
+  git: repo=https://github.com/learnlinux/tuxlab-reverse-proxy.git
+       dest=~/tuxlab-reverse-proxy
+
+- name: build tuxlab_proxy image
+  docker_image:
+    path: ~/tuxlab-reverse-proxy
+    name: tuxlab_proxy
+
+- name: start reverse proxy container
+  docker:
+    name: host-proxy
+    image: tuxlab_proxy
+    tty: yes
+    publish_all_ports: yes
+    stdin_open: yes
+    command: "/usr/bin/node /root/proxies.js"

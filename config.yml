@@ -66,6 +66,7 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - tuxlab-sshd
+      - tuxlab-proxy
 
   - name: Configure Swarm Manager
     hosts: tuxlab-swarm-manager:security_group_docker_manager
@@ -74,5 +75,5 @@
       ansible_ssh_user: core
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
-    - dockerswarm
-    - tuxlab-dns
+      - dockerswarm
+      - tuxlab-dns
