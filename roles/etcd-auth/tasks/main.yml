@@ -1,0 +1,27 @@
+---
+
+- name: Install pexpect
+  pip: name=pexpect executable=~/bin/pip 
+
+- name: Add etcd users
+  expect:
+    command: etcdctl user add {{ item.user }}
+    responses:
+      "New password:": "{{ item.pass }}"
+  with_items:
+    - { user: 'root', pass: '{{ root_pass }}' }
+    - { user: 'dns', pass: '{{ dns_pass }}' }
+    - { user: 'proxy', pass: '{{ proxy_pass }}' }
+    - { user: 'meteor', pass: '{{ meteor_pass }}' }
+
+- name: Add etcd roles
+  shell: "etcdctl role add dns; etcdctl role add proxy;"
+
+- name: Grant role permissions
+  shell: "etcdctl role grant dns -path '/helix/*' -readwrite; etcdctl role grant proxy -path '/proxy/*' -readwrite"
+
+- name: Grant etcd user roles
+  shell: "etcdctl user grant dns -roles dns; etcdctl user grant proxy -roles proxy; etcdctl user grant meteor -roles dns,proxy"
+
+- name: Enable authentication
+  shell: "etcdctl auth enable"

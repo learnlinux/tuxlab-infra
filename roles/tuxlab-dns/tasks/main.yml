@@ -13,4 +13,4 @@
     image: tuxlab_dns
     ports:
     - "53"
-    command: ./hdns
+    command: "./hdns"

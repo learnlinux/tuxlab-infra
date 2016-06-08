@@ -27,6 +27,50 @@
        - name: Load Discovery URL
          local_action: set_fact etcd_discovery="{{ lookup('file', '~/.tuxlab/discovery_url') }}"
 
+  - name: Setup ETCD Auth
+    hosts: all
+    gather_facts: no
+    tasks:
+
+      - name: Check if pass files set
+        local_action: stat path=~/.tuxlab/{{ item }}
+        ignore_errors: true
+        register: file_info
+        with_items:
+          - 'root_pass_file'
+          - 'meteor_pass_file'
+          - 'dns_pass_file'
+          - 'proxy_pass_file'
+
+      - name: Generate pass files
+        set_fact: 
+          "{{ item.val }}" : "{{ lookup('pipe','date +%N') | hash('md5') }}"
+        when: not {{ item.file }}.stat.exists
+        with_items:
+          - { file: 'file_info.results[0]', val: 'root_pass' }
+          - { file: 'file_info.results[1]', val: 'meteor_pass' }
+          - { file: 'file_info.results[2]', val: 'dns_pass' }
+          - { file: 'file_info.results[3]', val: 'proxy_pass' }
+
+      - name: Load pass filess
+        local_action: set_fact {{ item.val }}="{{ lookup('file', '~/.tuxlab/{{ item.name }}') }}"
+        when: ({{ item.file }}.stat.exists)
+        with_items:
+          - { file: 'file_info.results[0]', val: 'root_pass', name: 'root_pass_file' }
+          - { file: 'file_info.results[1]', val: 'meteor_pass', name: 'meteor_pass_file' }
+          - { file: 'file_info.results[2]', val: 'dns_pass', name: 'dns_pass_file' }
+          - { file: 'file_info.results[3]', val: 'proxy_pass', name: 'proxy_pass_file' }
+
+      - name: Copy pass files
+        local_action: copy content="{{ item.val }}" dest=~/.tuxlab/{{ item.name }}
+        when: not {{ item.file }}.stat.exists
+        with_items:
+          - { file: 'file_info.results[0]', val: "{{ root_pass }}", name: 'root_pass_file' }
+          - { file: 'file_info.results[1]', val: "{{ meteor_pass }}", name: 'meteor_pass_file' }
+          - { file: 'file_info.results[2]', val: "{{ dns_pass }}", name: 'dns_pass_file' }
+          - { file: 'file_info.results[3]', val: "{{ proxy_pass }}", name: 'proxy_pass_file' }
+
+
   - name: Configure Meteor Hosts
     hosts: tuxlab-meteor:security_group_meteor
     become: yes
@@ -69,4 +113,5 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - dockerswarm
+      #- etcd-auth
       - tuxlab-dns
