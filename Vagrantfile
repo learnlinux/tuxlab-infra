@@ -69,7 +69,7 @@ Vagrant.configure(2) do |vagrant|
             end
 
         # Add to Network
-        dhost.vm.network "private_network", ip: "10.100.1.10"
+        dhost.vm.network "private_network", ip: "10.100.1.11"
 
         # Configure via Ansible
         dhost.vm.provision :ansible do |ansible|

@@ -10,7 +10,11 @@
   sudo: true
   shell: systemctl daemon-reload
 
-- name: Restart etcd
+- name: Enable etcd
   sudo: true
   service: name=etcd
            enabled=yes
+
+- name: Start etcd
+  sudo: true
+  shell: "systemctl start etcd &"
