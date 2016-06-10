@@ -4,7 +4,7 @@
 ###############################
 
 ###############################
-#      REPO CONFIGURATION     #
+#      APP CONFIGURATION      #
 ###############################
 
 ###############################
@@ -23,7 +23,7 @@
 
   # Docker Swarm Settings
    SWARM_IMAGE: ami-8d6485e0
-   SWARM_INSTANCE_TYPE: t2.medium   
+   SWARM_INSTANCE_TYPE: t2.medium
 
   # Docker Host Settings
    DOCKER_IMAGE: ami-8d6485e0
