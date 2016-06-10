@@ -4,6 +4,9 @@
   git: repo=https://github.com/learnlinux/tuxlab-reverse-proxy.git
        dest=~/tuxlab-reverse-proxy
 
+- name: copying Settings
+  template: src=settings.json.j2 dest=~/tuxlab-reverse-proxy/src/settings.json owner=root group=root mode=0644
+
 - name: build tuxlab_proxy image
   docker_image:
     path: ~/tuxlab-reverse-proxy
