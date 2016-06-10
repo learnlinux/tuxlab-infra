@@ -1,0 +1,8 @@
+---
+
+- name: Clone certbot repo
+  repo=https://github.com/certbot/certbot.git
+  dest=~/certbot
+
+- name: Obtain SSL Certs
+  script: ~/certbot/letsencrypt-auto -d {{ letsencrypt_domain }} -email {{ letsencrypt_email }} certonly — standalone
