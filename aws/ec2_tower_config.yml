@@ -180,7 +180,7 @@
    set_fact:
      host_config_key : "{{ lookup('pipe','date +%s') | hash('md5') }}"
 
- - name: Create the Configuration Job Template
+ - name: Create the Setup Job Template
    uri:
      url: "https://127.0.0.1/api/v1/job_templates/"
      validate_certs: False
@@ -188,14 +188,14 @@
      method: POST
      HEADER_Authorization: "Token {{access_token.json.token}}"
      body: {
-             name : "TuxLab Configuration",
-             description : "Automatically configures new EC2 servers to run the TuxLab app.",
+             name : "TuxLab Setup",
+             description : "Automatically setup new EC2 servers to run the TuxLab app.",
              job_type : "run",
              inventory : "{{ ec2_inventory.json.id }}",
              project : "{{ ec2_project.json.id }}",
              credential : "{{ ec2_ssh_credentials.json.id }}",
              cloud_credential: "{{ ec2_aws_credentials.json.id }}",
-             playbook : "config.yml",
+             playbook : "setup.yml",
              host_config_key: "{{ host_config_key }}",
              forks: 0
             }

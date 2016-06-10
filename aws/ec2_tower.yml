@@ -1,6 +1,6 @@
 ---
 
- - include: aws/vars/ec2.yml
+ - include: config.yml
 
  - name: Configure Tower Security Group
    ec2_group:

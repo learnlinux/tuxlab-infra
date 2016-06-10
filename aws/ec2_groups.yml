@@ -1,5 +1,5 @@
 ---
- - include: aws/vars/ec2.yml
+ - include: config.yml
 
  - name: Configure etcd Group
    ec2_group:

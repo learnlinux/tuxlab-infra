@@ -35,16 +35,6 @@ Vagrant.configure(2) do |vagrant|
       dswarm.vm.network "forwarded_port", guest: 2375, host: 2375
       dswarm.vm.network "forwarded_port", guest: 2379, host: 2379
 
-      # Configure via Ansible
-      dswarm.vm.provision :ansible do |ansible|
-        ansible.playbook = "./config.yml"
-        ansible.groups = {
-           'tuxlab-swarm-manager' => ["dswarm"]
-         }
-        ansible.extra_vars = {
-          swarm_node_ip: "10.100.1.10"
-        }
-      end
     end
 
     # TuxLab Swarm Host
@@ -65,17 +55,6 @@ Vagrant.configure(2) do |vagrant|
 
         # Add to Network
         dhost.vm.network "private_network", ip: "10.100.1.11"
-
-        # Configure via Ansible
-        dhost.vm.provision :ansible do |ansible|
-          ansible.playbook = "./config.yml"
-          ansible.groups = {
-             'tuxlab-swarm-host' => ["dhost"]
-           }
-          ansible.extra_vars = {
-            swarm_node_ip: "10.100.1.10"
-          }
-        end
       end
 
   # MongoDB Host
@@ -85,15 +64,6 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       mongodb.vm.network "private_network", ip: "10.0.1.0"
-
-      # Configure via Ansible
-      mongodb.vm.provision :ansible do |ansible|
-        ansible.playbook = "./config.yml"
-        ansible.groups = {
-           'tuxlab-mongodb' => ["mongodb"],
-         }
-      end
-
     end
 
   # Meteor Host
@@ -108,11 +78,18 @@ Vagrant.configure(2) do |vagrant|
                          host: 8080,
                          auto_correct: false
 
-      # Configure via Ansible
+      # Configure All Hosts via Ansible
       meteor.vm.provision :ansible do |ansible|
-        ansible.playbook = "./config.yml"
+        ansible.playbook = "./setup.yml"
+        ansible.limit = 'all'
         ansible.groups = {
-           'tuxlab-meteor' => ["meteor"],
+           'tuxlab-swarm-manager' => ["dswarm"],
+           'tuxlab-swarm-host' => ["dhost"],
+           'tuxlab-mongodb' => ["mongodb"],
+           'tuxlab-meteor' => ["meteor"]
+         }
+         ansible.extra_vars = {
+           swarm_node_ip: "10.100.1.10"
          }
       end
 
