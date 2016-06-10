@@ -3,9 +3,11 @@
 - name: pull alpine container images with sshd
   become: yes
   become_method: sudo
-  git: repo=https://github.com/learnlinux/docker-sshd.git dest=docker-sshd
+  git: repo={{ item.url }} dest={{ item.directory }}
+  with_items: LAB_IMAGES
 
 - name: build tuxlab_sshd image
   docker_image:
-    path: ~/docker-sshd
-    name: tuxlab_sshd
+    path: "{{ item.directory }}"
+    name: "{{ item.image_name }}"
+  with_items: LAB_IMAGES
