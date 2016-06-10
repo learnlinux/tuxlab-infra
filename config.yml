@@ -1,125 +1,46 @@
 ---
-  # This playbook is executed by Vagrant or  Ansible Tower to configure
-  # new hosts once they have been provisioned.
+###############################
+#    DOMAIN CONFIGURATION     #
+###############################
+  TUX_DOMAIN: cmu.tuxlab.org
+  TUX_HOMEPAGE: http://cmu.tuxlab.org/
+  TUX_EMAIL: service@tuxlab.org
 
-  - name: Setup ETCD Discovery
-    hosts: all
-    gather_facts: no
-    tasks:
+###############################
+#      APP CONFIGURATION      #
+###############################
+   APP_REPO: https://github.com/learnlinux/tuxlab-app
+   #BINARY_APP_REPO: 
 
-       - name: Create TuxLab directory
-         local_action: file path=~/.tuxlab state=directory mode=0755
+###############################
+#    LABENV CONFIGURATION     #
+###############################
+   LAB_IMAGES: [{ url: https://github.com/learnlinux/docker-sshd.git, directory: ~/docker-sshd, image_name: tuxlab_sshd }]
 
-       - name: Check if Swarm URL is Set
-         local_action: stat path=~/.tuxlab/discovery_url
-         ignore_errors: true
-         register: etcd_discovery_file
+###############################
+#    MONGODB CONFIGURATION    #
+###############################
 
-       - name: Create ETCD Discovery URL
-         local_action: uri url=https://discovery.etcd.io/new?size=2 return_content=yes
-         register: etcd_discovery_web
-         when: not etcd_discovery_file.stat.exists
+###############################
+#      AWS CONFIGURATION      #
+###############################
+   EC2_REGION: us-east-1
+   EC2_AZ: us-east-1a
 
-       - name: Save to TuxLab Config Folder
-         local_action: copy content="{{etcd_discovery_web.content}}" dest=~/.tuxlab/discovery_url
-         when: not etcd_discovery_file.stat.exists
+  # Ansible Tower
+   TOWER_IMAGE: ami-a013f9cd
+   TOWER_INSTANCE_TYPE: m3.medium
 
-       - name: Load Discovery URL
-         local_action: set_fact etcd_discovery="{{ lookup('file', '~/.tuxlab/discovery_url') }}"
+  # Docker Swarm Settings
+   SWARM_IMAGE: ami-8d6485e0
+   SWARM_INSTANCE_TYPE: t2.medium   
 
-  - name: Setup ETCD Auth
-    hosts: all
-    gather_facts: no
-    tasks:
+  # Docker Host Settings
+   DOCKER_IMAGE: ami-8d6485e0
+   DOCKER_INSTANCE_TYPE: t2.medium
+   DOCKER_MAX_INSTANCES: 20
 
-      - name: Check if pass files set
-        local_action: stat path=~/.tuxlab/{{ item }}
-        ignore_errors: true
-        register: file_info
-        with_items:
-          - 'root_pass_file'
-          - 'meteor_pass_file'
-          - 'dns_pass_file'
-          - 'proxy_pass_file'
-
-      - name: Generate pass files
-        set_fact: 
-          "{{ item.val }}" : "{{ lookup('pipe','date +%N') | hash('md5') }}"
-        when: not {{ item.file }}.stat.exists
-        with_items:
-          - { file: 'file_info.results[0]', val: 'root_pass' }
-          - { file: 'file_info.results[1]', val: 'meteor_pass' }
-          - { file: 'file_info.results[2]', val: 'dns_pass' }
-          - { file: 'file_info.results[3]', val: 'proxy_pass' }
-
-      - name: Load pass filess
-        local_action: set_fact {{ item.val }}="{{ lookup('file', '~/.tuxlab/{{ item.name }}') }}"
-        when: ({{ item.file }}.stat.exists)
-        with_items:
-          - { file: 'file_info.results[0]', val: 'root_pass', name: 'root_pass_file' }
-          - { file: 'file_info.results[1]', val: 'meteor_pass', name: 'meteor_pass_file' }
-          - { file: 'file_info.results[2]', val: 'dns_pass', name: 'dns_pass_file' }
-          - { file: 'file_info.results[3]', val: 'proxy_pass', name: 'proxy_pass_file' }
-
-      - name: Copy pass files
-        local_action: copy content="{{ item.val }}" dest=~/.tuxlab/{{ item.name }}
-        when: not {{ item.file }}.stat.exists
-        with_items:
-          - { file: 'file_info.results[0]', val: "{{ root_pass }}", name: 'root_pass_file' }
-          - { file: 'file_info.results[1]', val: "{{ meteor_pass }}", name: 'meteor_pass_file' }
-          - { file: 'file_info.results[2]', val: "{{ dns_pass }}", name: 'dns_pass_file' }
-          - { file: 'file_info.results[3]', val: "{{ proxy_pass }}", name: 'proxy_pass_file' }
-
-
-  - name: Configure Meteor Hosts
-    hosts: tuxlab-meteor:security_group_meteor
-    become: yes
-    become_method: sudo
-    vars:
-        etcd_interface: "eth0"
-    roles:
-      - rhel
-      - etcd
-      - nodejs
-      - meteor
-      - tuxlab-app
-
-  - name: Configure Swarm Engine
-    hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
-    gather_facts: no
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
-
-      etcd_user: etcd
-      etcd_interface: "eth1"
-      etcd_dir: "/usr/bin"
-      etcd_cmd: "{{ etcd_dir }}/etcd2"
-      etcd_data_dir: "/var/lib/etcd2"
-    roles:
-      - defunctzombie.coreos-bootstrap
-      - coreos
-      - etcd
-      - dockerengine
-
-  - name: Configure Swarm Hosts
-    hosts: tuxlab-swarm-host:security_group_docker_host
-    gather_facts: no
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
-    roles:
-      - dockerhost
-      - tuxlab-sshd
-      - tuxlab-proxy
-
-  - name: Configure Swarm Manager
-    hosts: tuxlab-swarm-manager:security_group_docker_manager
-    gather_facts: no
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
-    roles:
-      - dockerswarm
-      #- etcd-auth
-      - tuxlab-dns
+  # Meteor Server Settings
+   METEOR_IMAGE: ami-2051294a
+   METEOR_INSTANCE_TYPE: t2.medium
+   METEOR_MAX_INSTANCES: 10
