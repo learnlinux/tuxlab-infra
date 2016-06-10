@@ -1,0 +1,4 @@
+---
+
+letsencrypt_domain: "cmu.tuxlab.org"
+letsencrypt_email: "support@tuxlab.org"
