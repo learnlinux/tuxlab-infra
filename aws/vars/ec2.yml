@@ -1,7 +1,0 @@
----
-  - include_vars: aws/vars/ec2_global.yml
-  - include_vars: aws/vars/ec2_tower.yml
-  - include_vars: aws/vars/ec2_tower_callback.yml
-
-  - include_vars: aws/vars/ec2_meteor.yml
-  - include_vars: aws/vars/ec2_docker.yml

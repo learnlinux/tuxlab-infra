@@ -1,5 +1,6 @@
 ---
-  - include: aws/vars/ec2.yml
+  - include: config.yml
+  - include: aws/vars/ec2_tower_callback.yml
 
 # Creates a Launch Confgiguration for Docker Host
   - name: Create Docker Launch Configuration

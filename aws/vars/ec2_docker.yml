@@ -1,5 +1,0 @@
----
- # Docker Swarm EC2 Settings
-   DOCKER_IMAGE: ami-8d6485e0
-   DOCKER_INSTANCE_TYPE: t2.medium
-   DOCKER_MAX_INSTANCES: 20

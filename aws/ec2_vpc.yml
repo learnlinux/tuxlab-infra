@@ -1,6 +1,6 @@
 ---
 
- - include: aws/vars/ec2.yml
+ - include: config.yml
 
  - name: Configure VPC
    ec2_vpc:
