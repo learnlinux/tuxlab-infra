@@ -1,12 +1,18 @@
 ---
 
 - name: pull alpine container images with redbird
-  git: repo=https://github.com/learnlinux/tuxlab-reverse-proxy.git
-       dest=~/tuxlab-reverse-proxy
+  git: repo=https://github.com/learnlinux/tuxlab-reverse-proxy.git dest=/home/core/tuxlab-reverse-proxy
+
+- name: copying Settings
+  become: yes
+  become_method: sudo
+  template: src=settings.json.j2 dest=/home/core/tuxlab-reverse-proxy/src/settings.json owner=root group=root mode=0644
 
 - name: build tuxlab_proxy image
+  become: yes
+  become_method: sudo
   docker_image:
-    path: ~/tuxlab-reverse-proxy
+    path: /home/core/tuxlab-reverse-proxy
     name: tuxlab_proxy
 
 - name: start reverse proxy container

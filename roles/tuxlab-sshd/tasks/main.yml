@@ -4,10 +4,12 @@
   become: yes
   become_method: sudo
   git: repo={{ item.url }} dest={{ item.directory }}
-  with_items: LAB_IMAGES
+  with_items: "{{LAB_IMAGES}}"
 
 - name: build tuxlab_sshd image
+  become: yes
+  become_method: sudo
   docker_image:
     path: "{{ item.directory }}"
     name: "{{ item.image_name }}"
-  with_items: LAB_IMAGES
+  with_items: "{{LAB_IMAGES}}"

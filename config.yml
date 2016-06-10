@@ -2,20 +2,20 @@
 ###############################
 #    DOMAIN CONFIGURATION     #
 ###############################
-  TUX_DOMAIN: cmu.tuxlab.org
-  TUX_HOMEPAGE: http://cmu.tuxlab.org/
-  TUX_EMAIL: service@tuxlab.org
+   TUX_DOMAIN: cmu.tuxlab.org
+   TUX_HOMEPAGE: http://cmu.tuxlab.org/
+   TUX_EMAIL: service@tuxlab.org
 
 ###############################
 #      APP CONFIGURATION      #
 ###############################
-   APP_REPO: https://github.com/learnlinux/tuxlab-app
-   #BINARY_APP_REPO: 
+   APP_REPO_GIT: https://github.com/learnlinux/tuxlab-app
+   #APP_REPO_BIN: https://api.github.com/repos/learnlinux/tuxlab/tarball/v1.0.0
 
 ###############################
 #    LABENV CONFIGURATION     #
 ###############################
-   LAB_IMAGES: [{ url: https://github.com/learnlinux/docker-sshd.git, directory: ~/docker-sshd, image_name: tuxlab_sshd }]
+   LAB_IMAGES: [{ url: "https://github.com/learnlinux/docker-sshd.git", directory: /home/core/docker-sshd, image_name: tuxlab_sshd }]
 
 ###############################
 #    MONGODB CONFIGURATION    #
@@ -31,16 +31,16 @@
    TOWER_IMAGE: ami-a013f9cd
    TOWER_INSTANCE_TYPE: m3.medium
 
-  # Docker Swarm Settings
+  # Docker Swarm Manager Settings
    SWARM_IMAGE: ami-8d6485e0
-   SWARM_INSTANCE_TYPE: t2.medium   
+   SWARM_INSTANCE_TYPE: t2.medium
 
   # Docker Host Settings
    DOCKER_IMAGE: ami-8d6485e0
    DOCKER_INSTANCE_TYPE: t2.medium
-   DOCKER_MAX_INSTANCES: 20
+   DOCKER_MAX_INSTANCES: 5
 
   # Meteor Server Settings
    METEOR_IMAGE: ami-2051294a
    METEOR_INSTANCE_TYPE: t2.medium
-   METEOR_MAX_INSTANCES: 10
+   METEOR_MAX_INSTANCES: 5

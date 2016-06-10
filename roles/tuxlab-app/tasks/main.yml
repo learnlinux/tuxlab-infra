@@ -10,15 +10,16 @@
     file: name={{ item }} state=directory owner=root group=root recurse=yes
     with_items:
       - "{{ deploy_dir }}"
-    when: binary_url is defined
+      - "{{ deploy_app_dir }}"
+    when: binary_deploy
 
   - name: download binary
-    get_url: url={{ release_url }} dest={{deploy_dir}}/tuxlab-app.tar.gz
-    when: binary_url is defined
+    get_url: url={{ repo_url }} dest={{deploy_dir}}/tuxlab-app.tar.gz
+    when: binary_deploy
 
   - name: unzip binary
     unarchive: src={{deploy_dir}}/tuxlab-app.tar.gz dest={{deploy_app_dir}}
-    when: binary_url is defined
+    when: binary_deploy
 
   - name: clone tuxlab source
     become: yes
@@ -26,19 +27,24 @@
     git: repo={{repo_url}}
          dest={{deploy_dir}}
          accept_hostkey=yes
-    when: repo_url is defined
+    when: not binary_deploy
 
   - name: install npm dependencies
     become: yes
     become_method: sudo
-    npm: path={{deploy_dir}}
-    when: repo_url is defined
+    npm: path={{deploy_dir}} production=yes
+    when: not binary_deploy
+
+  - name: typings install
+    become: yes
+    become_method: sudo
+    shell: typings install chdir={{deploy_dir}}
 
   - name: build tuxlab app
     become: yes
     become_method: sudo
-    shell: /usr/local/bin/meteor build --directory {{deploy_dir}} chdir={{deploy_dir}}
-    when: repo_url is defined
+    shell: /usr/local/bin/meteor build --directory {{deploy_app_dir}} chdir={{deploy_dir}}
+    when: not binary_deploy
 
   - name: install forvever
     npm: name=forever global=yes state=present

@@ -3,30 +3,22 @@
   # new hosts once they have been provisioned.
 
   - name: Setup ETCD
-    hosts: localhost
-    gather_facts: no
-    connection: local
-    remote_user: root
+    hosts: all
     gather_facts: no
     vars_files:
       - config.yml
     roles:
       - etcd-cluster
 
-  - name: Configure Meteor Hosts
+  - name: Prepare Meteor Hosts
     hosts: tuxlab-meteor:security_group_meteor
     become: yes
     become_method: sudo
     vars_files:
       - config.yml
-    vars:
-        etcd_interface: "eth0"
     roles:
       - rhel
       - etcd
-      - nodejs
-      - meteor
-      - tuxlab-app
 
   - name: Configure Swarm Engine
     hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
@@ -38,7 +30,6 @@
       ansible_python_interpreter: "/home/core/bin/python"
 
       etcd_user: etcd
-      etcd_interface: "eth1"
       etcd_dir: "/usr/bin"
       etcd_cmd: "{{ etcd_dir }}/etcd2"
       etcd_data_dir: "/var/lib/etcd2"
@@ -73,3 +64,14 @@
       - dockerswarm
       #- etcd-auth
       - tuxlab-dns
+
+  - name: Configure Meteor Applications
+    hosts: tuxlab-meteor:security_group_meteor
+    become: yes
+    become_method: sudo
+    vars_files:
+      - config.yml
+    roles:
+      - nodejs
+      - meteor
+      - tuxlab-app

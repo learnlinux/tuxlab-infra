@@ -1,6 +1,5 @@
 ---
-  - include: config.yml
-  - include: aws/vars/ec2_tower_callback.yml
+  - include_vars: aws/vars/ec2_tower_callback.yml
 
 # Creates a Launch Confgiguration for Docker Host
   - name: Create Docker Launch Configuration
@@ -10,6 +9,7 @@
         instance_type: "{{ DOCKER_INSTANCE_TYPE }}"
         key_name: "tuxlab"
         region: "{{ EC2_REGION }}"
+        assign_public_ip: yes
         security_groups: ["{{docker_host_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
         user_data: "{{ phone_home }}"
 

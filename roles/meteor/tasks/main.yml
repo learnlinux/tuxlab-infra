@@ -1,6 +1,10 @@
 ---
-# Install meteor
+- name: check for meteor
+  shell: command -v meteor >/dev/null && echo "true" || echo "false"
+  register: meteor_status
+
 - name: install meteor
   become: yes
   become_method: sudo
   shell: curl https://install.meteor.com/ | sh
+  when: meteor_status.stdout == "false"
