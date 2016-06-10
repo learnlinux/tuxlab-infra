@@ -7,7 +7,7 @@
   expect:
     command: etcdctl user add {{ item.user }}
     responses:
-      (.*): "{{ item.pass }}"
+      "New password:": "{{ item.pass }}"
   with_items:
     - { user: 'root', pass: '{{ root_pass }}' }
     - { user: 'dns', pass: '{{ dns_pass }}' }
@@ -21,10 +21,7 @@
   shell: "etcdctl role grant dns -path '/helix/*' -readwrite; etcdctl role grant proxy -path '/proxy/*' -readwrite"
 
 - name: Grant etcd user roles
-  shell: "user grant dns -roles dns; user grant proxy -roles proxy; user grant meteor -roles dns,proxy"
-
-- name: Revoke guest permissions
-  shell: "etcdct -u root:ROOTPW role revoke guest -path '/*' -readwrite"
+  shell: "etcdctl user grant dns -roles dns; etcdctl user grant proxy -roles proxy; etcdctl user grant meteor -roles dns,proxy"
 
 - name: Enable authentication
   shell: "etcdctl auth enable"
