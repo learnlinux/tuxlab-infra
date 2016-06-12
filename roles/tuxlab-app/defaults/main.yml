@@ -1,16 +1,14 @@
 ---
 # TuxLab Settings
 # Installation Settings
-root_url: http://cmu.tuxlab.org
-mongo_url: http://mongo.cmu.tuxlab.org
+root_url: "http://cmu.tuxlab.org"
+mongo_url: "http://mongo.cmu.tuxlab.org"
 
 # Github Settings
 # If you wish to use the latest from the master branch, use repo_url.
 # if instead you want to use a pre-compiled binary, use binary_url.
-repo_url: {{ APP_REPO }}
-
-{% if APP_BINARY_RAPO is defined %}
-binary_url: {{ APP_BINARY_REPO }}
+binary_deploy: "{{ is defined APP_REPO_BIN }}"
+repo_url: "{{ APP_REPO_BIN if binary_deploy else APP_REPO_GIT }}"
 
 # Meteor Settings
 deploy_dir: /var/www

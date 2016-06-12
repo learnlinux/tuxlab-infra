@@ -2,20 +2,20 @@
 ###############################
 #    DOMAIN CONFIGURATION     #
 ###############################
-  TUX_DOMAIN: cmu.tuxlab.org
-  TUX_HOMEPAGE: http://cmu.tuxlab.org/
-  TUX_EMAIL: service@tuxlab.org
+   TUX_DOMAIN: cmu.tuxlab.org
+   TUX_HOMEPAGE: http://cmu.tuxlab.org/
+   TUX_EMAIL: service@tuxlab.org
 
 ###############################
 #      APP CONFIGURATION      #
 ###############################
-   APP_REPO: https://github.com/learnlinux/tuxlab-app
-   #BINARY_APP_REPO: 
+   APP_REPO_GIT: https://github.com/learnlinux/tuxlab-app
+   #APP_REPO_BIN:
 
 ###############################
 #    LABENV CONFIGURATION     #
 ###############################
-   LAB_IMAGES: [{ url: https://github.com/learnlinux/docker-sshd.git, directory: ~/docker-sshd, image_name: tuxlab_sshd }]
+   LAB_IMAGES: [{ url: "https://github.com/learnlinux/docker-sshd.git", directory: ~/docker-sshd, image_name: tuxlab_sshd }]
 
 ###############################
 #    MONGODB CONFIGURATION    #
