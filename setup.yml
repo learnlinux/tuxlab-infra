@@ -3,10 +3,7 @@
   # new hosts once they have been provisioned.
 
   - name: Setup ETCD
-    hosts: localhost
-    gather_facts: no
-    connection: local
-    remote_user: root
+    hosts: all
     gather_facts: no
     vars_files:
       - config.yml
