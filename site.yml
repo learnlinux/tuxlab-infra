@@ -28,12 +28,10 @@
     remote_user: ubuntu
     gather_facts: no
     vars_prompt:
-
       - name: "ANSIBLE_TOWER_PASS"
         prompt: "New Ansible Tower password"
         private: yes
         confirm: yes
-
     tasks:
       - name: Configure Ansible Tower for AWS
         include: aws/ec2_tower_config.yml
@@ -48,8 +46,12 @@
     remote_user: root
     gather_facts: no
     tasks:
-      - name: Create Docker EC2 Enviornment
+
+      - name: Create Docker Swarm Node
+        include: aws/ec2_dockerswarm.yml
+
+      - name: Create Docker Host ASG
         include: aws/ec2_dockerhost.yml
 
-      - name: Create Meteor EC2 Enviornment
+      - name: Create Meteor ASG
         include: aws/ec2_meteor.yml

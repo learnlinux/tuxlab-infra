@@ -10,7 +10,7 @@
 #      APP CONFIGURATION      #
 ###############################
    APP_REPO_GIT: https://github.com/learnlinux/tuxlab-app
-   #APP_REPO_BIN:
+   #APP_REPO_BIN: https://api.github.com/repos/learnlinux/tuxlab/tarball/v1.0.0
 
 ###############################
 #    LABENV CONFIGURATION     #
@@ -31,7 +31,7 @@
    TOWER_IMAGE: ami-a013f9cd
    TOWER_INSTANCE_TYPE: m3.medium
 
-  # Docker Swarm Settings
+  # Docker Swarm Manager Settings
    SWARM_IMAGE: ami-8d6485e0
    SWARM_INSTANCE_TYPE: t2.medium
 

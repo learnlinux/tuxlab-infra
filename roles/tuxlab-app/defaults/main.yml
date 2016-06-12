@@ -7,7 +7,7 @@ mongo_url: "http://mongo.cmu.tuxlab.org"
 # Github Settings
 # If you wish to use the latest from the master branch, use repo_url.
 # if instead you want to use a pre-compiled binary, use binary_url.
-binary_deploy: "{{ is defined APP_REPO_BIN }}"
+binary_deploy: "{{ APP_REPO_BIN is defined }}"
 repo_url: "{{ APP_REPO_BIN if binary_deploy else APP_REPO_GIT }}"
 
 # Meteor Settings
