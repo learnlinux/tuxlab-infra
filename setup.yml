@@ -10,6 +10,18 @@
     roles:
       - etcd-cluster
 
+  - name: Prepare Meteor Hosts
+    hosts: tuxlab-meteor:security_group_meteor
+    become: yes
+    become_method: sudo
+    vars_files:
+      - config.yml
+    vars:
+        etcd_interface: "eth0"
+    roles:
+      - rhel
+      - etcd
+
   - name: Configure Swarm Engine
     hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
     gather_facts: no
@@ -56,17 +68,13 @@
       #- etcd-auth
       - tuxlab-dns
 
-  - name: Configure Meteor Hosts
+  - name: Configure Meteor Applications
     hosts: tuxlab-meteor:security_group_meteor
     become: yes
     become_method: sudo
     vars_files:
       - config.yml
-    vars:
-        etcd_interface: "eth0"
     roles:
-      - rhel
-      - etcd
       - nodejs
       - meteor
       - tuxlab-app

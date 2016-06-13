@@ -32,8 +32,9 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       dswarm.vm.network "private_network", ip: "10.100.1.10"
-      dswarm.vm.network "forwarded_port", guest: 2375, host: 2375
-      dswarm.vm.network "forwarded_port", guest: 2379, host: 2379
+      dswarm.vm.network "forwarded_port", guest: 53, host: 53 # Local DNS
+      dswarm.vm.network "forwarded_port", guest: 2375, host: 2375 # Docker Swarm
+      dswarm.vm.network "forwarded_port", guest: 2379, host: 2379 # ETCD Cluster
 
     end
 
