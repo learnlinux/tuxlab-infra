@@ -2,19 +2,23 @@
 
 # Get Discovery Token
  - name: Create TuxLab directory
+   run_once: true
    local_action: file path=~/.tuxlab state=directory mode=0755
 
  - name: Check if Swarm URL is Set
+   run_once: true
    local_action: stat path=~/.tuxlab/discovery_url
    ignore_errors: true
    register: etcd_discovery_file
 
  - name: Create ETCD Discovery URL
+   run_once: true
    local_action: uri url=https://discovery.etcd.io/new?size=2 return_content=yes
    register: etcd_discovery_web
    when: not etcd_discovery_file.stat.exists
 
  - name: Save to TuxLab Config Folder
+   run_once: true
    local_action: copy content="{{etcd_discovery_web.content}}" dest=~/.tuxlab/discovery_url
    when: not etcd_discovery_file.stat.exists
 
@@ -23,6 +27,7 @@
 
 # Set Password Files
  - name: Check if pass files set
+   run_once: true
    local_action: stat path=~/.tuxlab/{{ item }}
    ignore_errors: true
    register: file_info
@@ -33,6 +38,7 @@
      - 'proxy_pass_file'
 
  - name: Generate pass files
+   run_once: true
    set_fact:
      "{{ item.val }}" : "{{ lookup('pipe','date +%N') | hash('md5') }}"
    when: not {{ item.file }}.stat.exists
@@ -42,16 +48,8 @@
      - { file: 'file_info.results[2]', val: 'dns_pass' }
      - { file: 'file_info.results[3]', val: 'proxy_pass' }
 
- - name: Load pass filess
-   local_action: set_fact {{ item.val }}="{{ lookup('file', '~/.tuxlab/{{ item.name }}') }}"
-   when: ({{ item.file }}.stat.exists)
-   with_items:
-     - { file: 'file_info.results[0]', val: 'root_pass', name: 'root_pass_file' }
-     - { file: 'file_info.results[1]', val: 'meteor_pass', name: 'meteor_pass_file' }
-     - { file: 'file_info.results[2]', val: 'dns_pass', name: 'dns_pass_file' }
-     - { file: 'file_info.results[3]', val: 'proxy_pass', name: 'proxy_pass_file' }
-
  - name: Copy pass files
+   run_once: true
    local_action: copy content="{{ item.val }}" dest=~/.tuxlab/{{ item.name }}
    when: not {{ item.file }}.stat.exists
    with_items:
@@ -59,3 +57,11 @@
      - { file: 'file_info.results[1]', val: "{{ meteor_pass }}", name: 'meteor_pass_file' }
      - { file: 'file_info.results[2]', val: "{{ dns_pass }}", name: 'dns_pass_file' }
      - { file: 'file_info.results[3]', val: "{{ proxy_pass }}", name: 'proxy_pass_file' }
+
+ - name: Load pass files
+   local_action: set_fact {{ item.val }}="{{ lookup('file', '~/.tuxlab/{{ item.name }}') }}"
+   with_items:
+     - { file: 'file_info.results[0]', val: 'root_pass', name: 'root_pass_file' }
+     - { file: 'file_info.results[1]', val: 'meteor_pass', name: 'meteor_pass_file' }
+     - { file: 'file_info.results[2]', val: 'dns_pass', name: 'dns_pass_file' }
+     - { file: 'file_info.results[3]', val: 'proxy_pass', name: 'proxy_pass_file' }
