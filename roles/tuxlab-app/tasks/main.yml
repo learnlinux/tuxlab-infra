@@ -32,13 +32,13 @@
   - name: install npm dependencies
     become: yes
     become_method: sudo
-    npm: path={{deploy_dir}}
+    npm: path={{deploy_dir}} production=yes
     when: not binary_deploy
 
   - name: build tuxlab app
     become: yes
     become_method: sudo
-    shell: /usr/local/bin/meteor build --directory {{deploy_dir}} chdir={{deploy_dir}}
+    shell: /usr/local/bin/meteor build --directory {{deploy_app_dir}} chdir={{deploy_dir}}
     when: not binary_deploy
 
   - name: install forvever
