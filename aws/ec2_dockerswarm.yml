@@ -1,13 +1,12 @@
 ---
-  - include: config.yml
-  - include: aws/vars/ec2_tower_callback.yml
+  - include_vars: aws/vars/ec2_tower_callback.yml
 
   - ec2:
-      image: {{SWARM_IMAGE}}
-      instance_type: {{SWARM_INSTANCE_TYPE}}
+      image: "{{SWARM_IMAGE}}"
+      instance_type: "{{SWARM_INSTANCE_TYPE}}"
       region: "{{ EC2_REGION }}"
       assign_public_ip: yes
       vpc_subnet_id: "{{ vpc.subnets[0].id }}"
       user_data: "{{ phone_home }}"
-      security_groups: ["{{docker_manager_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
+      group_id: ["{{docker_manager_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
       wait: yes

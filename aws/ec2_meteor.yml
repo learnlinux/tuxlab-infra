@@ -1,5 +1,5 @@
 ---
-  - include: config.yml
+  - include_vars: aws/vars/ec2_tower_callback.yml
 
 # Creates an HTTP Load Balancer for Meteor
   - name: Create Meteor ELB

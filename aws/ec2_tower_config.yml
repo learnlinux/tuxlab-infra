@@ -1,6 +1,4 @@
 ---
- - include: aws/vars/ec2.yml
-
  - name: update apt
    become: yes
    become_method: sudo

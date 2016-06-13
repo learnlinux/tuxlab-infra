@@ -9,6 +9,8 @@
     connection: local
     remote_user: root
     gather_facts: no
+    vars_files:
+      - config.yml
     tasks:
       - name: Create AWS VPC
         include: aws/ec2_vpc.yml
@@ -27,6 +29,8 @@
     hosts: ansible_tower
     remote_user: ubuntu
     gather_facts: no
+    vars_files:
+      - config.yml
     vars_prompt:
       - name: "ANSIBLE_TOWER_PASS"
         prompt: "New Ansible Tower password"
@@ -36,15 +40,14 @@
       - name: Configure Ansible Tower for AWS
         include: aws/ec2_tower_config.yml
 
-# Launch Swarm Master
-
-
 # Launch Autoscaling Groups
   - name: Launch Autoscaling Groups
     hosts: localhost
     connection: local
     remote_user: root
     gather_facts: no
+    vars_files:
+      - config.yml
     tasks:
 
       - name: Create Docker Swarm Node

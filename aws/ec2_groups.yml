@@ -1,6 +1,4 @@
 ---
- - include: config.yml
-
  - name: Configure etcd Group
    ec2_group:
       name: etcd
