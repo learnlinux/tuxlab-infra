@@ -35,6 +35,11 @@
     npm: path={{deploy_dir}} production=yes
     when: not binary_deploy
 
+  - name: typings install
+    become: yes
+    become_method: sudo
+    shell: typings install chdir={{deploy_dir}}
+
   - name: build tuxlab app
     become: yes
     become_method: sudo
