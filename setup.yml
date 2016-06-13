@@ -56,7 +56,6 @@
       #- etcd-auth
       - tuxlab-dns
 
-
   - name: Configure Meteor Hosts
     hosts: tuxlab-meteor:security_group_meteor
     become: yes
