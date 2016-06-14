@@ -5,14 +5,7 @@
        dest=~/helixdns
 
 - name: build tuxlab_dns image from binary
-  docker_image:
-    path: ~/helixdns/docker
-    name: tuxlab_dns
+  shell: "docker build -t tuxlab_dns ~/helixdns/docker"
 
 - name: start dns container
-  docker:
-    name: swarm-dns
-    image: tuxlab_dns
-    ports:
-    - "53"
-    command: "./hdns"
+  shell: "docker run -d -p 53 --name swarm-dns tuxlab_dns ./hdns"

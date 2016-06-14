@@ -11,15 +11,7 @@
 - name: build tuxlab_proxy image
   become: yes
   become_method: sudo
-  docker_image:
-    path: /home/core/tuxlab-reverse-proxy
-    name: tuxlab_proxy
+  shell: "docker build -t tuxlab_proxy /home/core/tuxlab-reverse-proxy"
 
 - name: start reverse proxy container
-  docker:
-    name: host-proxy
-    image: tuxlab_proxy
-    tty: yes
-    publish_all_ports: yes
-    stdin_open: yes
-    command: "/usr/bin/node /root/proxies.js"
+  shell: "docker run --name host-proxy -t -i -P tuxlab_proxy /usr/bin/node /root/proxies.js"
