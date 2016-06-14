@@ -196,10 +196,7 @@
              playbook : "setup.yml",
              host_config_key: "{{ host_config_key }}",
              forks: 0,
-             extra_vars: {
-               swarm_node_ip: "{{hostvars['docker_swarm_manager']['swarm_node_ip']}}",
-               etcd_interface: "eth0"
-             }
+             extra_vars: "---\nswarm_node_ip: \"{{hostvars['docker_swarm_manager']['swarm_node_ip']}}\"\netcd_interface: \"eth0\""
             }
      status_code: 201
    register: ec2_job_template
