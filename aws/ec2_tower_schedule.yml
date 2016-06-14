@@ -1,0 +1,13 @@
+---
+ - name: Begin AwS Sync
+   uri:
+     url: "https://127.0.0.1{{ ec2_inventory_group.json.related.inventory_source }}update/"
+     validate_certs: False
+     body_format: json
+     method: POST
+     HEADER_Authorization: "Token {{access_token.json.token}}"
+     body: {
+             extra_vars: {}
+           }
+     status_code: 202
+   register: ec2_inventory_source
