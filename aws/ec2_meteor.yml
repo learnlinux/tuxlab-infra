@@ -32,6 +32,7 @@
         instance_type: "{{ METEOR_INSTANCE_TYPE }}"
         key_name: "tuxlab"
         region: "{{ EC2_REGION }}"
+        assign_public_ip: yes
         security_groups: ["{{meteor_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
         user_data: "{{ phone_home }}"
 

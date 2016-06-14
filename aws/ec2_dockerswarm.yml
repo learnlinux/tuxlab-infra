@@ -1,12 +1,14 @@
 ---
   - include_vars: aws/vars/ec2_tower_callback.yml
 
-  - ec2:
+  - name: Create Swarm Manager
+    ec2:
       image: "{{SWARM_IMAGE}}"
       instance_type: "{{SWARM_INSTANCE_TYPE}}"
       region: "{{ EC2_REGION }}"
       assign_public_ip: yes
       vpc_subnet_id: "{{ vpc.subnets[0].id }}"
+      key_name: "tuxlab"
       user_data: "{{ phone_home }}"
       group_id: ["{{docker_manager_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
       wait: yes
