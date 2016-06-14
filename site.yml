@@ -24,6 +24,9 @@
       - name: Create Security Groups
         include: aws/ec2_groups.yml
 
+      - name: Create Docker Swarm Node
+        include: aws/ec2_dockerswarm.yml
+
 # Configure Ansible Tower
   - name: Configure Ansible Tower
     hosts: ansible_tower
@@ -50,11 +53,19 @@
       - config.yml
     tasks:
 
-      - name: Create Docker Swarm Node
-        include: aws/ec2_dockerswarm.yml
-
       - name: Create Docker Host ASG
         include: aws/ec2_dockerhost.yml
 
       - name: Create Meteor ASG
         include: aws/ec2_meteor.yml
+
+# Setup Inventory Sync and Lifecycle Hooks
+  - name: Inventory Sync
+    hosts: ansible_tower
+    remote_user: ubuntu
+    gather_facts: no
+    vars_files:
+      - config.yml
+    tasks:
+        - name: Sync Ansible Inventory
+          include: aws/e2_tower_schedule.yml
