@@ -35,6 +35,11 @@
     npm: path={{deploy_dir}} production=yes
     when: not binary_deploy
 
+  - name: install typings
+    become: yes
+    become_method: sudo
+    npm: name=typings global=yes
+
   - name: typings install
     become: yes
     become_method: sudo
