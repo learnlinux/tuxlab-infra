@@ -68,4 +68,4 @@
       - config.yml
     tasks:
         - name: Sync Ansible Inventory
-          include: aws/e2_tower_schedule.yml
+          include: aws/ec2_tower_schedule.yml
