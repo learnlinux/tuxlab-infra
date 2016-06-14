@@ -16,8 +16,6 @@
     become_method: sudo
     vars_files:
       - config.yml
-    vars:
-        etcd_interface: "eth0"
     roles:
       - rhel
       - etcd
@@ -32,7 +30,6 @@
       ansible_python_interpreter: "/home/core/bin/python"
 
       etcd_user: etcd
-      etcd_interface: "eth0"
       etcd_dir: "/usr/bin"
       etcd_cmd: "{{ etcd_dir }}/etcd2"
       etcd_data_dir: "/var/lib/etcd2"

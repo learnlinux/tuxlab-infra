@@ -12,3 +12,8 @@
       user_data: "{{ phone_home }}"
       group_id: ["{{docker_manager_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
       wait: yes
+    register: docker_swarm_instance
+    
+  - name: Save Swarm Node IP
+    run_once: true
+    local_action: copy content="{{ docker_swarm_instance.public_ip }}" dest=~/.tuxlab/swarm_node_ip

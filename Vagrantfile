@@ -90,7 +90,8 @@ Vagrant.configure(2) do |vagrant|
            'tuxlab-meteor' => ["meteor"]
          }
          ansible.extra_vars = {
-           swarm_node_ip: "10.100.1.10"
+           swarm_node_ip: "10.100.1.10",
+           etcd_interface: "eth1"
          }
       end
 

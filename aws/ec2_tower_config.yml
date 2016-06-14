@@ -195,7 +195,11 @@
              cloud_credential: "{{ ec2_aws_credentials.json.id }}",
              playbook : "setup.yml",
              host_config_key: "{{ host_config_key }}",
-             forks: 0
+             forks: 0,
+             extra_vars: {
+               swarm_node_ip: "{{ lookup('file', '~/.tuxlab/swarm_node_ip') }}",
+               etcd_interface: "eth0"
+             }
             }
      status_code: 201
    register: ec2_job_template
