@@ -9,12 +9,15 @@
       assign_public_ip: yes
       vpc_subnet_id: "{{ vpc.subnets[0].id }}"
       key_name: "tuxlab"
-      user_data: "{{ phone_home }}"
       group_id: ["{{docker_manager_sec_group.group_id}}", "{{ansible_sec_group.group_id}}", "{{etcd_sec_group.group_id}}"]
       instance_tags:
           Name: Swarm Manager
       wait: yes
     register: docker_swarm_instance
 
-  - name: Associate Public IP
-    ec2_eip: device_id="{{docker_swarm_instance.instances[0].id}}" ip="{{ lookup('file', '~/.tuxlab/swarm_node_ip') }}" region="{{EC2_REGION}}"
+  - name: Add Swarm Manager to Hosts
+    add_host:
+         name="docker_swarm_manager"
+         group="docker_swarm_manager"
+         swarm_node_ip="{{item.private_ip}}"
+    with_items: "{{ docker_swarm_instance.instances }}"
