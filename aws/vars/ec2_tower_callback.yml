@@ -4,7 +4,7 @@ phone_home: |
           #!/bin/bash
           exec > /tmp/autoscale.log 2>&1
           set -x
-          TOWER_ADDRESS={{ hostvars['ansible_tower']['ansible_ssh_host'] }}
+          TOWER_ADDRESS={{ hostvars['ansible_tower']['tower_callback_ip'] }}
           HOST_CONFIG_KEY={{ hostvars['ansible_tower']['host_config_key'] }}
           TEMPLATE_ID={{ hostvars['ansible_tower']['job_template_id'] }}
 
