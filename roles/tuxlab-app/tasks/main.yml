@@ -1,4 +1,6 @@
 ---
+
+## DOWNLOAD
   - name: remove current build
     become: yes
     become_method: sudo
@@ -29,17 +31,30 @@
          accept_hostkey=yes
     when: not binary_deploy
 
+## INSTALL
   - name: install npm dependencies
     become: yes
     become_method: sudo
     npm: path={{deploy_dir}} production=yes
     when: not binary_deploy
 
+  - name: install typings
+    become: yes
+    become_method: sudo
+    npm: name=typings global=yes
+
   - name: typings install
     become: yes
     become_method: sudo
     shell: typings install chdir={{deploy_dir}}
 
+## COPY SETTINGS
+  - name: Copy settings.env.json
+    template: src="settings.env.json.j2"
+              dest="{{deploy_dir}}/private/settings.env.json"
+              mode=0644
+
+## BUILD AND RUN
   - name: build tuxlab app
     become: yes
     become_method: sudo
@@ -56,6 +71,6 @@
       PORT=80
       MONGO_URL={{ mongo_url }}
       ROOT_URL={{ root_url }}
-      forever start "{{ deploy_app_dir }}"/main.js
+      forever start "{{ deploy_app_dir }}"bundle/main.js
     async: 10
     poll: 1

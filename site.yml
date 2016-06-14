@@ -24,8 +24,8 @@
       - name: Create Security Groups
         include: aws/ec2_groups.yml
 
-      - name: Allocate Docker Swarm IP
-        include: aws/ec2_dockerswarm_ip.yml
+      - name: Create Docker Swarm Node
+        include: aws/ec2_dockerswarm.yml
 
 # Configure Ansible Tower
   - name: Configure Ansible Tower
@@ -52,9 +52,6 @@
     vars_files:
       - config.yml
     tasks:
-
-      - name: Create Docker Swarm Node
-        include: aws/ec2_dockerswarm.yml
 
       - name: Create Docker Host ASG
         include: aws/ec2_dockerhost.yml

@@ -6,6 +6,15 @@
   become_user: core
   pip: name=docker-py executable=~/bin/pip
 
+- name: Install /etc/default/docker
+  sudo: True
+  template: >
+    src=docker.default.j2
+    dest=/etc/default/docker
+    owner=root
+    group=root
+    mode=0644
+
 - name: copy docker conf
   become: yes
   become_method: sudo
@@ -34,4 +43,4 @@
 - name: start docker service
   become: yes
   become_method: sudo
-  service: name=docker-tcp.socket state=started
+  service: name=docker state=started

@@ -135,7 +135,7 @@
              source_regions : "{{EC2_REGION}}",
              source_vars : "---\nvpc_destination_variable: private_ip_address",
              update_cache_timeout : 0,
-             update_on_launch : false
+             update_on_launch : true
            }
      status_code: 200
    register: ec2_inventory_source
@@ -196,7 +196,7 @@
              playbook : "setup.yml",
              host_config_key: "{{ host_config_key }}",
              forks: 0,
-             extra_vars: "{\"swarm_node_ip\": \"{{ lookup('file', '~/.tuxlab/swarm_node_ip') }}\",\"etcd_interface\": \"eth0\"}"
+             extra_vars: "---\nswarm_node_ip: \"{{hostvars['docker_swarm_manager']['swarm_node_ip']}}\"\netcd_interface: \"eth0\""
             }
      status_code: 201
    register: ec2_job_template
@@ -206,3 +206,14 @@
  - name: Save Job Template ID
    set_fact:
      job_template_id: "{{ ec2_job_template.json.id}}"
+
+ - name: Provision Docker Swarm Manager
+   uri:
+     url: "https://127.0.0.1{{ec2_job_template.json.related.launch}}"
+     validate_certs: False
+     body_format: json
+     method: POST
+     HEADER_Authorization: "Token {{access_token.json.token}}"
+     body: {}
+     status_code: 202
+   register: docker_provision_job
