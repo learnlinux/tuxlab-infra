@@ -34,4 +34,4 @@
 - name: start docker service
   become: yes
   become_method: sudo
-  service: name=docker-tcp.socket state=started
+  service: name=docker state=started
