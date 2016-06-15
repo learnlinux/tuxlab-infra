@@ -61,6 +61,6 @@
       PORT=80
       MONGO_URL={{ mongo_url }}
       ROOT_URL={{ root_url }}
-      forever start "{{ deploy_app_dir }}"main.js
+      forever start "{{ deploy_app_dir }}"bundle/main.js
     async: 10
     poll: 1
