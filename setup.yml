@@ -16,6 +16,11 @@
     become_method: sudo
     vars:
       ansible_ssh_user: "{{ 'ec2-user' if 'security_group_meteor' in group_names  else 'vagrant' }}"
+
+      etcd_user: etcd
+      etcd_dir: "/usr/bin"
+      etcd_cmd: "{{ etcd_dir }}/etcd"
+      etcd_data_dir: "/var/lib/etcd"
     vars_files:
       - config.yml
     roles:

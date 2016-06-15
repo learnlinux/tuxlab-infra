@@ -13,7 +13,7 @@
 
  - name: Create ETCD Discovery URL
    run_once: true
-   local_action: uri url=https://discovery.etcd.io/new?size=2 return_content=yes
+   local_action: uri url=https://discovery.etcd.io/new?size=3 return_content=yes
    register: etcd_discovery_web
    when: not etcd_discovery_file.stat.exists
 

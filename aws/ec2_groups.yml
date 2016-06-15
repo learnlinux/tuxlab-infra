@@ -49,6 +49,10 @@
         from_port: 53
         to_port: 53
         cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 4000
+        to_port: 4000
+        group_name: 'meteor'
       rules_egress:
       - proto: all
         from_port: all
