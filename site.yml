@@ -43,6 +43,16 @@
       - name: Configure Ansible Tower for AWS
         include: aws/ec2_tower_config.yml
 
+# Run Callback on Swarm Manager
+  - name: Configure Docker Swarm Node
+    hosts: docker_swarm_manager
+    gather_facts: no
+    vars:
+      ansible_ssh_user: core
+      ansible_python_interpreter: "/home/core/bin/python"
+    tasks:
+      raw: "{{phone_home}}"
+
 # Launch Autoscaling Groups
   - name: Launch Autoscaling Groups
     hosts: localhost
@@ -58,14 +68,3 @@
 
       - name: Create Meteor ASG
         include: aws/ec2_meteor.yml
-
-# Setup Inventory Sync and Lifecycle Hooks
-  - name: Inventory Sync
-    hosts: ansible_tower
-    remote_user: ubuntu
-    gather_facts: no
-    vars_files:
-      - config.yml
-    tasks:
-        - name: Sync Ansible Inventory
-          include: aws/ec2_tower_schedule.yml
