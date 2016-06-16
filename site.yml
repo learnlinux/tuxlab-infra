@@ -43,19 +43,6 @@
       - name: Configure Ansible Tower for AWS
         include: aws/ec2_tower_config.yml
 
-# Run Callback on Swarm Manager
-  - name: Configure Docker Swarm Node
-    hosts: docker_swarm_manager
-    gather_facts: no
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
-    tasks:
-      - name: Copy Tower Callback
-        copy: content="{{phone_home}}" dest="~/tower-callback"
-      - name: Execute Tower Callback
-        raw: "~/tower-callback &"
-
 # Launch Autoscaling Groups
   - name: Launch Autoscaling Groups
     hosts: localhost

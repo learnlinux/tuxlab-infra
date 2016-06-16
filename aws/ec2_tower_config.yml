@@ -206,3 +206,14 @@
  - name: Save Job Template ID
    set_fact:
      job_template_id: "{{ ec2_job_template.json.id}}"
+
+ - name: Provision Docker Swarm Manager
+   uri:
+     url: "https://127.0.0.1{{ec2_job_template.json.related.launch}}"
+     validate_certs: False
+     body_format: json
+     method: POST
+     HEADER_Authorization: "Token {{access_token.json.token}}"
+     body: {}
+     status_code: 202
+   register: docker_provision_job
