@@ -24,7 +24,7 @@
     vars_files:
       - config.yml
     roles:
-      - rhel
+      - centos
       - etcd
 
   - name: Configure Swarm Engine
