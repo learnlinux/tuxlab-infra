@@ -51,7 +51,10 @@
       ansible_ssh_user: core
       ansible_python_interpreter: "/home/core/bin/python"
     tasks:
-      raw: "{{phone_home}}"
+      - name: Copy Tower Callback
+        copy: content="{{phone_home}}" dest="~/tower-callback"
+      - name: Execute Tower Callback
+        raw: "~/tower-callback &"
 
 # Launch Autoscaling Groups
   - name: Launch Autoscaling Groups
