@@ -25,10 +25,16 @@
     group=root
     mode=0644
 
+- name: check api socket status
+  command: systemctl status docker-tcp.socket
+  register: api_status
+  ignore_errors: yes
+
 - name: enable remote api socket
   become: yes
   become_method: sudo
   service: name=docker-tcp.socket enabled=yes
+  when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
 
 - name: stop docker service
   become: yes
@@ -39,6 +45,7 @@
   become: yes
   become_method: sudo
   service: name=docker-tcp.socket state=started
+  when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
 
 - name: start docker service
   become: yes

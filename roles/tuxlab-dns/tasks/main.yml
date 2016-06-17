@@ -8,4 +8,7 @@
   shell: "docker build -t tuxlab_dns ~/helixdns/docker"
 
 - name: start dns container
-  shell: "docker run -d -p 53 --name swarm-dns tuxlab_dns ./hdns"
+  shell: "docker run -d -p 53:53 --name swarm-dns tuxlab_dns ./hdns"
+
+- name: create helix etcd directory
+  shell: "etcdctl mkdir helix"
