@@ -1,0 +1,68 @@
+---
+
+  #Check ETCD Cluster Health
+
+  - name: create test directory
+    shell: "etcdctl -u root:{{ root_pass }} mkdir test"
+    when: ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+
+  - name: create meteor test file
+    shell: "etcdctl -u root:{{ root_pass }} mkdir test/meteor"
+    when: ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+
+  - name: create swarm test files
+    shell: "etcdctl -u root:{{ root_pass }} mkdir /test/{{ inventory_hostname }}"
+    when: not ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+
+  - name: ensure swarm test files exist
+    run_once: true
+    shell: "etcdctl -u root:{{ root_pass }} ls /test/"
+    register: result
+    until: "'{{ item }}' in result.stdout"
+    retries: 3
+    delay: 5
+    with_items: "{{ play_hosts }}"
+    when: not ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+  
+  - name: ensure meteor test file exists
+    run_once: true
+    shell: "etcdctl -u root:{{ root_pass }} ls /test/"
+    register: result
+    until: "'meteor' in result.stdout"
+    retries: 3
+    delay: 5
+    when: not ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+
+  - name: remove test subdirectories
+    run_once: true
+    shell: "etcdctl -u root:{{ root_pass }} rmdir /test/{{ item }}"
+    with_items: "{{ play_hosts }}"
+    when: not ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+
+  - name: remove test directory
+    run_once: true
+    shell: "etcdctl -u root:{{ root_pass }} rmdir /test/meteor; etcdctl -u root:{{ root_pass }} rmdir /test/"
+    when: not ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+
+  #Check Docker Swarm Health
+
+  - name: get swarm info
+    shell: "docker --host :4000 info > ~/.swarm_status; cat ~/.swarm_status"
+    register: swarm_info
+    when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+  - name: ensure swarm contains correct number of nodes
+    assert:
+      that: "'Nodes: {{ play_hosts|length - 1 }}' in swarm_info.stdout_lines"
+    when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+  - name: search for healthy nodes
+    shell: "grep 'Status: Healthy' ~/.swarm_status"
+    ignore_errors: true
+    register: healthy_nodes
+    when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+  - name: ensure all nodes are healthy
+    assert: 
+      that: "'{{ (healthy_nodes.stdout_lines)|length }}' == '{{ play_hosts|length - 1 }}'"
+    when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
