@@ -14,4 +14,4 @@
   shell: "docker build -t tuxlab_proxy /home/core/tuxlab-reverse-proxy"
 
 - name: start reverse proxy container
-  shell: "docker run -d tuxlab_proxy"
+  shell: "docker run --name host-proxy -d tuxlab_proxy"
