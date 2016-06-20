@@ -30,9 +30,14 @@ You need the following things:
  * Place your Ansible Tower license in /aws/keys/tower.txt, and add the JSON property `"eula_accepted" : true`, indicating you have read and accepted the Ansible Tower EULA.
  * Edit the `aws/vars/` files based on your configuration.
  * Set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY Enviornment Variables, and run the ansible playbook:
-
-```
-export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXX
-export AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXX
-ansible-playbook site.yml
-```
+    ```
+    export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXX
+    export AWS_SECRET_ACCESS_KEY=XXXXXXXXXXXXXXXXXXXX
+    ansible-playbook site.yml
+    ```
+ * Finally, create DNS records to route your domain to the TuxLab instance. If you wanted for the tuxlab app to be displayed at domain.com.
+   ```
+   NS   *.domain.com     <SWARM_NODE_IP>
+   A    domain.com       <LOAD_BALANCER_DNS_NAME>
+   ```
+   Alternatively, If you are using Amazon Route 53, you can use [Aliases](http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/using-domain-names-with-elb.html#dns-associate-custom-elb) to more easily configure these IP addresses.
