@@ -1,0 +1,22 @@
+- name: create directory for keys
+  become: yes
+  become_method: sudo
+  file: path=/etc/ssl/local state=directory
+
+- name: copying letsencrypt keys if they exist
+  become: yes
+  become_method: sudo
+  copy: src="~/.tuxlab/{{ item }}" dest=/etc/ssl/local/{{ item }}
+  when: ssl_key.stat.exists
+  with_items:
+    - host.key
+    - host.key.pub
+
+- name: copying static keys if letsencrypt keys not found
+  become: yes
+  become_method: sudo
+  copy: src="local/{{ item }}" dest=/etc/ssl/local/{{ item }}
+  when: not ssl_key.stat.exists
+  with_items:
+    - host.key
+    - host.key.pub

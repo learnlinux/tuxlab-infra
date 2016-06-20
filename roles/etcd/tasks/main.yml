@@ -1,20 +1,24 @@
 ---
 
 - name: add etcd systemd service
-  sudo: true
+  become: yes
+  become_method: sudo
   template: src=etc/systemd/system/etcd.j2
             dest=/etc/systemd/system/etcd.service
             mode=0644
 
 - name: Reload systemctl
-  sudo: true
+  become: yes
+  become_method: sudo
   shell: systemctl daemon-reload
 
 - name: Enable etcd
-  sudo: true
+  become: yes
+  become_method: sudo
   service: name=etcd
            enabled=yes
 
 - name: Start etcd
-  sudo: true
+  become: yes
+  become_method: sudo
   shell: "systemctl start etcd &"

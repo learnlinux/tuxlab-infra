@@ -42,6 +42,7 @@
   become: yes
   become_method: sudo
   service: name=docker-tcp.socket state=stopped
+  when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
 
 - name: start remote api socket
   become: yes
