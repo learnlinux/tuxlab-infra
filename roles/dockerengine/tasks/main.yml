@@ -28,6 +28,8 @@
 - name: check api socket status
   command: systemctl status docker-tcp.socket
   register: api_status
+  failed_when: false
+  changed_when: false
   ignore_errors: yes
 
 - name: enable remote api socket
