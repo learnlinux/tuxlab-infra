@@ -66,3 +66,19 @@
     assert: 
       that: "'{{ (healthy_nodes.stdout_lines)|length }}' == '{{ play_hosts|length - 1 }}'"
     when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+  #Check DNS Health
+
+  - name: create A record
+    shell: "etcdctl -u root:{{ root_pass }} set /helix/org/tuxlab/cmu/tux/A '10.100.1.11'"
+    when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+  - name: dig for A record
+    shell: "dig tux.cmu.tuxlab.org. @10.100.1.10"
+    register: tux_record
+    when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+  - name: ensure A record is properly configured
+    assert:
+      that: "'\n;; ANSWER SECTION:\ntux.cmu.tuxlab.org.\t5\tIN\tA\t10.100.1.11\n' in tux_record.stdout"
+    when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)

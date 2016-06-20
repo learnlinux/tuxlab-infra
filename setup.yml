@@ -57,7 +57,7 @@
     roles:
       - dockerhost
       - tuxlab-sshd
-      - tuxlab-proxy
+      #- tuxlab-proxy
 
   - name: Configure Swarm Manager
     hosts: tuxlab-swarm-manager:security_group_docker_manager
