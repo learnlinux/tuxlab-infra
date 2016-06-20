@@ -1,0 +1,16 @@
+---
+
+- name: install chronyd
+  become: yes
+  become_method: sudo
+  yum: name=chrony
+
+- name: enable chronyd
+  become: yes
+  become_method: sudo
+  service: name=chronyd enabled=yes
+
+- name: start chronyd
+  become: yes
+  become_method: sudo
+  service: name=chronyd state=started

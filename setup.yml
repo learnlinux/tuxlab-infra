@@ -25,6 +25,7 @@
       - config.yml
     roles:
       - centos
+      - chronyd
       - etcd
 
   - name: Configure Swarm Engine
@@ -43,6 +44,7 @@
     roles:
       - defunctzombie.coreos-bootstrap
       - coreos
+      - timesyncd
       - etcd
       - dockerengine
 
