@@ -14,3 +14,6 @@
   become: yes
   become_method: sudo
   apt: name=mongodb-org-shell update_cache=yes
+
+- name: setup external db
+  shell: "mongo {{ mongo_database }} files/mongosetup.js --host {{ mongo_url }} -u {{ mongo_user }} -p {{ mongo_pass }}"
