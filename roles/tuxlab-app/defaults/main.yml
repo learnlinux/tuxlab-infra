@@ -2,7 +2,8 @@
 # TuxLab Settings
 # Installation Settings
 root_url: "http://cmu.tuxlab.org"
-mongo_url: "http://mongo.cmu.tuxlab.org"
+mongo_url: "mongodb://{{ MONGO_USER }}:{{ MONGO_PASS }}@{{ MONGO_URL }}"
+mail_url: "{{ MONGO_EMAIL }}"
 
 # Github Settings
 # If you wish to use the latest from the master branch, use repo_url.

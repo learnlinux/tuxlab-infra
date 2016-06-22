@@ -59,7 +59,7 @@
     roles:
       - dockerhost
       - tuxlab-sshd
-      #- tuxlab-proxy
+      - tuxlab-proxy
 
   - name: Configure Swarm Manager
     hosts: tuxlab-swarm-manager:security_group_docker_manager
@@ -71,7 +71,7 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - dockerswarm
-      #- etcd-auth
+      - etcd-auth
       - tuxlab-dns
 
   - name: Configure Meteor Applications
@@ -86,6 +86,11 @@
       - nodejs
       - meteor
       - tuxlab-app
+
+  - name: Install mongo client on tower
+    hosts: security_group_tower
+    roles:
+      - tuxlab-mongo
 
   - name: Run Meteor Tests
     hosts: tuxlab-meteor:security_group_meteor

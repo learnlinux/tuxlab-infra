@@ -21,6 +21,11 @@
 #    MONGODB CONFIGURATION    #
 ###############################
 
+   MONGO_URL: ds025792.mlab.com:25792/tuxlab
+   MONGO_USER: tuxlab
+   MONGO_PASS: sc0ySWbWDkDc #IF THIS IS ON GITHUB, SOMETHING'S GONE HORRIBLY HORRIBLY WRONG
+   MONGO_EMAIL: smtp://smtp.tuxlab.org/
+
 ###############################
 #      AWS CONFIGURATION      #
 ###############################
