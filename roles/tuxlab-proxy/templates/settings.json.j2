@@ -5,5 +5,9 @@
 	},
   "webssh_port" : 80,
   "webssh_root" : "{{ WEBSSH_ROOT }}",
-	"webssh_http_redirect_url" : "{{ WEBSSH_REDIRECT }}"
+  "webssh_http_redirect_url" : "{{ WEBSSH_REDIRECT }}",
+  {% if proxy_pass is defined %},
+  "etcd_user" : 'proxy',
+  "etcd_pass" : {{ proxy_pass }}
+  {% endif %}
 }
