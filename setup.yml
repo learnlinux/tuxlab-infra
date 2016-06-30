@@ -9,6 +9,7 @@
       - config.yml
     roles:
       - etcd-cluster
+      - letsencrypt
 
   - name: Prepare Meteor Hosts
     hosts: tuxlab-meteor:security_group_meteor
@@ -59,6 +60,7 @@
     roles:
       - dockerhost
       - tuxlab-sshd
+      - ssl-distribution
       - tuxlab-proxy
 
   - name: Configure Swarm Manager
@@ -83,6 +85,7 @@
     vars_files:
       - config.yml
     roles:
+      - ssl-distribution
       - nodejs
       - meteor
       - tuxlab-app
