@@ -1,17 +1,22 @@
 ---
 
-- name: pull alpine container images with redbird
-  git: repo=https://github.com/learnlinux/tuxlab-reverse-proxy.git dest=/home/core/tuxlab-reverse-proxy
+- name: pull alpine container images with redrouter
+  git: repo=https://github.com/learnlinux/tuxlab-ssh-proxy.git dest=/home/core/tuxlab-ssh-proxy
 
 - name: copying Settings
   become: yes
   become_method: sudo
-  template: src=settings.json.j2 dest=/home/core/tuxlab-reverse-proxy/src/settings.json owner=root group=root mode=0644
+  template: src=settings.json.j2 dest=/home/core/tuxlab-ssh-proxy/src/settings.json owner=root group=root mode=0644
+
+- name: copying SSL keys
+  become: yes
+  become_method: sudo
+  shell: "cp -r /etc/ssl/local/ /home/core/tuxlab-ssh-proxy/src/"
 
 - name: build tuxlab_proxy image
   become: yes
   become_method: sudo
-  shell: "docker build -t tuxlab_proxy /home/core/tuxlab-reverse-proxy"
+  shell: "docker build -t tuxlab_proxy /home/core/tuxlab-ssh-proxy"
 
 - name: start reverse proxy container
   shell: "docker run --name host-proxy -d tuxlab_proxy"
