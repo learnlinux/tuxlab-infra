@@ -32,9 +32,6 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       dswarm.vm.network "private_network", ip: "10.100.1.10"
-      dswarm.vm.network "forwarded_port", guest: 53, host: 53 # Local DNS
-      dswarm.vm.network "forwarded_port", guest: 2375, host: 2375 # Docker Swarm
-      dswarm.vm.network "forwarded_port", guest: 2379, host: 2379 # ETCD Cluster
 
     end
 
@@ -56,6 +53,8 @@ Vagrant.configure(2) do |vagrant|
 
         # Add to Network
         dhost.vm.network "private_network", ip: "10.100.1.11"
+        dhost.vm.network "forwarded_port", guest: 2222, host: 2250, auto_correct: false
+
       end
 
   # MongoDB Host
@@ -74,10 +73,6 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       meteor.vm.network "private_network", ip: "10.100.0.10"
-      meteor.vm.network :forwarded_port,
-                         guest: 80,
-                         host: 8080,
-                         auto_correct: false
 
       # Configure All Hosts via Ansible
       meteor.vm.provision :ansible do |ansible|
