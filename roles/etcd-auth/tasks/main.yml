@@ -25,3 +25,6 @@
 
 - name: Enable authentication
   shell: "etcdctl auth enable"
+
+- name: Revoke guest privleges
+  shell: "etcdctl -u root:{{ root_pass }} role revoke guest -path '/*' -readwrite"

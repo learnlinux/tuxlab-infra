@@ -69,7 +69,7 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - dockerhost
-      - tuxlab-sshd
+      - tuxlab-labvm
       - ssl-distribution
       - tuxlab-proxy
 
