@@ -1,7 +1,3 @@
 ---
 - name: updating coreos
   shell: update_engine_client -check_for_update
-
-- name: log hostvars
-  run_once: true
-  local_action: copy content="{{ hostvars }}" dest=~/.tuxlab/hostvars.json

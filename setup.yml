@@ -45,7 +45,7 @@
     roles:
       - defunctzombie.coreos-bootstrap
       - coreos
-      #- timesyncd
+      - timesyncd
       - etcd
       - dockerengine
 
