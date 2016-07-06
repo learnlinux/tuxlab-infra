@@ -15,7 +15,7 @@
 ###############################
 #    LABENV CONFIGURATION     #
 ###############################
-   LAB_IMAGES: [{ url: "https://github.com/learnlinux/docker-sshd.git", directory: /home/core/docker-sshd, image_name: tuxlab_sshd }]
+   LAB_IMAGES: [{ url: "https://github.com/learnlinux/tuxlab-labvm.git", directory: /home/core/tuxlab-labvm, image_name: tuxlab_labvm }]
 
 ###############################
 #    MONGODB CONFIGURATION    #
