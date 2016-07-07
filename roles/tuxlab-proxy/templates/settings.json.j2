@@ -1,6 +1,6 @@
 {
   "etcd_conf" : {
-    "hosts" : ["172.17.0.1:2379"],
+    "etcd_hosts" : ["172.17.0.1:2379"],
     "etcd_conn_opts" : {
       {% if proxy_pass is defined %}
       "auth" : {
