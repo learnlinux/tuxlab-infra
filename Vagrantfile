@@ -19,6 +19,8 @@ Vagrant.configure(2) do |vagrant|
       dswarm.vm.box = "coreos-stable"
       dswarm.vm.box_url = "https://storage.googleapis.com/stable.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
 
+      dswarm.ssh.username = "core"
+
       # Disable Guest Additions Installing on CoreOS
           dswarm.vm.provider :virtualbox do |v|
             # On VirtualBox, we don't have guest additions or a functional vboxsf
@@ -38,7 +40,8 @@ Vagrant.configure(2) do |vagrant|
       vagrant.vm.define "dhost" do |dhost|
         dhost.vm.box = "coreos-stable"
         dhost.vm.box_url = "https://storage.googleapis.com/stable.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
-        dhost.ssh.port = 2222
+
+        dhost.ssh.username = "core"
 
         # Disable Guest Additions Installing on CoreOS
             dhost.vm.provider :virtualbox do |v|
@@ -58,7 +61,6 @@ Vagrant.configure(2) do |vagrant|
 
   # Meteor Host
     vagrant.vm.define "meteor" do |meteor|
-
       meteor.vm.box = "centos/7"
 
       # Add to Network
@@ -69,7 +71,10 @@ Vagrant.configure(2) do |vagrant|
         ansible.playbook = "./setup.yml"
         ansible.limit = 'all'
         ansible.inventory_path = "./local/vagrant_ansible_inventory"
+        ansible.force_remote_user = false
+        ansible.host_key_checking = false
         ansible.extra_vars = {
+          host_key_checking: "False",
           swarm_node_ip: "10.100.1.10",
           etcd_interface: "eth1"
         }
