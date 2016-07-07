@@ -69,8 +69,7 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - dockerhost
-      - tuxlab-labvm
-      - ssl-distribution
+      - tuxlab-sshd
       - tuxlab-proxy
 
   - name: Configure Swarm Manager
@@ -100,10 +99,14 @@
       - meteor
       - tuxlab-app
 
-  - name: Install mongo client on tower
-    hosts: security_group_tower
-    roles:
-      - tuxlab-mongo
+  - name: Run Meteor Tests
+    hosts: tuxlab-meteor:security_group_meteor
+    vars:
+      ansible_ssh_user: "{{ 'ec2-user' if 'security_group_meteor' in group_names else 'vagrant' }}"
+    vars_files:
+      - config.yml
+    tasks:
+     - include: tests.yml
 
   - name: Run Tests
     include: tests.yml
