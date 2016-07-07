@@ -105,21 +105,5 @@
     roles:
       - tuxlab-mongo
 
-  - name: Run Meteor Tests
-    hosts: tuxlab-meteor:security_group_meteor
-    vars:
-      ansible_ssh_user: "{{ 'ec2-user' if 'security_group_meteor' in group_names else 'vagrant' }}"
-    vars_files:
-      - config.yml
-    tasks:
-     - include: tests.yml
-
-  - name: Run Docker Swarm Tests
-    hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
-    vars_files:
-      - config.yml
-    tasks:
-     - include: tests.yml
+  - name: Run Tests
+    include: tests.yml
