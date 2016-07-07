@@ -1,0 +1,24 @@
+{
+  "etcd_conf" : {
+    "hosts" : ["172.17.0.1:2379"],
+    "etcd_conn_opts" : {
+      {% if proxy_pass is defined %}
+      "auth" : {
+        "user" : "proxy",
+        "pass" : "{{ proxy_pass }}"
+      }
+      {% endif %}
+    }
+  },
+  "docker_conf" : {
+    "docker_url" : "tcp://{{ ansible_ssh_host }}:2375"
+  },
+  "wetty_conf" : {
+    "host" : "localhost",
+    "port" : 80
+  },
+  "ssh_conf" : {
+    "host" : "localhost",
+    "port" : 22
+  }
+}

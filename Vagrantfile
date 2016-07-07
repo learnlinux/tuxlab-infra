@@ -32,6 +32,10 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       dswarm.vm.network "private_network", ip: "10.100.1.10"
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9e5729d439de3c1a0254b9378d3880dda2791a46
     end
 
     # TuxLab Swarm Host
@@ -52,6 +56,8 @@ Vagrant.configure(2) do |vagrant|
 
         # Add to Network
         dhost.vm.network "private_network", ip: "10.100.1.11"
+        dhost.vm.network "forwarded_port", guest: 2222, host: 2250, auto_correct: false
+
       end
 
   # Meteor Host
@@ -61,10 +67,6 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       meteor.vm.network "private_network", ip: "10.100.0.10"
-      meteor.vm.network :forwarded_port,
-                         guest: 80,
-                         host: 8080,
-                         auto_correct: false
 
       # Configure All Hosts via Ansible
       meteor.vm.provision :ansible do |ansible|

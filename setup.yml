@@ -9,6 +9,7 @@
       - config.yml
     roles:
       - etcd-cluster
+      - letsencrypt
 
   - name: Prepare Meteor Hosts
     hosts: tuxlab-meteor:security_group_meteor
@@ -48,8 +49,18 @@
       - etcd
       - dockerengine
 
+  - name: Configure SSH Connection to Swarm Hosts
+    hosts: tuxlab-swarm-host:security_group_docker_host
+    gather_facts: no
+    vars_files:
+      - config.yml
+    roles:
+      - ssh-config
+
   - name: Configure Swarm Hosts
     hosts: tuxlab-swarm-host:security_group_docker_host
+    become: yes
+    become_method: sudo
     gather_facts: no
     vars_files:
       - config.yml
@@ -58,7 +69,8 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - dockerhost
-      - tuxlab-sshd
+      - tuxlab-labvm
+      - ssl-distribution
       - tuxlab-proxy
 
   - name: Configure Swarm Manager
@@ -71,7 +83,7 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - dockerswarm
-      #- etcd-auth
+      - etcd-auth
       - tuxlab-dns
 
   - name: Configure Meteor Applications
@@ -83,9 +95,15 @@
     vars_files:
       - config.yml
     roles:
+      - ssl-distribution
       - nodejs
       - meteor
       - tuxlab-app
+
+  - name: Install mongo client on tower
+    hosts: security_group_tower
+    roles:
+      - tuxlab-mongo
 
   - name: Run Meteor Tests
     hosts: tuxlab-meteor:security_group_meteor

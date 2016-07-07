@@ -3,25 +3,33 @@
 - name: Install pexpect
   pip: name=pexpect executable=~/bin/pip 
 
+- name: Add etcd root user
+  expect:
+    command: etcdctl user add root
+    responses:
+      "New password:": "{{ root_pass }}"
+
+- name: Enable authentication
+  shell: "etcdctl auth enable"
+
+- name: Revoke guest privleges
+  shell: "etcdctl -u root:{{ root_pass }} role revoke guest -path '/*' -readwrite"
+
 - name: Add etcd users
   expect:
-    command: etcdctl user add {{ item.user }}
+    command: etcdctl -u root:{{ root_pass }} user add {{ item.user }}
     responses:
       "New password:": "{{ item.pass }}"
   with_items:
-    - { user: 'root', pass: '{{ root_pass }}' }
     - { user: 'dns', pass: '{{ dns_pass }}' }
     - { user: 'proxy', pass: '{{ proxy_pass }}' }
     - { user: 'meteor', pass: '{{ meteor_pass }}' }
 
 - name: Add etcd roles
-  shell: "etcdctl role add dns; etcdctl role add proxy;"
+  shell: "etcdctl -u root:{{ root_pass }} role add dns; etcdctl -u root:{{ root_pass }} role add proxy;"
 
 - name: Grant role permissions
-  shell: "etcdctl role grant dns -path '/helix/*' -readwrite; etcdctl role grant proxy -path '/proxy/*' -readwrite"
+  shell: "etcdctl -u root:{{ root_pass }} role grant dns -path '/helix/*' -readwrite; etcdctl -u root:{{ root_pass }} role grant proxy -path '/redrouter/*' -readwrite"
 
 - name: Grant etcd user roles
-  shell: "etcdctl user grant dns -roles dns; etcdctl user grant proxy -roles proxy; etcdctl user grant meteor -roles dns,proxy"
-
-- name: Enable authentication
-  shell: "etcdctl auth enable"
+  shell: "etcdctl -u root:{{ root_pass }} user grant dns -roles dns; etcdctl -u root:{{ root_pass }} user grant proxy -roles proxy; etcdctl -u root:{{ root_pass }} user grant meteor -roles dns,proxy"

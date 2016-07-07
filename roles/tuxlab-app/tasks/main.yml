@@ -64,13 +64,19 @@
   - name: install forvever
     npm: name=forever global=yes state=present
 
+  - name: set mongodb URL
+    become: yes
+    become_method: sudo
+    shell: MONGO_URL={{ mongo_url }}
+    when: "'security_group_meteor' in group_names"
+
   - name: start tuxlab app
     become: yes
     become_method: sudo
     shell:  >
       PORT=80
-      MONGO_URL={{ mongo_url }}
       ROOT_URL={{ root_url }}
+      MAIL_URL={{ mail_url }}
       forever start "{{ deploy_app_dir }}"bundle/main.js
     async: 10
     poll: 1

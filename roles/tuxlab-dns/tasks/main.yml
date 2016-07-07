@@ -11,4 +11,4 @@
   shell: "docker run -d --name swarm-dns --expose 53 --net=host tuxlab_dns ./hdns"
 
 - name: create helix etcd directory
-  shell: "etcdctl mkdir helix"
+  shell: "etcdctl -u root:{{ root_pass }} mkdir helix"

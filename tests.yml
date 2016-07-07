@@ -2,6 +2,20 @@
 
   #Check ETCD Cluster Health
 
+  - name: test guest permissions
+    shell: "etcdctl mkdir insecure"
+    register: secure
+    ignore_errors: true
+    when: ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+
+  - name: log guest permissions
+    debug: msg="WARNING! ETCD is insecure!"
+    when: (('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names) and 'Error' in secure.stdout)
+
+  - name: clean up guest permissions test file
+    shell: "etcdctl rmdir insecure"
+    when: (('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names) and 'Error' in secure.stdout)
+
   - name: create test directory
     shell: "etcdctl -u root:{{ root_pass }} mkdir test"
     when: ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
@@ -70,7 +84,7 @@
   #Check DNS Health
 
   - name: create A record
-    shell: "etcdctl -u root:{{ root_pass }} set /helix/org/tuxlab/cmu/tux/A '10.100.1.11'"
+    shell: "etcdctl -u dns:{{ dns_pass }} set /helix/org/tuxlab/cmu/tux/A '10.100.1.11'"
     when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
   - name: dig for A record
@@ -81,4 +95,15 @@
   - name: ensure A record is properly configured
     assert:
       that: "'\n;; ANSWER SECTION:\ntux.cmu.tuxlab.org.\t5\tIN\tA\t10.100.1.11\n' in tux_record.stdout"
+    when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+  #Check Proxy Health
+
+  - name: run labVM container
+    shell: "docker run --name tux -d tuxlab_labvm" 
+    when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+  - name: get labVM password
+    shell: "docker exec tux cat /pass"
+    register: tux_pass
     when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
