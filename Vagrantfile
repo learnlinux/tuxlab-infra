@@ -32,13 +32,13 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       dswarm.vm.network "private_network", ip: "10.100.1.10"
-
     end
 
     # TuxLab Swarm Host
       vagrant.vm.define "dhost" do |dhost|
         dhost.vm.box = "coreos-stable"
         dhost.vm.box_url = "https://storage.googleapis.com/stable.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
+        dhost.ssh.port = 2222
 
         # Disable Guest Additions Installing on CoreOS
             dhost.vm.provider :virtualbox do |v|
@@ -53,18 +53,8 @@ Vagrant.configure(2) do |vagrant|
 
         # Add to Network
         dhost.vm.network "private_network", ip: "10.100.1.11"
-        dhost.vm.network "forwarded_port", guest: 2222, host: 2250, auto_correct: false
 
       end
-
-  # MongoDB Host
-    vagrant.vm.define "mongodb" do |mongodb|
-
-      mongodb.vm.box = "centos/7"
-
-      # Add to Network
-      mongodb.vm.network "private_network", ip: "10.0.1.0"
-    end
 
   # Meteor Host
     vagrant.vm.define "meteor" do |meteor|
@@ -78,19 +68,12 @@ Vagrant.configure(2) do |vagrant|
       meteor.vm.provision :ansible do |ansible|
         ansible.playbook = "./setup.yml"
         ansible.limit = 'all'
-        ansible.groups = {
-           'tuxlab-swarm-manager' => ["dswarm"],
-           'tuxlab-swarm-host' => ["dhost"],
-           'tuxlab-mongodb' => ["mongodb"],
-           'tuxlab-meteor' => ["meteor"]
-         }
-         ansible.extra_vars = {
-           swarm_node_ip: "10.100.1.10",
-           etcd_interface: "eth1"
-         }
+        ansible.inventory_path = "./local/vagrant_ansible_inventory"
+        ansible.extra_vars = {
+          swarm_node_ip: "10.100.1.10",
+          etcd_interface: "eth1"
+        }
       end
 
     end
-
-
 end

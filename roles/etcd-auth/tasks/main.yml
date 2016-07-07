@@ -12,8 +12,8 @@
 #- name: Enable authentication
 #  shell: "etcdctl auth enable"
 
-- name: Revoke guest privileges
-  shell: "etcdctl -u root:{{ root_pass }} role revoke guest -path '/*' -readwrite"
+#- name: Revoke guest privileges
+#  shell: "etcdctl -u root:{{ root_pass }} role revoke guest -path '/*' -readwrite"
 
 - name: Add etcd users
   expect:
