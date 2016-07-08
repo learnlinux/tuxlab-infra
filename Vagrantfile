@@ -70,10 +70,9 @@ Vagrant.configure(2) do |vagrant|
       meteor.vm.provision :ansible do |ansible|
         ansible.playbook = "./setup.yml"
         ansible.limit = 'all'
-        ansible.force_remote_user = false
         ansible.inventory_path = "./local/vagrant_ansible_inventory"
+        ansible.force_remote_user = false
         ansible.host_key_checking = false
-        ansible.verbose = "vvvv"
         ansible.extra_vars = {
           host_key_checking: "False",
           swarm_node_ip: "10.100.1.10",
