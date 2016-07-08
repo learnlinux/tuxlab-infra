@@ -75,6 +75,7 @@ Vagrant.configure(2) do |vagrant|
         ansible.playbook = "./setup.yml"
         ansible.limit = 'all'
         ansible.inventory_path = "./local/vagrant_ansible_inventory"
+        ansible.host_key_checking = false
         ansible.extra_vars = {
           swarm_node_ip: "10.100.1.10",
           etcd_interface: "eth1"
