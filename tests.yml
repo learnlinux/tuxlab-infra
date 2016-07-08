@@ -39,7 +39,7 @@
 
       - name: Ensure we use the configured SSH port for the remainder of the role
         set_fact:
-          ansible_port: 2250
+          ansible_port: 2222
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
      #Check ETCD Cluster Health
@@ -124,12 +124,16 @@
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM ID
-        shell: "docker inspect --format='{{ '{{' }}.Config.Hostname{{ '}}' }}' tux"
+        shell: "docker inspect --format='{{ '{{' }}.NetworkSettings.IPAddress{{ '}}' }}' tux"
         register: tux_id
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: add proxy data
-        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux \"{'docker_container' : '{{ tux_id.stdout }}', 'username' : 'root', 'allowed_auth' : ['password']}\""
+        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux \"{'host' : '{{ tux_id.stdout }}', 'username' : 'root', 'allowed_auth' : ['password']}\""
+        when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+      - name: display password
+        debug: msg="{{ tux_pass.stdout }}"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
   - name: Final SSH test
@@ -146,8 +150,8 @@
        register: ssh_success
 
      - name: Check SSH success
-       fail: msg="Proxy health tests failed"
-       when: ('Connection refused' in ssh_success.stderr)
+       fail: msg="{{ ssh_success}}"
+       #when: ('Connection refused' in ssh_success.stderr)
 
 
   - name: Clean up labVM container
@@ -162,7 +166,7 @@
 
       - name: Ensure we use the configured SSH port for the remainder of the role
         set_fact:
-          ansible_port: 2250
+          ansible_port: 2222
 
       - name: stop container
         shell: "docker stop tux"
