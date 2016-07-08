@@ -39,7 +39,7 @@
 # after this use the right ansible_port.
 - name: Ensure we use the configured SSH port for the remainder of the role
   set_fact:
-    ansible_port: 2250
+    ansible_port: 2222
 
 # Gather facts should be set to false when running this role since it will
 # fail if the Ansible SSH port is not set correctly.

@@ -39,7 +39,7 @@
 
       - name: Ensure we use the configured SSH port for the remainder of the role
         set_fact:
-          ansible_port: 2250
+          ansible_port: 2222
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
      #Check ETCD Cluster Health
@@ -132,6 +132,10 @@
         shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux \"{'docker_container' : '{{ tux_id.stdout }}', 'username' : 'root', 'allowed_auth' : ['password']}\""
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
+      - name: display password
+        debug: msg="{{ tux_pass.stdout }}"
+        when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
   - name: Final SSH test
     hosts: tuxlab-meteor:security_group_meteor
     vars:
@@ -141,7 +145,7 @@
     tasks:
 
      - name: SSH into tux's labVM
-       local_action: command ssh tux@10.100.1.11
+       local_action: command ssh -o UserKnownHostFiles=/dev/null tux@10.100.1.11 -p 2222
        ignore_errors: true
        register: ssh_success
 
@@ -162,7 +166,7 @@
 
       - name: Ensure we use the configured SSH port for the remainder of the role
         set_fact:
-          ansible_port: 2250
+          ansible_port: 2222
 
       - name: stop container
         shell: "docker stop tux"
