@@ -24,7 +24,7 @@
 # port 22
 - name: Check if we're using the default SSH port
   wait_for:
-    #port: "{{ hostvars.dhost.ansible_ssh_port }}"
+    #port: "{{ hostvars.dhost.ansible_port }}"
     state: "started"
     host: "{{ inventory_hostname }}"
     connect_timeout: "5"
@@ -36,7 +36,7 @@
 # If reachable, continue the following tasks with this port
 - name: Set inventory ansible_port to default
   set_fact:
-    ansible_port: "{{ hostvars.dhost.ansible_ssh_port }}"
+    ansible_port: "{{ hostvars.dhost.ansible_port }}"
   when: default_ssh is defined and
         default_ssh.state == "started"
   register: ssh_port_set

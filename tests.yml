@@ -39,7 +39,7 @@
 
       - name: Ensure we use the configured SSH port for the remainder of the role
         set_fact:
-          ansible_ssh_port: 2250
+          ansible_port: 2250
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
      #Check ETCD Cluster Health
@@ -55,7 +55,7 @@
         retries: 3
         delay: 5
         with_items: "{{ play_hosts }}"
-  
+
       - name: ensure meteor test file exists
         run_once: true
         shell: "etcdctl -u root:{{ root_pass }} ls /test/"
@@ -92,7 +92,7 @@
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
       - name: ensure all nodes are healthy
-        assert: 
+        assert:
           that: "'{{ (healthy_nodes.stdout_lines)|length }}' == '{{ play_hosts|length - 1 }}'"
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
@@ -115,7 +115,7 @@
       #Check Proxy Health
 
       - name: run labVM container
-        shell: "docker run --name tux -d tuxlab_labvm" 
+        shell: "docker run --name tux -d tuxlab_labvm"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM password
@@ -131,7 +131,7 @@
       - name: add proxy data
         shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux \"{'docker_container' : '{{ tux_id.stdout }}', 'username' : 'root', 'allowed_auth' : ['password']}\""
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
-    
+
   - name: Final SSH test
     hosts: tuxlab-meteor:security_group_meteor
     vars:
@@ -149,7 +149,7 @@
        fail: msg="Proxy health tests failed"
        when: ('Connection refused' in ssh_success.stderr)
 
- 
+
   - name: Clean up labVM container
     hosts: tuxlab-swarm-host:security_group_docker_host
     gather_facts: no
@@ -162,7 +162,7 @@
 
       - name: Ensure we use the configured SSH port for the remainder of the role
         set_fact:
-          ansible_ssh_port: 2250
+          ansible_port: 2250
 
       - name: stop container
         shell: "docker stop tux"
