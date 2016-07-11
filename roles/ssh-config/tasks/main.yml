@@ -15,11 +15,6 @@
 #
 #   Author: David Moreau Simard <dms@redhat.com>
 
-# ansible_port can change throughout this role, keep a copy around
-- name: Set configured port fact
-  set_fact:
-    configured_port: 2250
-
 # From localhost, check if we're able to reach {{ inventory_hostname }} on
 # port 22
 - name: Check if we're using the default SSH port
