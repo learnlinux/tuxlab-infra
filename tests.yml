@@ -124,12 +124,12 @@
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM ID
-        shell: "docker inspect --format='{{ '{{' }}.Config.Hostname{{ '}}' }}' tux"
+        shell: "docker inspect --format='{{ '{{' }}.NetworkSettings.IPAddress{{ '}}' }}' tux"
         register: tux_id
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: add proxy data
-        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux \"{'docker_container' : '{{ tux_id.stdout }}', 'username' : 'root', 'allowed_auth' : ['password']}\""
+        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux \"{'host' : '{{ tux_id.stdout }}', 'username' : 'root', 'allowed_auth' : ['password']}\""
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: display password
