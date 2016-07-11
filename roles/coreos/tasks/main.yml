@@ -2,11 +2,13 @@
 # Sanity check, make sure Ansible is able to connect to the host
 - name: Confirm host connection works
   ping:
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
 - name: copy coreos sshd settings
   become: yes
   become_method: sudo
   shell: "cp /usr/lib/systemd/system/sshd.socket /etc/systemd/system/sshd.socket"
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
 - name: change coreos ssh port
   become: yes
@@ -15,6 +17,7 @@
     dest: /etc/systemd/system/sshd.socket
     regexp: "^ListenStream="
     line: "ListenStream=2222"
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
 - name: change coreos binding
   become: yes
@@ -23,28 +26,33 @@
     dest: /etc/systemd/system/sshd.socket
     insertafter: "^ListenStream=2222"
     line: "FreeBind=true"
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
 - name: restart coreos daemon
   become: yes
   become_method: sudo
   shell: "systemctl daemon-reload"
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
 # We notified "Restart sshd" if we modified the sshd config.
 # By calling flush_handlers, we make sure the handler is run *right now*
 - name: Ensure SSH is reloaded if need be
   meta: flush_handlers
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
 # We're done, make sure ansible_port is set properly so that any tasks
 # after this use the right ansible_port.
 - name: Ensure we use the configured SSH port for the remainder of the role
   set_fact:
     ansible_port: 2222
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
 # Gather facts should be set to false when running this role since it will
 # fail if the Ansible SSH port is not set correctly.
 # We run setup to gather facts here once the SSH port is set up.
 - name: Run deferred setup to gather facts
   setup:
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
 - name: updating coreos
   shell: update_engine_client -check_for_update

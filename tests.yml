@@ -145,7 +145,7 @@
     tasks:
 
      - name: SSH into tux's labVM
-       local_action: command ssh -i /home/aaron/.vagrant.d/insecure_private_key -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o StrictHostKeyChecking=no -o IdentitiesOnly=yes tux@10.100.1.11 -p 2222
+       local_action: command ssh tux@10.100.1.11
        ignore_errors: true
        register: ssh_success
 
