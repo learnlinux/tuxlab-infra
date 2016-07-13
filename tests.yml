@@ -129,7 +129,7 @@
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: add proxy data
-        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux \"{'host' : '{{ tux_id.stdout }}', 'username' : 'root', 'allowed_auth' : ['password']}\""
+        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux '{\"host\" : \"172.17.0.2\", \"username\" : \"root\", \"allowed_auth\" : [\"password\"]}'"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: display password
