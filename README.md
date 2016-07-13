@@ -9,12 +9,12 @@ If you are instead looking for the application source code itself, visit the [Ap
 
 The TuxLab infrastructure is configured as follows:
 
-
 ![TuxLab Infrastructure Diagram](https://docs.google.com/drawings/d/1jLnkbWYxgBlfEEc6eldGdA_ONhBRTjJ6KmwGvpoFXkY/pub?w=960&h=720)
 
 ## Running the Development Environment
-In order to make development easier, we have created a Vagrant Enviornment to simulate the servers needed to run the TuxLab Site. You can get this up and running by first installing the following pre-requisites:
+In order to make development easier, we have created a Vagrant Environment to simulate the servers needed to run the TuxLab Site. You can get this up and running by first installing the following pre-requisites:
  * Vagrant
+ * VirtualBox (netadp, netflt, guest-iso)
  * Vagrant Hosts Plugin
  * VirtualBox
  * Ansible (>2.2)
