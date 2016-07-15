@@ -58,22 +58,3 @@
 
       - name: Create Meteor ASG
         include: aws/ec2_meteor.yml
-
- - name: Install Winston Logging Role
-   hosts: localhost
-   become: yes
-   become_method: sudo
-   shell: "ansible-galaxy install graylog2.graylog"
-
- - name: Run Winston Logging
-   hosts: all
-   become: yes
-   become_method: sudo
-
-   vars:
-     elasticsearch_version: '1.7'
-     elasticsearch_cluster_name: 'graylog2'
-     elasticsearch_gateway_expected_nodes: 1
-
-   roles:
-     - graylog2.graylog
