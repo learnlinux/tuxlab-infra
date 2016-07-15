@@ -129,12 +129,13 @@
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: add proxy data
-        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux '{\"host\" : \"172.17.0.2\", \"username\" : \"root\", \"allowed_auth\" : [\"password\"]}'"
+        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux '{\"host\" : \"{{ tux_id.stdout }}\", \"username\" : \"root\", \"allowed_auth\" : [\"password\"]}'"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: display password
         debug: msg="{{ tux_pass.stdout }}"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
 
   - name: Final SSH test
     hosts: tuxlab-meteor:security_group_meteor
@@ -144,15 +145,25 @@
       - config.yml
     tasks:
 
-     - name: SSH into tux's labVM
-       local_action: command ssh tux@10.100.1.11
-       ignore_errors: true
-       register: ssh_success
+      - name: Add labVM as container
+        add_host:
+          name: labVM
+          ansible_host: 10.100.1.11
+          ansible_port: 22
+          ansible_user: tux
+          ansible_ssh_pass: "{{ tux_pass.stdout }}"
 
-     - name: Check SSH success
-       fail: msg="{{ ssh_success}}"
-       #when: ('Connection refused' in ssh_success.stderr)
+      - name: SSH into tux's labVM
+        command: "cat /pass"
+        register: ssh_success
+        delegate_to: labVM
 
+      - name: show SSH result
+        debug: msg="{{ ssh_success }}"
+
+      - name: Check SSH success
+        fail: msg="SSH into labVM failed"
+        when: ('{{ tux_pass.stdout }}' not in '{{ ssh_success.stdout }}')
 
   - name: Clean up labVM container
     hosts: tuxlab-swarm-host:security_group_docker_host

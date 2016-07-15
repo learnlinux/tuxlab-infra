@@ -1,5 +1,5 @@
 ---
 
 - name: start swarm-agent
-  shell: docker run -d --name swarm-agent --net=host swarm:latest join --addr={{ ansible_host }}:2375 etcd://127.0.0.1:2379/swarm
+  shell: docker run -d --name swarm-agent --restart on-failure --net=host swarm:latest join --addr={{ ansible_host }}:2375 etcd://127.0.0.1:2379/swarm
 
