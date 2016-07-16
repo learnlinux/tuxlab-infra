@@ -24,17 +24,17 @@
     when: binary_deploy
 
   - name: clone tuxlab source
-    become: yes
-    become_method: sudo
     git: repo={{repo_url}}
          dest={{deploy_dir}}
          accept_hostkey=yes
     when: not binary_deploy
 
-## INSTALL
-  - name: install npm dependencies
+  - file: path={{deploy_dir}} owner={{ansible_user}} recurse=yes
     become: yes
     become_method: sudo
+
+## INSTALL
+  - name: install npm dependencies
     npm: path={{deploy_dir}} production=yes
     when: not binary_deploy
 
@@ -44,8 +44,6 @@
     npm: name=typings global=yes
 
   - name: typings install
-    become: yes
-    become_method: sudo
     shell: typings install chdir={{deploy_dir}}
 
 ## COPY SETTINGS

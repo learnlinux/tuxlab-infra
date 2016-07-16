@@ -12,5 +12,5 @@ binary_deploy: "{{ APP_REPO_BIN is defined }}"
 repo_url: "{{ APP_REPO_BIN if binary_deploy else APP_REPO_GIT }}"
 
 # Meteor Settings
-deploy_dir: /var/tuxlab
+deploy_dir: /var/tuxlab/
 deploy_app_dir: /var/www/
