@@ -136,7 +136,6 @@
         debug: msg="{{ tux_pass.stdout }}"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
-
   - name: Final SSH test
     hosts: tuxlab-meteor:security_group_meteor
     vars:

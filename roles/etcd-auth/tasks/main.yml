@@ -1,8 +1,5 @@
 ---
 
-- name: Install pexpect
-  pip: name=pexpect executable=~/bin/pip
-
 - name: Add etcd root user
   expect:
     command: etcdctl user add root
