@@ -5,9 +5,13 @@
        dest=~/helixdns
 
 - name: build tuxlab_dns image from binary
+  become: yes
+  become_method: sudo
   shell: "docker build -t tuxlab_dns ~/helixdns/docker"
 
 - name: start dns container
+  become: yes
+  become_method: sudo
   shell: "docker run -d --name swarm-dns --restart on-failure --expose 53 --net=host tuxlab_dns ./hdns"
 
 - name: create helix etcd directory

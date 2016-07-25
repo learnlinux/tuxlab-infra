@@ -1,2 +1,2 @@
 # Uses DOCKER_OPTS to configure TCP Ports
-DOCKER_OPTS="--tlsverify --tlscacert=~/ca.pem --tlscert=~/server-cert.pem --tlskey=~/server-key.pem -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock" 
+DOCKER_OPTS="--tlsverify --tlscacert=~/ca.pem --tlscert=~/server-cert.pem --tlskey=~/server-key.pem -H 0.0.0.0:2375 -H unix:///var/run/docker.sock" 

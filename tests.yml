@@ -76,6 +76,8 @@
       #Check Docker Swarm Health
 
       - name: get swarm info
+        become: yes
+        become_method: sudo
         shell: "docker --host :4000 info > ~/.swarm_status; cat ~/.swarm_status"
         register: swarm_info
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
@@ -115,15 +117,21 @@
       #Check Proxy Health
 
       - name: run labVM container
+        become: yes
+        become_method: sudo
         shell: "docker run --name tux -d tuxlab_labvm"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM password
+        become: yes
+        become_method: sudo
         shell: "docker exec tux cat /pass"
         register: tux_pass
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM ID
+        become: yes
+        become_method: sudo
         shell: "docker inspect --format='{{ '{{' }}.NetworkSettings.IPAddress{{ '}}' }}' tux"
         register: tux_id
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
@@ -147,10 +155,11 @@
       - name: Add labVM as container
         add_host:
           name: labVM
+          host_key_checking: false
           ansible_host: 10.100.1.11
           ansible_port: 22
           ansible_user: tux
-          ansible_ssh_pass: "{{ tux_pass.stdout }}"
+          ansible_ssh_pass: "{{ hostvars['dhost']['tux_pass'].stdout }}"
 
       - name: SSH into tux's labVM
         command: "cat /pass"
@@ -162,7 +171,7 @@
 
       - name: Check SSH success
         fail: msg="SSH into labVM failed"
-        when: ('{{ tux_pass.stdout }}' not in '{{ ssh_success.stdout }}')
+        when: ("{{ hostvars['dhost']['tux_pass'].stdout }}" not in "{{ ssh_success.stdout }}")
 
   - name: Clean up labVM container
     hosts: tuxlab-swarm-host:security_group_docker_host

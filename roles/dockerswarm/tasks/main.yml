@@ -1,3 +1,5 @@
 ---
 - name: start swarm-manager
+  become: yes
+  become_method: sudo
   shell: docker run -d --expose 4000 -e SWARM_HOST=":4000" --restart on-failure --name swarm-manager --net=host swarm:latest manage etcd://127.0.0.1:2379/swarm
