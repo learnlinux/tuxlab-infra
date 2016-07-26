@@ -63,6 +63,9 @@ Vagrant.configure(2) do |vagrant|
     vagrant.vm.define "meteor" do |meteor|
       meteor.vm.box = "centos/7"
 
+      meteor.ssh.username="vagrant"
+      meteor.ssh.insert_key=false
+
       # Add to Network
       meteor.vm.network "private_network", ip: "10.100.0.10"
 
