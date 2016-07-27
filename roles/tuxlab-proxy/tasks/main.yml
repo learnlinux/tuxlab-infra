@@ -1,7 +1,7 @@
 ---
 
 - name: pull alpine container images with redrouter
-  git: repo=https://github.com/trunkatedpig/tuxlab-ssh-proxy.git dest=/home/core/tuxlab-ssh-proxy
+  git: repo=https://github.com/learnlinux/tuxlab-ssh-proxy.git dest=/home/core/tuxlab-ssh-proxy
 
 - name: copying Settings
   become: yes
