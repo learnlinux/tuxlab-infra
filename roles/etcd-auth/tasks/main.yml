@@ -1,8 +1,5 @@
 ---
 
-- name: Install pexpect
-  pip: name=pexpect executable=~/bin/pip
-
 - name: Add etcd root user
   expect:
     command: etcdctl user add root
@@ -29,7 +26,7 @@
   shell: "etcdctl -u root:{{ root_pass }} role add dns; etcdctl -u root:{{ root_pass }} role add proxy;"
 
 - name: Grant role permissions
-  shell: "etcdctl -u root:{{ root_pass }} role grant dns -path '/helix/*' -readwrite; etcdctl -u root:{{ root_pass }} role grant proxy -path '/redrouter/*' -readwrite"
+  shell: "etcdctl -u root:{{ root_pass }} role grant dns -path '/skydns/*' -readwrite; etcdctl -u root:{{ root_pass }} role grant proxy -path '/redrouter/*' -readwrite"
 
 - name: Grant etcd user roles
   shell: "etcdctl -u root:{{ root_pass }} user grant dns -roles dns; etcdctl -u root:{{ root_pass }} user grant proxy -roles proxy; etcdctl -u root:{{ root_pass }} user grant meteor -roles dns,proxy"

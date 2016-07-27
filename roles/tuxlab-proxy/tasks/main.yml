@@ -13,10 +13,17 @@
   become_method: sudo
   shell: "cp -r /etc/ssl/local/ /home/core/tuxlab-ssh-proxy/src/"
 
+- name: copying TLS keys
+  become: yes
+  become_method: sudo
+  shell: "cp /home/core/{ca,cert,key}.pem /home/core/tuxlab-ssh-proxy/src/"
+
 - name: build tuxlab_proxy image
   become: yes
   become_method: sudo
   shell: "docker build -t tuxlab_proxy /home/core/tuxlab-ssh-proxy"
 
 - name: start reverse proxy container
+  become: yes
+  become_method: sudo
   shell: "docker run --name host-proxy --restart on-failure --net=host -d tuxlab_proxy"

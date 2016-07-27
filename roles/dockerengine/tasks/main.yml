@@ -19,14 +19,14 @@
   become: yes
   become_method: sudo
   template: >
-    src=docker-tcp-socket.j2
-    dest=/etc/systemd/system/docker-tcp.socket
+    src=docker-tls-tcp-socket.j2
+    dest=/etc/systemd/system/docker-tls-tcp.socket
     owner=root
     group=root
     mode=0644
 
 - name: check api socket status
-  command: systemctl status docker-tcp.socket
+  command: systemctl status docker-tls-tcp.socket
   register: api_status
   failed_when: false
   changed_when: false
@@ -35,22 +35,45 @@
 - name: enable remote api socket
   become: yes
   become_method: sudo
-  service: name=docker-tcp.socket enabled=yes
+  service: name=docker-tls-tcp.socket enabled=yes
   when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
 
-- name: stop docker service
+- name: stop docker
   become: yes
   become_method: sudo
-  service: name=docker-tcp.socket state=stopped
+  service: name=docker state=stopped
   when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
 
 - name: start remote api socket
   become: yes
   become_method: sudo
-  service: name=docker-tcp.socket state=started
+  service: name=docker-tls-tcp.socket state=started
   when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
 
-- name: start docker service
+- name: create tls settings directoty
   become: yes
   become_method: sudo
-  service: name=docker state=started
+  file: path=/etc/systemd/system/docker.service.d state=directory
+
+- name: copy tls settings
+  become: yes
+  become_method: sudo
+  template: >
+    src=tls-verify.conf
+    dest=/etc/systemd/system/docker.service.d/10-tls-verify.conf
+    owner=root
+    group=root
+    mode=0644
+
+- name: reload systemctl daemon
+  become: yes
+  become_method: sudo
+  shell: systemctl daemon-reload
+
+- name: restart docker service
+  become: yes
+  become_method: sudo
+  service: name=docker.service state=restarted
+
+- name: set docker tls settings
+  shell: export DOCKER_HOST=0.0.0.0:2375 DOCKER_TLS_VERIFY=1

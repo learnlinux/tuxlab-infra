@@ -8,6 +8,8 @@
   shell: "etcdctl -u root:{{ root_pass }} set skydns/config '{\"domain\" : \"{{TUX_DOMAIN}}\", \"hostmaster\" : \"{{ TUX_EMAIL }}\"}'"
 
 - name: start dns container
+  become: yes
+  become_method: sudo
   shell: >
         docker run -d
         --name swarm-dns

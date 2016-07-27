@@ -11,7 +11,12 @@
     }
   },
   "docker_conf" : {
-    "docker_url" : "tcp://{{ ansible_host }}:2375"
+    "docker_url" : "tcp://{{ ansible_host }}:2375",
+    "docker_args" : {
+      "cert" : "/root/cert.pem", 
+      "key" : "/root/key.pem",
+      "cacert" : "/root/ca.pem"
+    }
   },
   "wetty_conf" : {
     "host" : "0.0.0.0",
