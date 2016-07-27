@@ -1,3 +1,4 @@
 # Uses DOCKER_OPTS to configure TCP Ports
-
-DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock" 
+DOCKER_OPTS="--tlsverify --tlscacert=~/ca.pem --tlscert=~/server-cert.pem --tlskey=~/server-key.pem -H 0.0.0.0:2375 -H unix:///var/run/docker.sock"
+DOCKER_HOST="tcp://{{ ansible_host }}:2375" 
+DOCKER_TLS_VERIFY=1 

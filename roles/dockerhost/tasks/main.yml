@@ -1,5 +1,7 @@
 ---
 
 - name: start swarm-agent
+  become: yes
+  become_method: sudo
   shell: docker run -d --name swarm-agent --restart on-failure --net=host swarm:latest join --addr={{ ansible_host }}:2375 etcd://127.0.0.1:2379/swarm
 

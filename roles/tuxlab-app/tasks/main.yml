@@ -1,5 +1,24 @@
 ---
 
+## VERSION 1.4 FIXES
+  - name: remove current meteor installation
+    become: yes
+    become_method: sudo
+    file: path=~./meteor state=absent
+
+  - name: remove meteor local files
+    become: yes
+    become_method: sudo
+    file: path=/var/tuxlab/meteor/local state=absent
+
+  - name: remove meteor dev bundle
+    become: yes
+    become_method: sudo
+    file: path=/var/tuxlab/meteor/dev_bundle state=absent
+
+  - name: modify tuxlab ownership
+    file: path=/var/tuxlab state=directory owner=vagrant
+
 ## DOWNLOAD
   - name: remove current build
     become: yes
@@ -29,7 +48,8 @@
          accept_hostkey=yes
     when: not binary_deploy
 
-  - file: path={{deploy_dir}} owner={{ansible_user}} recurse=yes
+  - name: grant ansible user ownership
+    file: path={{deploy_dir}} owner={{ansible_user}} recurse=yes
     become: yes
     become_method: sudo
 
@@ -53,9 +73,10 @@
               mode=0644
 
 ## BUILD AND RUN
+
   - name: build tuxlab app
-    become: yes
-    become_method: sudo
+    become: true
+    become_user: "{{ ansible_user }}"
     shell: /usr/local/bin/meteor build --directory {{deploy_app_dir}} chdir={{deploy_dir}}
     when: not binary_deploy
 

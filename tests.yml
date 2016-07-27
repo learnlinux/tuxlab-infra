@@ -19,7 +19,7 @@
 
       - name: clean up guest permissions test file
         shell: "etcdctl rmdir insecure"
-        when: (not 'Error' in secure.stdout)
+        when: (not 'Error' in secure.stderr)
 
       - name: create test directory
         shell: "etcdctl -u root:{{ root_pass }} mkdir test"
@@ -76,9 +76,13 @@
       #Check Docker Swarm Health
 
       - name: get swarm info
-        shell: "docker --host :4000 info > ~/.swarm_status; cat ~/.swarm_status"
+        become: yes
+        become_method: sudo
+        shell: "docker --tlsverify --tlscacert=/home/core/ca.pem --tlscert=/home/core/cert.pem --tlskey=/home/core/key.pem --host {{ ansible_host }}:4000 info > ~/.swarm_status; cat ~/.swarm_status"
         register: swarm_info
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+      - debug: msg="{{ swarm_info }}"
 
       - name: ensure swarm contains correct number of nodes
         assert:
@@ -86,6 +90,8 @@
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
       - name: search for healthy nodes
+        become: yes
+        become_method: sudo
         shell: "grep 'Status: Healthy' ~/.swarm_status"
         ignore_errors: true
         register: healthy_nodes
@@ -99,7 +105,7 @@
       #Check DNS Health
 
       - name: create A record
-        shell: "etcdctl -u dns:{{ dns_pass }} set /helix/org/tuxlab/cmu/tux/A '10.100.1.11'"
+        shell: "etcdctl -u dns:{{ dns_pass }} set /skydns/org/tuxlab/cmu/tux/A '10.100.1.11'"
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
       - name: dig for A record
@@ -115,15 +121,21 @@
       #Check Proxy Health
 
       - name: run labVM container
+        become: yes
+        become_method: sudo
         shell: "docker run --name tux -d tuxlab_labvm"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM password
+        become: yes
+        become_method: sudo
         shell: "docker exec tux cat /pass"
         register: tux_pass
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM ID
+        become: yes
+        become_method: sudo
         shell: "docker inspect --format='{{ '{{' }}.NetworkSettings.IPAddress{{ '}}' }}' tux"
         register: tux_id
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
@@ -136,7 +148,6 @@
         debug: msg="{{ tux_pass.stdout }}"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
-
   - name: Final SSH test
     hosts: tuxlab-meteor:security_group_meteor
     vars:
@@ -148,10 +159,11 @@
       - name: Add labVM as container
         add_host:
           name: labVM
+          host_key_checking: false
           ansible_host: 10.100.1.11
           ansible_port: 22
           ansible_user: tux
-          ansible_ssh_pass: "{{ tux_pass.stdout }}"
+          ansible_ssh_pass: "{{ hostvars['dhost']['tux_pass'].stdout }}"
 
       - name: SSH into tux's labVM
         command: "cat /pass"
@@ -163,7 +175,7 @@
 
       - name: Check SSH success
         fail: msg="SSH into labVM failed"
-        when: ('{{ tux_pass.stdout }}' not in '{{ ssh_success.stdout }}')
+        when: ("{{ hostvars['dhost']['tux_pass'].stdout }}" not in "{{ ssh_success.stdout }}")
 
   - name: Clean up labVM container
     hosts: tuxlab-swarm-host:security_group_docker_host

@@ -4,17 +4,15 @@
 - name: create skydns etcd directory
   shell: "etcdctl -u root:{{ root_pass }} mkdir skydns"
 
-- name: create skydns config
-  shell: "etcdctl -u root:{{ root_pass }} set skydns/config '{\"domain\" : \"{{TUX_DOMAIN}}\", \"hostmaster\" : \"{{ TUX_EMAIL }}\"}'"
+- name: build tuxlab_dns image from binary
+  become: yes
+  become_method: sudo
+  shell: "docker build -t tuxlab_dns /home/core/helixdns/docker"
 
 - name: start dns container
-  shell: >
-        docker run -d
-        --name swarm-dns
-        --restart on-failure
-        --expose 53
-        --net=host
-        -e ETCD_MACHINES='http://172.17.0.1:2379'
-        -e ETCD_USERNAME='dns'
-        -e ETCD_PASSWORD='{{ dns_pass }}'
-        skynetservices/skydns:latest
+  become: yes
+  become_method: sudo
+  shell: "docker run -d --name swarm-dns --restart on-failure --expose 53 --net=host tuxlab_dns ./hdns"
+
+- name: create helix etcd directory
+  shell: "etcdctl -u root:{{ root_pass }} mkdir helix"

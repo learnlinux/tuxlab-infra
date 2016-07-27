@@ -1,0 +1,84 @@
+---
+
+- name: copy ca file
+  copy: content="{{ ca_content }}" dest=/home/core/ca.pem
+
+- name: copy ca key file
+  copy: content="{{ ca_key_content }}" dest=/home/core/ca-key.pem
+
+- name: install pexpect
+  pip: name=pexpect executable=~/bin/pip
+
+- name: generate server-key.pem
+  shell: openssl genrsa -out server-key.pem 4096
+
+- name: generate server.csr
+  shell: openssl req -subj "/CN={{ ansible_host }}" -sha256 -new -key server-key.pem -out server.csr
+
+- name: configure server-cert.pem
+  shell: echo subjectAltName = IP:{{ ansible_host }},IP:10.0.2.15,IP:127.0.0.1,IP:0.0.0.0 > extfile.cnf
+
+- name: generate server-cert.pem
+  expect:
+    command: openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem -extfile extfile.cnf
+    responses:
+      pass: "guest"
+
+- name: generate key.pem
+  shell: openssl genrsa -out key.pem 4096
+
+- name: generate host client.csr
+  shell: openssl req -subj "/CN=client" -new -key key.pem -out client.csr
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+- name: generate swarm client.csr
+  shell: openssl req -subj "/CN={{ ansible_host }}" -new -key key.pem -out client.csr
+  when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+- name: configure cert.pem
+  shell: echo extendedKeyUsage = clientAuth > extfile.cnf
+
+- name: generate cert.pem
+  expect:
+    command: openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out cert.pem -extfile extfile.cnf
+    responses:
+      pass: "guest"
+
+- name: remove extra files
+  file: path=~/{{ item }} state=absent
+  with_items:
+    - 'client.csr'
+    - 'server.csr'
+
+- name: set file permissions
+  file: path=~/{{ item.file }} state=file mode={{ item.mode }}
+  with_items:
+    - { file: "ca-key.pem", mode: "0400" }
+    - { file: "key.pem", mode: "0400" }
+    - { file: "server-key.pem", mode: "0400" }
+    - { file: "ca.pem", mode: "0444" }
+    - { file: "server-cert.pem", mode: "0444" }
+    - { file: "cert.pem", mode: "0444" }
+
+- name: create tls pem file directory
+  file: path=/home/core/.docker state=directory
+
+- name: copy tls pem files
+  become: yes
+  become_method: sudo
+  shell: cp {{ item }} /home/core/.docker/{{ item }}
+  with_items:
+    - 'key.pem'
+    - 'ca.pem'
+    - 'cert.pem'
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+- name: copy tls pem files
+  become: yes
+  become_method: sudo
+  shell: cp {{ item.src }} /home/core/.docker/{{ item.dest }}
+  with_items:
+    - {'src' : 'server-key.pem', 'dest' : 'key.pem'}
+    - {'src' : 'ca.pem', 'dest' : 'ca.pem'}
+    - {'src' : 'server-cert.pem', 'dest' : 'cert.pem'}
+  when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
