@@ -64,10 +64,12 @@ Vagrant.configure(2) do |vagrant|
       meteor.vm.box = "centos/7"
 
       meteor.ssh.username="vagrant"
-      meteor.ssh.insert_key=false
+      meteor.ssh.insert_key = false
+      meteor.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
       # Add to Network
       meteor.vm.network "private_network", ip: "10.100.0.10"
+      meteor.vm.network "forwarded_port", guest: 22, host: 2201, id: 'ssh'
 
       # Configure All Hosts via Ansible
       meteor.vm.provision :ansible do |ansible|
