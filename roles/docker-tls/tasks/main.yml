@@ -85,3 +85,14 @@
     - {'src' : 'ca.pem', 'dest' : 'ca.pem'}
     - {'src' : 'server-cert.pem', 'dest' : 'cert.pem'}
   when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+- name: register swarm tls certs
+  become: yes
+  become_method: sudo
+  shell: cat /home/core/.docker/{{ item }}
+  register: swarm_certs
+  with_items:
+    - 'key.pem'
+    - 'ca.pem'
+    - 'cert.pem'
+  when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)

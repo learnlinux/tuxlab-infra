@@ -53,14 +53,6 @@
     roles:
       - ssh-config
 
-  - name: Generate certs
-    hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
-    gather_facts: no
-    vars_files:
-      - config.yml
-    roles:
-      - tls-ca
-
   - name: Configure Swarm Engine
     hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
     gather_facts: no

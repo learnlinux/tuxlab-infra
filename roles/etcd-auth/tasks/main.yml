@@ -6,8 +6,8 @@
     responses:
       "New password:": "{{ root_pass }}"
 
-#- name: Enable authentication
-#  shell: "etcdctl auth enable"
+- name: Enable authentication
+  shell: "etcdctl auth enable"
 
 #- name: Revoke guest privileges
 #  shell: "etcdctl -u root:{{ root_pass }} role revoke guest -path '/*' -readwrite"
@@ -26,7 +26,7 @@
   shell: "etcdctl -u root:{{ root_pass }} role add dns; etcdctl -u root:{{ root_pass }} role add proxy;"
 
 - name: Grant role permissions
-  shell: "etcdctl -u root:{{ root_pass }} role grant dns -path '/helix/*' -readwrite; etcdctl -u root:{{ root_pass }} role grant proxy -path '/redrouter/*' -readwrite"
+  shell: "etcdctl -u root:{{ root_pass }} role grant dns -path '/skydns/*' -readwrite; etcdctl -u root:{{ root_pass }} role grant proxy -path '/redrouter/*' -readwrite"
 
 - name: Grant etcd user roles
   shell: "etcdctl -u root:{{ root_pass }} user grant dns -roles dns; etcdctl -u root:{{ root_pass }} user grant proxy -roles proxy; etcdctl -u root:{{ root_pass }} user grant meteor -roles dns,proxy"

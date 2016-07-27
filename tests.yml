@@ -82,14 +82,14 @@
         register: swarm_info
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
-      - debug: msg="{{ swarm_info }}"
-
       - name: ensure swarm contains correct number of nodes
         assert:
           that: "'Nodes: {{ play_hosts|length - 1 }}' in swarm_info.stdout_lines"
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
       - name: search for healthy nodes
+        become: yes
+        become_method: sudo
         shell: "grep 'Status: Healthy' ~/.swarm_status"
         ignore_errors: true
         register: healthy_nodes
@@ -103,7 +103,7 @@
       #Check DNS Health
 
       - name: create A record
-        shell: "etcdctl -u dns:{{ dns_pass }} set /helix/org/tuxlab/cmu/tux/A '10.100.1.11'"
+        shell: "etcdctl -u dns:{{ dns_pass }} set /skydns/org/tuxlab/cmu/tux/A '10.100.1.11'"
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
       - name: dig for A record
