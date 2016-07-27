@@ -15,7 +15,7 @@ The TuxLab infrastructure is configured as follows:
 In order to make development easier, we have created a Vagrant Environment to simulate the servers needed to run the TuxLab Site. You can get this up and running by first installing the following pre-requisites:
  * Vagrant
  * VirtualBox (netadp, netflt, guest-iso)
- * Vagrant Hosts Plugin
+ * Vagrant Guests Plugin
  * VirtualBox
  * Ansible (>2.2)
  * SSHPass

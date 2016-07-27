@@ -69,7 +69,6 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       meteor.vm.network "private_network", ip: "10.100.0.10"
-      meteor.vm.network "forwarded_port", guest: 22, host: 2201, id: 'ssh'
 
       # Configure All Hosts via Ansible
       meteor.vm.provision :ansible do |ansible|

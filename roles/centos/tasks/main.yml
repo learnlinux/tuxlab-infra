@@ -22,6 +22,14 @@
     key: "{{ epel_repo_gpg_key_url }}"
     state: present
 
+- name: Flush Network Interface
+  become: yes
+  become_method: sudo
+  shell: |
+    service NetworkManager stop
+    service network restart
+    chkconfig network on
+
 - name: Install git
   sudo: true
   yum: name=git state=latest
