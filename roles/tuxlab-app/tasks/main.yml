@@ -29,7 +29,8 @@
          accept_hostkey=yes
     when: not binary_deploy
 
-  - file: path={{deploy_dir}} owner={{ansible_user}} recurse=yes
+  - name: grant ansible user ownership
+    file: path={{deploy_dir}} owner={{ansible_user}} recurse=yes
     become: yes
     become_method: sudo
 

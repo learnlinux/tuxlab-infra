@@ -78,9 +78,11 @@
       - name: get swarm info
         become: yes
         become_method: sudo
-        shell: "docker --host :4000 info > ~/.swarm_status; cat ~/.swarm_status"
+        shell: "docker --tlsverify --tlscacert=/home/core/ca.pem --tlscert=/home/core/cert.pem --tlskey=/home/core/key.pem --host {{ ansible_host }}:4000 info > ~/.swarm_status; cat ~/.swarm_status"
         register: swarm_info
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+
+      - debug: msg="{{ swarm_info }}"
 
       - name: ensure swarm contains correct number of nodes
         assert:

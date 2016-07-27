@@ -1,9 +1,4 @@
 ---
-
-   root_pass: hi
-   meteor_pass: hi
-   dns_pass: hi
-   proxy_pass: hi
 ###############################
 #    DOMAIN CONFIGURATION     #
 ###############################

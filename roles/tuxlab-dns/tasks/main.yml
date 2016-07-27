@@ -7,7 +7,7 @@
 - name: build tuxlab_dns image from binary
   become: yes
   become_method: sudo
-  shell: "docker build -t tuxlab_dns ~/helixdns/docker"
+  shell: "docker build -t tuxlab_dns /home/core/helixdns/docker"
 
 - name: start dns container
   become: yes
