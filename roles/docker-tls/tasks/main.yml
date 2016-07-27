@@ -16,7 +16,7 @@
   shell: openssl req -subj "/CN={{ ansible_host }}" -sha256 -new -key server-key.pem -out server.csr
 
 - name: configure server-cert.pem
-  shell: echo subjectAltName = IP:{{ ansible_host }},IP:10.0.2.15,IP:10.1.100.10,IP:10.100.1.11,IP:127.0.0.1,IP:0.0.0.0 > extfile.cnf
+  shell: echo subjectAltName = IP:{{ ansible_host }},IP:10.0.2.15,IP:127.0.0.1,IP:0.0.0.0 > extfile.cnf
 
 - name: generate server-cert.pem
   expect:
@@ -59,9 +59,6 @@
     - { file: "ca.pem", mode: "0444" }
     - { file: "server-cert.pem", mode: "0444" }
     - { file: "cert.pem", mode: "0444" }
-
-- name: copy connection settings script
-  template: src=docker_setup.sh dest=/home/core/docker_setup.sh
 
 - name: create tls pem file directory
   file: path=/home/core/.docker state=directory

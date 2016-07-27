@@ -18,4 +18,3 @@ destroy:
 	vagrant destroy -f;
 	rm -rf .vagrant/;
 	rm -rf ~/.tuxlab;
-	rm -rf ~/VirtualBox\ VMs/*;
