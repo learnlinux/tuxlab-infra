@@ -1,7 +1,7 @@
 # Static Inventory File for Vagrant
 
-meteor ansible_host=10.100.0.10 ansible_port=22 ansible_user='vagrant' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key'
-dhost ansible_host=10.100.1.11 ansible_port=22 ansible_user='core' ansible_ssh_user='core' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key'
+meteor ansible_host=127.0.0.1 ansible_port=2201 ansible_user='vagrant' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key'
+dhost ansible_host=10.100.1.11 ansible_port=22 ansible_user='core' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key'
 dswarm ansible_host=10.100.1.10 ansible_port=22 ansible_user='core' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key'
 
 [tuxlab-swarm-manager]
