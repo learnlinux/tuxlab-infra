@@ -20,3 +20,11 @@
   with_items:
     - host.key
     - host.key.pub
+
+- name: copy tls keys to meteor
+  become: yes
+  become_method: sudo
+  shell: echo '{{ item.stdout }}' >> /etc/ssl/local/{{ item.item }}
+  when: ('security_group_meteor' in group_names or 'tuxlab-meteor' in group_names)
+  with_items: "{{ hostvars['dswarm']['swarm_certs'].results }}"
+  no_log: yes
