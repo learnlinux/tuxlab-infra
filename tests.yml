@@ -19,7 +19,7 @@
 
       - name: clean up guest permissions test file
         shell: "etcdctl rmdir insecure"
-        when: (not 'Error' in secure.stdout)
+        when: (not 'Error' in secure.stderr)
 
       - name: create test directory
         shell: "etcdctl -u root:{{ root_pass }} mkdir test"
