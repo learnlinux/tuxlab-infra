@@ -23,10 +23,10 @@
     - { user: 'meteor', pass: '{{ meteor_pass }}' }
 
 - name: Add etcd roles
-  shell: "etcdctl -u root:{{ root_pass }} role add dns; etcdctl -u root:{{ root_pass }} role add proxy;"
+  shell: "etcdctl -u root:{{ root_pass }} role add skydns; etcdctl -u root:{{ root_pass }} role add redrouter;"
 
 - name: Grant role permissions
-  shell: "etcdctl -u root:{{ root_pass }} role grant dns -path '/skydns/*' -readwrite; etcdctl -u root:{{ root_pass }} role grant proxy -path '/redrouter/*' -readwrite"
+  shell: "etcdctl -u root:{{ root_pass }} role grant skydns -path '/skydns/*' -readwrite; etcdctl -u root:{{ root_pass }} role grant redrouter -path '/redrouter/*' -readwrite"
 
 - name: Grant etcd user roles
-  shell: "etcdctl -u root:{{ root_pass }} user grant dns -roles dns; etcdctl -u root:{{ root_pass }} user grant proxy -roles proxy; etcdctl -u root:{{ root_pass }} user grant meteor -roles dns,proxy"
+  shell: "etcdctl -u root:{{ root_pass }} user grant dns -roles skydns; etcdctl -u root:{{ root_pass }} user grant proxy -roles redrouter; etcdctl -u root:{{ root_pass }} user grant meteor -roles redrouter,skydns"
