@@ -1,11 +1,8 @@
 ---
 
 # Configure Options
-- name: create skydns etcd directory
-  shell: "etcdctl -u root:{{ root_pass }} mkdir skydns"
-
 - name: create skydns config
-  shell: "etcdctl -u root:{{ root_pass }} set skydns/config '{\"domain\" : \"{{TUX_DOMAIN}}\", \"hostmaster\" : \"{{ TUX_EMAIL }}\"}'"
+  shell: "etcdctl -u dns:{{ dns_pass }} set skydns/config '{\"domain\" : \"{{TUX_DOMAIN}}\", \"hostmaster\" : \"{{ TUX_EMAIL }}\"}'"
 
 - name: start dns container
   become: yes

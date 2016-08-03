@@ -1,0 +1,24 @@
+---
+
+- name: clone tuxlab-session-daemon repo
+  git: repo=https://github.com/learnlinux/tuxlab-session-daemon.git dest=/home/core/tuxlab-session-daemon
+
+- name: copy settings.json
+  template: src=settings.json dest=/home/core/tuxlab-session-daemon/src/settings.json
+
+- name: copy docker tls certs
+  shell: cp /home/core/{{ item }} /home/core/tuxlab-session-daemon/src/{{ item }}
+  with_items:
+    - ca.pem
+    - cert.pem
+    - key.pem
+
+- name: build session_daemon image
+  become: yes
+  become_method: sudo
+  shell: docker build -t session_daemon /home/core/tuxlab-session-daemon 
+
+- name: run session-daemon container
+  become: yes
+  become_method: sudo
+  shell: docker run --name session-daemon --restart on-failure -d session_daemon
