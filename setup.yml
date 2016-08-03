@@ -93,8 +93,8 @@
       ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - dockerhost
-      - tuxlab-sshd
-      - tuxlab-proxy
+      - tuxlab-labvm
+      - ssl-distribution
 
   - name: Configure Swarm Manager
     hosts: tuxlab-swarm-manager:security_group_docker_manager
@@ -108,6 +108,20 @@
       - dockerswarm
       - etcd-auth
       - tuxlab-dns
+
+  - name: Configure Swarm Hosts
+    hosts: tuxlab-swarm-host:security_group_docker_host
+    become: yes
+    become_method: sudo
+    gather_facts: no
+    vars_files:
+      - config.yml
+    vars:
+      ansible_ssh_user: core
+      ansible_python_interpreter: "/home/core/bin/python"
+    roles:
+      - tuxlab-proxy
+      - tuxlab-session-daemon
 
   - name: Configure Meteor Applications
     hosts: tuxlab-meteor:security_group_meteor
