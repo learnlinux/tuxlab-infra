@@ -29,7 +29,10 @@
     - { user: 'meteor', pass: '{{ meteor_pass }}' }
 
 - name: Add etcd roles
-  shell: "etcdctl -u root:{{ root_pass }} role add skydns; etcdctl -u root:{{ root_pass }} role add redrouter;"
+  shell: |
+    etcdctl -u root:{{ root_pass }} role add skydns;
+    etcdctl -u root:{{ root_pass }} role add redrouter;
+    etcdctl -u root:{{ root_pass }} role add tuxlab;
 
 - name: Grant role permissions
   shell: |
@@ -37,6 +40,8 @@
     etcdctl -u root:{{ root_pass }} role grant skydns -path '/skydns/*' -readwrite;
     etcdctl -u root:{{ root_pass }} role grant redrouter -path '/redrouter' -readwrite;
     etcdctl -u root:{{ root_pass }} role grant redrouter -path '/redrouter/*' -readwrite;
+    etcdctl -u root:{{ root_pass }} role grant tuxlab -path '/tuxlab' -readwrite;
+    etcdctl -u root:{{ root_pass }} role grant tuxlab -path '/tuxlab/*' -readwrite;
 
 - name: Grant etcd user roles
   shell: | 
@@ -44,6 +49,7 @@
     etcdctl -u root:{{ root_pass }} user grant proxy -roles redrouter; 
     etcdctl -u root:{{ root_pass }} user grant meteor -roles skydns;
     etcdctl -u root:{{ root_pass }} user grant meteor -roles redrouter;
+    etcdctl -u root:{{ root_pass }} user grant meteor -roles tuxlab;
 
 - name: Ensure dns user configured properly
   expect:
