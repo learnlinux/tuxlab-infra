@@ -154,26 +154,20 @@
       - config.yml
     tasks:
 
-      - name: Add labVM as container
-        add_host:
-          name: labVM
-          host_key_checking: false
-          ansible_host: 10.100.1.11
-          ansible_port: 22
-          ansible_user: tux
-          ansible_ssh_pass: "{{ hostvars['dhost']['tux_pass'].stdout }}"
-
       - name: SSH into tux's labVM
-        command: "cat /pass"
+        expect:
+          command: ssh tux@10.100.1.11
+          responses:
+            password: "{{ hostvars['dhost']['tux_pass'].stdout }}"
         register: ssh_success
-        delegate_to: labVM
+        delegate_to: localhost
 
       - name: show SSH result
         debug: msg="{{ ssh_success }}"
 
       - name: Check SSH success
         fail: msg="SSH into labVM failed"
-        when: ("{{ hostvars['dhost']['tux_pass'].stdout }}" not in "{{ ssh_success.stdout }}")
+        when: ("welcome" not in "{{ ssh_success.stdout }}")
 
   - name: Clean up labVM container
     hosts: tuxlab-swarm-host:security_group_docker_host
