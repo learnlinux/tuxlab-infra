@@ -121,7 +121,7 @@
       - name: run labVM container
         become: yes
         become_method: sudo
-        shell: "docker run --name tux -d tuxlab_labvm"
+        shell: "docker run --name tux -d tuxlab_labvm_alpine"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM password

@@ -17,7 +17,7 @@
     file: path=/var/tuxlab/meteor/dev_bundle state=absent
 
   - name: modify tuxlab ownership
-    file: path=/var/tuxlab state=directory owner=vagrant
+    file: path=/var/tuxlab state=directory owner={{ ansible_user }}
 
 ## DOWNLOAD
   - name: remove current build
@@ -28,7 +28,7 @@
   - name: Create {{ deploy_dir }}
     become: yes
     become_method: sudo
-    file: name={{ item }} state=directory owner=root group=root recurse=yes
+    file: name={{ item }} state=directory owner={{ ansible_user }} recurse=yes
     with_items:
       - "{{ deploy_dir }}"
       - "{{ deploy_app_dir }}"
