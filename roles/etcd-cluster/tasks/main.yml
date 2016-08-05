@@ -37,6 +37,7 @@
      - 'meteor_pass_file'
      - 'dns_pass_file'
      - 'proxy_pass_file'
+     - 'session_pass_file'
 
  - name: Generate pass files
    run_once: true
@@ -48,6 +49,7 @@
      - { file: 'file_info.results[1]', val: 'meteor_pass' }
      - { file: 'file_info.results[2]', val: 'dns_pass' }
      - { file: 'file_info.results[3]', val: 'proxy_pass' }
+     - { file: 'file_info.results[4]', val: 'session_pass' }
 
  - name: Load pass files
    set_fact:
@@ -58,6 +60,7 @@
      - { file: 'file_info.results[1]', val: 'meteor_pass', name: 'meteor_pass_file' }
      - { file: 'file_info.results[2]', val: 'dns_pass', name: 'dns_pass_file' }
      - { file: 'file_info.results[3]', val: 'proxy_pass', name: 'proxy_pass_file' }
+     - { file: 'file_info.results[4]', val: 'session_pass', name: 'session_pass_file' }
 
  - name: Copy pass files
    run_once: true
@@ -67,3 +70,4 @@
      - { file: 'file_info.results[1]', val: "{{ meteor_pass }}", name: 'meteor_pass_file' }
      - { file: 'file_info.results[2]', val: "{{ dns_pass }}", name: 'dns_pass_file' }
      - { file: 'file_info.results[3]', val: "{{ proxy_pass }}", name: 'proxy_pass_file' }
+     - { file: 'file_info.results[4]', val: "{{ session_pass }}", name: 'session_pass_file' }

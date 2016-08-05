@@ -27,12 +27,14 @@
     - { user: 'dns', pass: '{{ dns_pass }}' }
     - { user: 'proxy', pass: '{{ proxy_pass }}' }
     - { user: 'meteor', pass: '{{ meteor_pass }}' }
+    - { user: 'session', pass: '{{ session_pass }}' }
 
 - name: Add etcd roles
   shell: |
     etcdctl -u root:{{ root_pass }} role add skydns;
     etcdctl -u root:{{ root_pass }} role add redrouter;
     etcdctl -u root:{{ root_pass }} role add tuxlab;
+    etcdctl -u root:{{ root_pass }} role add session;
 
 - name: Grant role permissions
   shell: |
@@ -50,6 +52,7 @@
     etcdctl -u root:{{ root_pass }} user grant meteor -roles skydns;
     etcdctl -u root:{{ root_pass }} user grant meteor -roles redrouter;
     etcdctl -u root:{{ root_pass }} user grant meteor -roles tuxlab;
+    etcdctl -u root:{{ root_pass }} user grant session -roles tuxlab;
 
 - name: Ensure dns user configured properly
   expect:
@@ -78,5 +81,15 @@
       "New password:": "{{ meteor_pass }}"
   register: pass_success_meteor
   until: "'Password updated' in '{{ pass_success_meteor.stdout }}'"
+  retries: 5
+  delay: 1
+
+- name: Ensure session user configured properly
+  expect:
+    command: etcdctl -u root:{{ root_pass }} user passwd session
+    responses:
+      "New password:": "{{ session_pass }}"
+  register: pass_success_session
+  until: "'Password updated' in '{{ pass_success_session.stdout }}'"
   retries: 5
   delay: 1
