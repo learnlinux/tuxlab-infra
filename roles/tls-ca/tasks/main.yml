@@ -1,11 +1,11 @@
 ---
 
-#- name: install pexpect
-#  become: yes
-#  become_method: sudo
-#  pip: name=pexpect version=3.3
-#  delegate_to: localhost
-#  run_once: true
+- name: install pexpect
+  become: yes
+  become_method: sudo
+  pip: name=pexpect version=3.3
+  delegate_to: localhost
+  run_once: true
 
 - name: register home directory
   local_action: command echo $HOME

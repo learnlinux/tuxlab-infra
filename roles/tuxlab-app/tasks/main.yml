@@ -74,6 +74,16 @@
 
 ## BUILD AND RUN
 
+  - name: create deploy_app_dir
+    become: yes
+    become_method: sudo
+    shell: mkdir {{ deploy_app_dir }}
+
+  - name: modify deploy_app_dir ownership
+    become: yes
+    become_method: sudo
+    shell: chown -hR {{ ansible_user }} {{ deploy_app_dir }}
+
   - name: build tuxlab app
     become: true
     become_user: "{{ ansible_user }}"
