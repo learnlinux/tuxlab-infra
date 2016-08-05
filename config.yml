@@ -15,7 +15,7 @@
 ###############################
 #    LABENV CONFIGURATION     #
 ###############################
-   LAB_IMAGES: [{ url: "https://github.com/learnlinux/tuxlab-labvm.git", directory: /home/core/tuxlab-labvm, image_name: tuxlab_labvm }]
+   LAB_IMAGES: [{ url: "https://github.com/learnlinux/tuxlab-labvm-alpine.git", directory: /home/core/tuxlab-labvm-alpine, image_name: tuxlab_labvm_alpine }]
 
 ###############################
 #    MONGODB CONFIGURATION    #
