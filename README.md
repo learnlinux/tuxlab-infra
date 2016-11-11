@@ -17,7 +17,7 @@ In order to make development easier, we have created a Vagrant Environment to si
  * VirtualBox (netadp, netflt, guest-iso)
  * Vagrant Guests Plugin
  * VirtualBox
- * Ansible (>2.2)
+ * Ansible (Version 2.3 or above)
  * SSHPass
 
 You can then initialize this environment by running `vagrant up`.  The TuxLab site will be
