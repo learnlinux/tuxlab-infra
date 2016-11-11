@@ -17,7 +17,7 @@ In order to make development easier, we have created a Vagrant Environment to si
  * VirtualBox (netadp, netflt, guest-iso)
  * Vagrant Guests Plugin
  * VirtualBox
- * Ansible (>2.2)
+ * Ansible (Version 2.3 or above)
  * SSHPass
 
 You can then initialize this environment by running `vagrant up`.  The TuxLab site will be
@@ -25,7 +25,7 @@ visible at `10.100.0.10:8080`.
 
 ## Running on AWS Cloud
 You need the following things:
- * Install Python, pip and Ansible (>2.2) via your package manager.
+ * Install Python, pip and Ansible (Version 2.3 or above) via your package manager.
  * Install boto and tower-cli using pip (`sudo pip install -U boto ansible-tower-cli`)
  * Place your Ansible Tower license in /aws/keys/tower.txt, and add the JSON property `"eula_accepted" : true`, indicating you have read and accepted the Ansible Tower EULA.
  * Edit the `aws/vars/` files based on your configuration.
