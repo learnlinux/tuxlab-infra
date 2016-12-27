@@ -5,12 +5,13 @@
    TUX_DOMAIN: cmu.tuxlab.org
    TUX_HOMEPAGE: http://cmu.tuxlab.org/
    TUX_EMAIL: service@tuxlab.org
+   LETS_ENCRYPT: false
 
 ###############################
 #      APP CONFIGURATION      #
 ###############################
    APP_REPO_GIT: https://github.com/learnlinux/tuxlab-app
-   #APP_REPO_BIN: https://api.github.com/repos/learnlinux/tuxlab/tarball/v1.0.0
+   #APP_REPO_BIN: https://api.github.com/repos/learnlinux/tuxlab/tarball/v1.0.0 USE IF WANT BINARY INSTALL
 
 ###############################
 #    LABENV CONFIGURATION     #

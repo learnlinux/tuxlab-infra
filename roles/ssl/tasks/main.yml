@@ -1,0 +1,69 @@
+---
+
+# Enable Self-Signing
+- name: install pexpect
+  become: yes
+  become_method: sudo
+  pip: name=pexpect version=3.3
+
+- name: generate ca keys
+  become: yes
+  become_method: sudo
+  expect:
+    command: openssl req -new -x509 -days 365 -keyout ~/.tuxlab/ca-key.pem -sha256 -out ~/.tuxlab/ca.pem
+    responses:
+      Country: "US"
+      State: "Pennsylvania"
+      Locality: "Pittsburgh"
+      company: "Carnegie Mellon University"
+      section: "TuxLab Project"
+      FQDN: "tuxlab.org"
+      Email: "contact@tuxlab.org"
+  delegate_to: localhost
+  run_once: true
+
+# Create SSL Folder on hosts
+- name: Create Key Directory
+  become: yes
+  become_method: sudo
+  file: path=/etc/ssl/local state=directory
+
+# Generate Keys
+- name: Generate Host Key
+  become: yes
+  become_method: sudo
+  shell: openssl genrsa -out /etc/ssl/local/host.pem 2048
+
+- name: Create CSR
+  become: yes
+  become_method: sudo
+  expect:
+    command: openssl req -new key /etc/ssl/local/host.pem
+    responses:
+      password: "."
+      Country: "US"
+      State: "Pennsylvania"
+      Locality: "Pittsburgh"
+      company: "Carnegie Mellon University"
+      section: "TuxLab Project"
+      FQDN: "tuxlab.org"
+      Email: "contact@tuxlab.org"
+  register: ssl_csr
+
+# Sign Certificate (Self-Signing)
+- name: Sign CSR
+  become: yes
+  become_method: sudo
+  delegate_to: localhost
+  shell: echo "{{ ssl_csr }}" >> openssl x509 -req -days 365 -signkey ~/.tuxlab/ca-key.pem
+  register: ssl_cert
+
+# TODO: Add Let's Encrypt Key
+
+# Copy CA Public Key
+- name: Copy CA Key
+  copy: src=~/.tuxlab/ca.pem dest=/etc/ssl/local/ca.pem mode=444 owner="{{ ansible_user }}"
+
+# Save Certificate
+- name: Save Certificate
+  copy: content="{{ssl_cert}}" dest="/etc/ssl/local/cert.pem" mode=444 owner="{{ ansible_user }}"

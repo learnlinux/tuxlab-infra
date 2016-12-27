@@ -2,18 +2,15 @@
   "etcd_conf" : {
     "etcd_hosts" : ["172.17.0.1:2379"],
     "etcd_conn_opts" : {
-      {% if proxy_pass is defined %}
-      "auth" : {
-        "user" : "proxy",
-        "pass" : "{{ proxy_pass }}"
-      }
-      {% endif %}
+      "cert" : "/root/cert.pem",
+      "key" : "/root/key.pem",
+      "cacert" : "/root/ca.pem"
     }
   },
   "docker_conf" : {
     "docker_url" : "tcp://{{ ansible_host }}:2375",
     "docker_args" : {
-      "cert" : "/root/cert.pem", 
+      "cert" : "/root/cert.pem",
       "key" : "/root/key.pem",
       "cacert" : "/root/ca.pem"
     }

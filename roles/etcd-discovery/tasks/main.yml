@@ -1,0 +1,27 @@
+---
+
+# Get Discovery Token
+
+ - name: Create TuxLab directory
+   run_once: true
+   local_action: file path=~/.tuxlab state=directory mode=0755
+
+ - name: Check if Swarm URL is Set
+   run_once: true
+   local_action: stat path=~/.tuxlab/discovery_url
+   ignore_errors: true
+   register: etcd_discovery_file
+
+ - name: Create ETCD Discovery URL
+   run_once: true
+   local_action: uri url=https://discovery.etcd.io/new?size=3 return_content=yes
+   register: etcd_discovery_web
+   when: not etcd_discovery_file.stat.exists
+
+ - name: Save to TuxLab Config Folder
+   run_once: true
+   local_action: copy content="{{etcd_discovery_web.content}}" dest=~/.tuxlab/discovery_url
+   when: not etcd_discovery_file.stat.exists
+
+ - name: Load Discovery URL
+   local_action: set_fact etcd_discovery="{{ lookup('file', '~/.tuxlab/discovery_url') }}"
