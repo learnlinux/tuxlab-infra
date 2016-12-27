@@ -1,7 +1,12 @@
 ---
-
 - name: start swarm-agent
   become: yes
   become_method: sudo
-  shell: docker run -d --name swarm-agent --restart on-failure --net=host swarm:latest join --addr={{ ansible_host }}:2375 etcd://127.0.0.1:2379/swarm
-
+  shell: >
+    docker run -d
+    --name swarm-agent --restart on-failure
+    --net=host swarm:latest join --addr={{ ansible_host }}:2375
+    --discovery-opt kv.cacertfile=/etc/ssl/local/ca.pem
+    --discovery-opt kv.certfile=/etc/ssl/local/cert.pem
+    --discovery-opt kv.keyfile=/etc/ssl/local/host.pem
+    etcd://127.0.0.1:2379/swarm

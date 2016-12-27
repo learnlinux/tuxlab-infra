@@ -1,6 +1,4 @@
 {
   "etcd_host_ip": "{{ ansible_host }}",
-  "etcd_host_port": "2379",
-  "etcd_username": "session",
-  "etcd_pass": "{{ session_pass }}"
+  "etcd_host_port": "2379"
 }

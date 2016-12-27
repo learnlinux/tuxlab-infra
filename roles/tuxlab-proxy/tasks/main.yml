@@ -13,11 +13,6 @@
   become_method: sudo
   shell: "cp -r /etc/ssl/local/ /home/core/tuxlab-ssh-proxy/src/"
 
-- name: copying TLS keys
-  become: yes
-  become_method: sudo
-  shell: "cp /home/core/{ca,cert,key}.pem /home/core/tuxlab-ssh-proxy/src/"
-
 - name: build tuxlab_proxy image
   become: yes
   become_method: sudo
