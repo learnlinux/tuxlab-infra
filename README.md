@@ -21,7 +21,7 @@ In order to make development easier, we have created a Vagrant Environment to si
  * SSHPass
 
 You can then initialize this environment by running `vagrant up`.  The TuxLab site will be
-visible at `10.100.0.10:8080`.
+visible at `10.100.1.10:8080`.
 
 ## Running on AWS Cloud
 You need the following things:

@@ -18,8 +18,6 @@ After=network.target
 [Service]
 Type=notify
 User={{ etcd_user }}
-
-
 ExecStart={{ etcd_cmd }} \
 						{% if etcd_discovery != none -%}
 						-discovery {{ etcd_discovery }} \
@@ -51,7 +49,7 @@ ExecStart={{ etcd_cmd }} \
 						{% endif -%}
 						{% endif -%}
 						-data-dir {{ etcd_data_dir }} \
-						-name {{ inventory_hostname }}
+						-name {{ inventory_hostname }} \
 
 Restart=always
 RestartSec=10s

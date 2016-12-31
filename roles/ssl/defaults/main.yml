@@ -1,4 +1,7 @@
 ---
 
-letsencrypt_domain: "cmu.tuxlab.org"
-letsencrypt_email: "support@tuxlab.org"
+# The Common Name (CN) for the CSR
+SSL_DOMAIN: "{{ TUX_DOMAIN }}"
+
+# The SUBJ for the CSR
+SSL_SUBJ: "/C={{SSL_COUNTRY}}/ST={{SSL_STATE}}/L={{SSL_LOCALITY}}/O={{SSL_ORG}}/OU={{SSL_ORG_UNIT}}/CN={{SSL_DOMAIN}}/R={{TUX_EMAIL}}"

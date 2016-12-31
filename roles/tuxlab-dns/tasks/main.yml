@@ -2,18 +2,27 @@
 
 # Configure Options
 - name: create skydns config
-  shell: "etcdctl -u dns:{{ dns_pass }} set skydns/config '{\"domain\" : \"{{TUX_DOMAIN}}\", \"hostmaster\" : \"{{ TUX_EMAIL }}\"}'"
+  shell: "etcdctl set skydns/config '{\"domain\" : \"{{TUX_DOMAIN}}\", \"hostmaster\" : \"{{ TUX_EMAIL }}\"}'"
+
+#TODO https://github.com/ansible/ansible-modules-core/issues/5515
+- name: pull dns image
+  become: yes
+  shell: docker pull skynetservices/skydns
 
 - name: start dns container
   become: yes
-  become_method: sudo
-  shell: >
-        docker run -d
-        --name swarm-dns
-        --restart on-failure
-        --expose 53
-        --net=host
-        -tls-key='/etc/ssl/local/host.pem'
-        -tls-pem='/etc/ssl/local/cert.pem'
-        -ca-cert='/etc/ssl/local/ca.pem'
-        skynetservices/skydns:latest
+  docker_container:
+    name: swarm-dns
+    image: skynetservices/skydns
+    state: started
+    network_mode: host
+    restart_policy: on-failure
+    exposed_ports:
+      - 53
+    volumes:
+      - /etc/ssl/local:/ssl:ro
+    env:
+      ETCD_MACHINES: "https://127.0.0.1:2379"
+      ETCD_TLSKEY: "/ssl/host.pem"
+      ETCD_TLSPEM: "/ssl/cert.pem"
+      ETCD_CACERT: "/ssl/ca.pem"

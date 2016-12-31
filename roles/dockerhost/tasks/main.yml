@@ -1,12 +1,27 @@
 ---
-- name: start swarm-agent
+
+#TODO https://github.com/ansible/ansible-modules-core/issues/5515
+- name: pull swarm image
   become: yes
-  become_method: sudo
-  shell: >
-    docker run -d
-    --name swarm-agent --restart on-failure
-    --net=host swarm:latest join --addr={{ ansible_host }}:2375
-    --discovery-opt kv.cacertfile=/etc/ssl/local/ca.pem
-    --discovery-opt kv.certfile=/etc/ssl/local/cert.pem
-    --discovery-opt kv.keyfile=/etc/ssl/local/host.pem
-    etcd://127.0.0.1:2379/swarm
+  shell: docker pull swarm
+
+- name: start swarm-manager
+  become: yes
+  docker_container:
+    name: swarm-agent
+    image: swarm
+    restart_policy: on-failure
+    network_mode: host
+    volumes:
+      - /etc/ssl/local:/certs:ro
+    command: >
+      join
+      --addr={{ ansible_host }}:2375
+      --tlsverify
+      --tlscacert=/certs/ca.pem
+      --tlscert=/certs/cert.pem
+      --tlskey=/certs/host.pem
+      --discovery-opt kv.cacertfile=/certs/ca.pem
+      --discovery-opt kv.certfile=/certs/cert.pem
+      --discovery-opt kv.keyfile=/certs/host.pem
+      etcd://127.0.0.1:2379/swarm

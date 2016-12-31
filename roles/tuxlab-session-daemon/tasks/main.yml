@@ -1,24 +1,21 @@
 ---
 
-- name: clone tuxlab-session-daemon repo
-  git: repo=https://github.com/learnlinux/tuxlab-session-daemon.git dest=/home/core/tuxlab-session-daemon
-
-- name: copy settings.json
-  template: src=settings.json dest=/home/core/tuxlab-session-daemon/src/settings.json
-
-- name: copy docker tls certs
-  shell: cp -r /etc/ssl/local/{{ item }} /home/core/tuxlab-session-daemon/src/{{ item }}
-  with_items:
-    - ca.pem
-    - cert.pem
-    - host.pem
-
-- name: build session_daemon image
+- name: copy session daemon settings
   become: yes
-  become_method: sudo
-  shell: docker build -t session_daemon /home/core/tuxlab-session-daemon
+  template: src=settings.json.j2 dest=/root/tuxlab-sessiond-settings.json
+
+#TODO: https://github.com/ansible/ansible-modules-core/issues/5515
+- name: pull session-daemon image
+  become: yes
+  shell: docker pull tuxlab/session-daemon
 
 - name: run session-daemon container
   become: yes
-  become_method: sudo
-  shell: docker run --name session-daemon --restart on-failure -d session_daemon
+  docker_container:
+    name: session-daemon
+    image: tuxlab/session-daemon
+    state: started
+    restart_policy: on-failure
+    volumes:
+      - ~/tuxlab-sessiond-settings.json:/settings.json:ro
+      - /etc/ssl/local:/ssl:ro

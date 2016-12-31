@@ -1,6 +1,0 @@
----
-
-- name: enable time syncing service
-  become: yes
-  become_method: sudo
-  service: name=systemd-networkd state=started

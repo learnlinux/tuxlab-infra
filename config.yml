@@ -5,7 +5,15 @@
    TUX_DOMAIN: cmu.tuxlab.org
    TUX_HOMEPAGE: http://cmu.tuxlab.org/
    TUX_EMAIL: service@tuxlab.org
-   LETS_ENCRYPT: false
+
+###############################
+#     SSL CONFIGURATION       #
+###############################
+   SSL_COUNTRY: US
+   SSL_STATE: Pennsylvania
+   SSL_LOCALITY: Pittsburgh
+   SSL_ORG: Carnegie Mellon University
+   SSL_ORG_UNIT: TuxLab
 
 ###############################
 #      APP CONFIGURATION      #
@@ -16,7 +24,8 @@
 ###############################
 #    LABENV CONFIGURATION     #
 ###############################
-   LAB_IMAGES: [{ url: "https://github.com/learnlinux/tuxlab-labvm-alpine.git", directory: /home/core/tuxlab-labvm-alpine, image_name: tuxlab_labvm_alpine }]
+   LAB_IMAGES:
+    - 'tuxlab/labvm-alpine'
 
 ###############################
 #    MONGODB CONFIGURATION    #
@@ -35,15 +44,15 @@
    EC2_AZ: us-east-1a
 
   # Ansible Tower
-   TOWER_IMAGE: ami-a013f9cd
+   TOWER_IMAGE: ami-ebedc8fc
    TOWER_INSTANCE_TYPE: m3.medium
 
   # Docker Swarm Manager Settings
-   SWARM_IMAGE: ami-8d6485e0
+   SWARM_IMAGE: ami-cfeca0d8
    SWARM_INSTANCE_TYPE: t2.medium
 
   # Docker Host Settings
-   DOCKER_IMAGE: ami-8d6485e0
+   DOCKER_IMAGE: ami-cfeca0d8
    DOCKER_INSTANCE_TYPE: t2.medium
    DOCKER_MAX_INSTANCES: 1
 

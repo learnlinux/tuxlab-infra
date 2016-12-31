@@ -1,0 +1,60 @@
+---
+# Sanity check, make sure Ansible is able to connect to the host
+- name: Confirm host connection works
+  ping:
+
+# Download Atomic Upgrades
+- name: updating atomic host
+  become: yes
+  shell: atomic host upgrade
+
+# Changes SSHD Socket Port to 2222
+- name: change ssh port
+  become: yes
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^#Port 22"
+    line: "Port 2222"
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+# Allow Policy Change
+- name: selinux change ssh port
+  become: yes
+  shell: "semanage port -a -t ssh_port_t -p tcp 2222"
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+# Restart SSHD
+- name: restart SSHD
+  become: yes
+  systemd:
+    name: sshd
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+
+# Reboot
+- name: trigger reboot
+  become: yes
+  command: sleep 2 && systemctl reboot
+  async: 1
+  poll: 0
+
+# Update Port in Ansible Inventory
+- name: Ensure we use the configured SSH port for the remainder of the role
+  set_fact:
+    ansible_port: 2222
+  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+
+# Wait for Reboot
+- name: waiting for server to come back
+  local_action: wait_for
+  args:
+    host: "{{ ansible_host }}"
+    port: "{{ ansible_port }}"
+    state: started
+    delay: 30
+    timeout: 300
+
+# Gather Facts
+- name: Run deferred setup to gather facts
+  setup:

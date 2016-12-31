@@ -6,33 +6,17 @@
     vars_files:
       - config.yml
     tasks:
-      #Check ETCD Cluster Health
 
-      - name: test guest permissions
-        shell: "etcdctl mkdir insecure"
-        register: secure
-        ignore_errors: true
-
-      - name: log guest permissions
-        debug: msg="WARNING! ETCD is insecure!"
-        when: ('Error' in secure.stdout)
-
-      - name: clean up guest permissions test file
-        shell: "etcdctl rmdir insecure"
-        when: (not 'Error' in secure.stderr)
-
+      # Check ETCD Cluster Health
       - name: create test directory
-        shell: "etcdctl -u root:{{ root_pass }} mkdir test"
+        shell: "etcdctl mkdir test"
 
       - name: create meteor test file
-        shell: "etcdctl -u root:{{ root_pass }} mkdir test/meteor"
+        shell: "etcdctl mkdir test/meteor"
 
   - name: Run Docker Swarm Tests
     hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
     gather_facts: no
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
     vars_files:
       - config.yml
     tasks:
@@ -45,11 +29,11 @@
      #Check ETCD Cluster Health
 
       - name: create swarm test files
-        shell: "etcdctl -u root:{{ root_pass }} mkdir /test/{{ inventory_hostname }}"
+        shell: "etcdctl mkdir /test/{{ inventory_hostname }}"
 
       - name: ensure swarm test files exist
         run_once: true
-        shell: "etcdctl -u root:{{ root_pass }} ls /test/"
+        shell: "etcdctl ls /test/"
         register: result
         until: "'{{ item }}' in result.stdout"
         retries: 3
@@ -58,7 +42,7 @@
 
       - name: ensure meteor test file exists
         run_once: true
-        shell: "etcdctl -u root:{{ root_pass }} ls /test/"
+        shell: "etcdctl ls /test/"
         register: result
         until: "'meteor' in result.stdout"
         retries: 3
@@ -66,30 +50,17 @@
 
       - name: remove test subdirectories
         run_once: true
-        shell: "etcdctl -u root:{{ root_pass }} rmdir /test/{{ item }}"
+        shell: "etcdctl rmdir /test/{{ item }}"
         with_items: "{{ play_hosts }}"
 
       - name: remove test directory
         run_once: true
-        shell: "etcdctl -u root:{{ root_pass }} rmdir /test/meteor; etcdctl -u root:{{ root_pass }} rmdir /test/"
+        shell: "etcdctl rmdir /test/meteor; etcdctl rmdir /test/"
 
       #Check Docker Swarm Health
 
-      - name: get swarm info
-        become: yes
-        become_method: sudo
-        shell: "docker --tlsverify --tlscacert=/home/core/ca.pem --tlscert=/home/core/cert.pem --tlskey=/home/core/key.pem --host {{ ansible_host }}:4000 info > ~/.swarm_status; cat ~/.swarm_status"
-        register: swarm_info
-        when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
-
-      - name: ensure swarm contains correct number of nodes
-        assert:
-          that: "'Nodes: {{ play_hosts|length - 1 }}' in swarm_info.stdout_lines"
-        when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
-
       - name: search for healthy nodes
         become: yes
-        become_method: sudo
         shell: "grep 'Status: Healthy' ~/.swarm_status"
         ignore_errors: true
         register: healthy_nodes
@@ -100,46 +71,42 @@
           that: "'{{ (healthy_nodes.stdout_lines)|length }}' == '{{ play_hosts|length - 1 }}'"
         when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
-      #Check DNS Health
+      # Check DNS Health
+      - name: create A record
+        shell: 'etcdctl set /skydns/org/tuxlab/cmu/tux/A "{\"host\" : \"10.100.1.10\"}"'
+        when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
 
-      #- name: create A record
-      #  shell: "etcdctl -u dns:{{ dns_pass }} set /skydns/org/tuxlab/cmu/tux/A '10.100.1.11'"
-      #  when: ('security_group_docker_manager' in group_names or 'tuxlab-swarm-manager' in group_names)
+      - name: dig for A record
+        shell: "dig tux.cmu.tuxlab.org. @10.100.1.10"
+        register: tux_record
+        when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
-      #- name: dig for A record
-      #  shell: "dig tux.cmu.tuxlab.org. @10.100.1.10"
-      #  register: tux_record
-      #  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
-
-      #- name: ensure A record is properly configured
-      #  assert:
-      #    that: "'\n;; ANSWER SECTION:\ntux.cmu.tuxlab.org.\t5\tIN\tA\t10.100.1.11\n' in tux_record.stdout"
-      #  when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
+      - name: ensure A record is properly configured
+        assert:
+          that: "'\n;; ANSWER SECTION:\ntux.cmu.tuxlab.org.\t5\tIN\tA\t10.100.1.10\n' in tux_record.stdout"
+        when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       #Check Proxy Health
 
       - name: run labVM container
         become: yes
-        become_method: sudo
-        shell: "docker run --name tux -d tuxlab_labvm_alpine"
+        shell: "docker run --name tux -d tuxlab/labvm-alpine"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM password
         become: yes
-        become_method: sudo
         shell: "docker exec tux cat /pass"
         register: tux_pass
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: get labVM ID
         become: yes
-        become_method: sudo
         shell: "docker inspect --format='{{ '{{' }}.NetworkSettings.IPAddress{{ '}}' }}' tux"
         register: tux_id
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: add proxy data
-        shell: "etcdctl -u proxy:{{ proxy_pass }} set redrouter/SSH::tux '{\"host\" : \"{{ tux_id.stdout }}\", \"username\" : \"root\", \"allowed_auth\" : [\"password\"]}'"
+        shell: "etcdctl set redrouter/SSH::tux '{\"host\" : \"{{ tux_id.stdout }}\", \"username\" : \"root\", \"allowed_auth\" : [\"password\"]}'"
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
       - name: display password
@@ -147,9 +114,8 @@
         when: ('security_group_docker_host' in group_names or 'tuxlab-swarm-host' in group_names)
 
   - name: Final SSH test
-    hosts: tuxlab-meteor:security_group_meteor
-    vars:
-      ansible_ssh_user: "{{ 'ec2-user' if 'security_group_meteor' in group_names else 'vagrant' }}"
+    hosts: 127.0.0.1
+    connection: local
     vars_files:
       - config.yml
     tasks:
@@ -171,10 +137,6 @@
 
   - name: Clean up labVM container
     hosts: tuxlab-swarm-host:security_group_docker_host
-    gather_facts: no
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
     vars_files:
       - config.yml
     tasks:
@@ -184,7 +146,9 @@
           ansible_port: 2222
 
       - name: stop container
+        become: yes
         shell: "docker stop tux"
 
       - name: remove container
+        become: yes
         shell: "docker rm tux"

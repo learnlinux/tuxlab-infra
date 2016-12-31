@@ -1,12 +1,30 @@
 ---
+
+#TODO https://github.com/ansible/ansible-modules-core/issues/5515
+- name: pull swarm image
+  become: yes
+  shell: docker pull swarm
+
 - name: start swarm-manager
   become: yes
-  become_method: sudo
-  shell: >
-    docker run -d --expose 4000 -e SWARM_HOST=":4000"
-    --restart on-failure --name swarm-manager
-    --net=host  swarm:latest manage
-    --discovery-opt kv.cacertfile=/etc/ssl/local/ca.pem
-    --discovery-opt kv.certfile=/etc/ssl/local/cert.pem
-    --discovery-opt kv.keyfile=/etc/ssl/local/host.pem
-    etcd://127.0.0.1:2379/swarm
+  docker_container:
+    name: swarm-manager
+    image: swarm
+    network_mode: host
+    restart_policy: on-failure
+    exposed_ports:
+      - 4000
+    env:
+      SWARM_HOST: ":4000"
+    volumes:
+      - /etc/ssl/local:/certs:ro
+    command: >
+      manage
+      --tlsverify
+      --tlscacert=/certs/ca.pem
+      --tlscert=/certs/cert.pem
+      --tlskey=/certs/host.pem
+      --discovery-opt kv.cacertfile=/certs/ca.pem
+      --discovery-opt kv.certfile=/certs/cert.pem
+      --discovery-opt kv.keyfile=/certs/host.pem
+      etcd://127.0.0.1:2379/swarm

@@ -1,69 +1,140 @@
 ---
 
-# Enable Self-Signing
-- name: install pexpect
-  become: yes
-  become_method: sudo
-  pip: name=pexpect version=3.3
-
-- name: generate ca keys
-  become: yes
-  become_method: sudo
-  expect:
-    command: openssl req -new -x509 -days 365 -keyout ~/.tuxlab/ca-key.pem -sha256 -out ~/.tuxlab/ca.pem
-    responses:
-      Country: "US"
-      State: "Pennsylvania"
-      Locality: "Pittsburgh"
-      company: "Carnegie Mellon University"
-      section: "TuxLab Project"
-      FQDN: "tuxlab.org"
-      Email: "contact@tuxlab.org"
+###############################
+#    CREATE INTERMEDIATE CA   #
+###############################
+- name: check for existing ca
+  stat: path="~/.tuxlab/ca"
+  register: existing_ca
   delegate_to: localhost
   run_once: true
 
+- name: Make CA Directory Structure
+  file:
+    path: "~/.tuxlab/{{ item.dir }}"
+    state: directory
+  with_items:
+    - { dir: 'ca' }
+    - { dir: 'ca/certs' }
+    - { dir: 'ca/crl' }
+    - { dir: 'ca/newcerts' }
+    - { dir: 'ca/private' }
+  delegate_to: localhost
+  run_once: true
+  when: existing_ca.stat.exists == False
+
+- name: Create Index
+  file:
+    path: "~/.tuxlab/ca/index.txt"
+    state: touch
+  delegate_to: localhost
+  run_once: true
+  when: existing_ca.stat.exists == False
+
+- name: Create Serial
+  copy:
+    content: "1000"
+    dest: "~/.tuxlab/ca/serial"
+  delegate_to: localhost
+  run_once: true
+  when: existing_ca.stat.exists == False
+
+- name: Create OpenSSL.cnf
+  template:
+    src: openssl.cnf.j2
+    dest: "~/.tuxlab/ca/openssl.cnf"
+  delegate_to: localhost
+  run_once: true
+  when: existing_ca.stat.exists == False
+
+- name: generate intermediate CA key
+  command: >
+    openssl genrsa -out ~/.tuxlab/ca/private/ca.key.pem 4096
+  delegate_to: localhost
+  run_once: true
+  when: existing_ca.stat.exists == False
+
+- name: self-sign intermediate CA key
+  command: >
+    openssl req -x509 -new -nodes
+    -days 365
+    -extensions v3_ca
+    -subj "{{ SSL_SUBJ }}"
+    -config ~/.tuxlab/ca/openssl.cnf
+    -key ~/.tuxlab/ca/private/ca.key.pem
+    -out ~/.tuxlab/ca/certs/ca.cert.pem
+  delegate_to: localhost
+  run_once: true
+  when: existing_ca.stat.exists == False
+
+###############################
+#         CREATE CSR          #
+###############################
 # Create SSL Folder on hosts
 - name: Create Key Directory
   become: yes
-  become_method: sudo
   file: path=/etc/ssl/local state=directory
 
-# Generate Keys
-- name: Generate Host Key
+- name: Add SANs to openssl.cnf
   become: yes
-  become_method: sudo
-  shell: openssl genrsa -out /etc/ssl/local/host.pem 2048
+  lineinfile:
+    dest: /etc/pki/tls/openssl.cnf
+    insertafter: "^keyUsage = nonRepudiation, digitalSignature, keyEncipherment"
+    regexp: "^subjectAltName="
+    line: "subjectAltName=DNS:{{TUX_DOMAIN}},IP:127.0.0.1,IP:{{ansible_host}}"
 
-- name: Create CSR
+- name: Enabling SAN extension in openssl.cnf
   become: yes
-  become_method: sudo
-  expect:
-    command: openssl req -new key /etc/ssl/local/host.pem
-    responses:
-      password: "."
-      Country: "US"
-      State: "Pennsylvania"
-      Locality: "Pittsburgh"
-      company: "Carnegie Mellon University"
-      section: "TuxLab Project"
-      FQDN: "tuxlab.org"
-      Email: "contact@tuxlab.org"
-  register: ssl_csr
+  lineinfile:
+    dest: /etc/pki/tls/openssl.cnf
+    regexp: "^# req_extensions"
+    line: "req_extensions = v3_req"
 
-# Sign Certificate (Self-Signing)
+- name: Generate Private Key and CSR
+  become: yes
+  command: >
+    openssl req
+    -newkey rsa:2048
+    -nodes
+    -subj "{{ SSL_SUBJ }}"
+    -keyout /etc/ssl/local/host.pem
+    -config /etc/pki/tls/openssl.cnf
+  register: CSR
+
+###############################
+#          SIGN CSR           #
+###############################
 - name: Sign CSR
-  become: yes
-  become_method: sudo
+  shell: "echo '{{ CSR.stdout }}' | openssl ca -batch -config ./openssl.cnf -in /dev/stdin -extensions server_cert -notext -days 365"
+  args:
+    chdir: "~/.tuxlab/ca"
   delegate_to: localhost
-  shell: echo "{{ ssl_csr }}" >> openssl x509 -req -days 365 -signkey ~/.tuxlab/ca-key.pem
-  register: ssl_cert
+  register: CRT
 
-# TODO: Add Let's Encrypt Key
+###############################
+#      SAVE CERTIFICATES      #
+###############################
+- name: Copy Host Certificate
+  become: yes
+  copy: content="{{ CRT.stdout }}" dest=/etc/ssl/local/cert.pem
 
-# Copy CA Public Key
-- name: Copy CA Key
-  copy: src=~/.tuxlab/ca.pem dest=/etc/ssl/local/ca.pem mode=444 owner="{{ ansible_user }}"
+- name: Copy CA Certificate
+  become: yes
+  copy:
+    src: ~/.tuxlab/ca/certs/ca.cert.pem
+    dest: /etc/ssl/local/ca.pem
+    owner: root
+    group: root
+    mode: 0644
 
-# Save Certificate
-- name: Save Certificate
-  copy: content="{{ssl_cert}}" dest="/etc/ssl/local/cert.pem" mode=444 owner="{{ ansible_user }}"
+# Symlink CA into trusted Certificates
+- name: Symlink to Trusted Certificates
+  become: yes
+  file:
+    src: /etc/ssl/local/ca.pem
+    dest: /etc/pki/ca-trust/source/anchors/tuxlab.pem
+    state: link
+
+- name: Updated Trusted Certificates
+  become: yes
+  shell: update-ca-trust

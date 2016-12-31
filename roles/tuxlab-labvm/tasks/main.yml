@@ -2,12 +2,4 @@
 
 - name: pull labvm images
   become: yes
-  become_method: sudo
-  git: repo={{ item.url }} dest={{ item.directory }}
-  with_items: "{{LAB_IMAGES}}"
-
-- name: build labvm images
-  become: yes
-  become_method: sudo
-  shell: "docker build -t {{ item.image_name }} {{ item.directory }}"
-  with_items: "{{LAB_IMAGES}}"
+  shell: docker pull tuxlab/labvm-alpine
