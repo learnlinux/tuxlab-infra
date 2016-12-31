@@ -1,24 +1,24 @@
 ---
-
 - name: add etcd systemd service
   become: yes
-  become_method: sudo
-  template: src=etc/systemd/system/etcd.j2
+  template: src=etcd.j2
             dest=/etc/systemd/system/etcd.service
             mode=0644
 
-- name: Reload systemctl
-  become: yes
-  become_method: sudo
-  shell: systemctl daemon-reload
-
 - name: Enable etcd
   become: yes
-  become_method: sudo
-  service: name=etcd
-           enabled=yes
+  shell: |
+    systemctl daemon-reload
+    systemctl enable etcd.service
+    systemctl start etcd.service &
 
-- name: Start etcd
+- name: Save SSL Variables
   become: yes
-  become_method: sudo
-  shell: "systemctl start etcd &"
+  template:
+    src: etcdctl.sh.j2
+    dest: /etc/profile.d/etcdctl.sh
+    mode: 0755
+
+- name: Import SSL Variables
+  become: yes
+  shell: source /etc/profile.d/etcdctl.sh

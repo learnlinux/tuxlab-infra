@@ -2,153 +2,103 @@
   # This playbook is executed by Vagrant or  Ansible Tower to configure
   # new hosts once they have been provisioned.
 
-  # Install Pre-Requisites for Ansible in CoreOS
-  - name: Bootstrap coreos
-    hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
-    gather_facts: no
-    vars_files:
-      - config.yml
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
-
-      etcd_user: etcd
-      etcd_dir: "/usr/bin"
-      etcd_cmd: "{{ etcd_dir }}/etcd2"
-      etcd_data_dir: "/var/lib/etcd2"
-    roles:
-      - defunctzombie.coreos-bootstrap
-
-  # Pass SSL Keys to respective hosts
-  - name: SSL Setup
-    hosts: all
-    vars_files:
-      - config.yml
-    roles:
-      - ssl
-
+  # Generate ETCD Discovery Tokens
   - name: Setup ETCD Discovery
     hosts: all
+    become_method: sudo
     vars_files:
       - config.yml
     roles:
       - etcd-discovery
 
+  # Perform Routine Tasks on Meteor Hosts
+  #   - Update Packages
+  #   - Add Meteor EPEL
+  #   - Sync Chronyd
+  #   - Start ETCD Clustering
   - name: Prepare Meteor Hosts
     hosts: tuxlab-meteor:security_group_meteor
-    become: yes
     become_method: sudo
     vars:
       ansible_ssh_user: "{{ 'ec2-user' if 'security_group_meteor' in group_names else 'vagrant' }}"
-
-      etcd_user: etcd
-      etcd_dir: "/usr/bin"
-      etcd_cmd: "{{ etcd_dir }}/etcd"
-      etcd_data_dir: "/var/lib/etcd"
+      etcd_interface: eth1
     vars_files:
       - config.yml
     roles:
       - centos
       - chronyd
+      - ssl
       - etcd
 
-  - name: Configure SSH Connection to Swarm Hosts
-    hosts: tuxlab-swarm-host:security_group_docker_host
-    gather_facts: no
-    vars_files:
-      - config.yml
-    roles:
-      - ssh-config
-
-  - name: Generate certs
-    hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
-    gather_facts: no
-    vars_files:
-      - config.yml
-    roles:
-      - tls-ca
-
+  # Configure Swarm Engine
+  #    - Update Atomic
+  #    - Create and Sign SSL Certificates
+  #    - Configure ETCD
+  #    - Configure Docker
   - name: Configure Swarm Engine
     hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
-    gather_facts: no
-    vars_files:
-      - config.yml
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
-
-      etcd_user: etcd
-      etcd_dir: "/usr/bin"
-      etcd_cmd: "{{ etcd_dir }}/etcd2"
-      etcd_data_dir: "/var/lib/etcd2"
-    roles:
-      - docker-tls
-      - coreos
-      - timesyncd
-      - etcd
-      - dockerengine
-
-  - name: Configure Swarm Hosts
-    hosts: tuxlab-swarm-host:security_group_docker_host
-    become: yes
     become_method: sudo
     gather_facts: no
     vars_files:
       - config.yml
     vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
+      etcd_interface: enp0s8
     roles:
-      - dockerhost
-      - tuxlab-labvm
-      - ssl-distribution
+      - atomic
+      - ssl
+      - etcd
+      - dockerengine
 
-  - name: Configure Swarm Manager
-    hosts: tuxlab-swarm-manager:security_group_docker_manager
+  # Configure Swarm Engine
+  #    - Update Atomic
+  #    - Create and Sign SSL Certificates
+  #    - Configure ETCD
+  #    - Configure Docker
+  - name: Configure Swarm Hosts
+    hosts: tuxlab-swarm-host:security_group_docker_host
+    become_method: sudo
     gather_facts: no
     vars_files:
       - config.yml
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
+    roles:
+      - dockerhost
+      - tuxlab-labvm
+
+  - name: Configure Swarm Manager
+    hosts: tuxlab-swarm-manager:security_group_docker_manager
+    become_method: sudo
+    gather_facts: no
+    vars_files:
+      - config.yml
     roles:
       - dockerswarm
-      - etcd-auth
       - tuxlab-dns
 
   - name: Configure Swarm Hosts
     hosts: tuxlab-swarm-host:security_group_docker_host
-    become: yes
     become_method: sudo
     gather_facts: no
     vars_files:
       - config.yml
-    vars:
-      ansible_ssh_user: core
-      ansible_python_interpreter: "/home/core/bin/python"
     roles:
       - tuxlab-proxy
       - tuxlab-session-daemon
 
   - name: Configure Meteor Applications
     hosts: tuxlab-meteor:security_group_meteor
-    become: yes
     become_method: sudo
     vars:
       ansible_ssh_user: "{{ 'ec2-user' if 'security_group_meteor' in group_names  else 'vagrant' }}"
     vars_files:
       - config.yml
     roles:
-      - ssl-distribution
       - nodejs
       - meteor
       - tuxlab-app
 
-## Testing
+  # Install Mongo Client for Logging
   - name: Install mongo client on tower
     hosts: security_group_tower
+    become_method: sudo
     roles:
       - tuxlab-mongo
-
-  - name: Run Tests
-    include: tests.yml

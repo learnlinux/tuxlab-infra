@@ -16,12 +16,9 @@ Vagrant.configure(2) do |vagrant|
 
   # TuxLab Swarm Controller
     vagrant.vm.define "dswarm" do |dswarm|
-      dswarm.vm.box = "coreos-stable"
-      dswarm.vm.box_url = "https://storage.googleapis.com/stable.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
+      dswarm.vm.box = "centos/atomic-host"
 
-      dswarm.ssh.username = "core"
-
-      # Disable Guest Additions Installing on CoreOS
+      # Disable Guest Additions Installing
           dswarm.vm.provider :virtualbox do |v|
             # On VirtualBox, we don't have guest additions or a functional vboxsf
             # in CoreOS, so tell Vagrant that so it can be smarter.
@@ -31,19 +28,23 @@ Vagrant.configure(2) do |vagrant|
           if Vagrant.has_plugin?("vagrant-vbguest") then
             dswarm.vbguest.auto_update = false
           end
+      # Disable Folder Syncing
+      dswarm.vm.synced_folder ".", "/vagrant", disabled: true
 
-      # Add to Network
+      # Setup Network and SSH
       dswarm.vm.network "private_network", ip: "10.100.1.10"
+      dswarm.ssh.insert_key = false
+      dswarm.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
+
+      # Force Refresh Network
+      dswarm.vm.provision "shell", path: "local/vagrant_network_conf.sh"
     end
 
     # TuxLab Swarm Host
       vagrant.vm.define "dhost" do |dhost|
-        dhost.vm.box = "coreos-stable"
-        dhost.vm.box_url = "https://storage.googleapis.com/stable.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
+        dhost.vm.box = "centos/atomic-host"
 
-        dhost.ssh.username = "core"
-
-        # Disable Guest Additions Installing on CoreOS
+        # Disable Guest Additions Installing
             dhost.vm.provider :virtualbox do |v|
               # On VirtualBox, we don't have guest additions or a functional vboxsf
               # in CoreOS, so tell Vagrant that so it can be smarter.
@@ -53,10 +54,16 @@ Vagrant.configure(2) do |vagrant|
             if Vagrant.has_plugin?("vagrant-vbguest") then
               dhost.vbguest.auto_update = false
             end
+        # Disable Folder Syncing
+        dhost.vm.synced_folder ".", "/vagrant", disabled: true
 
-        # Add to Network
+        # Setup Network and SSH
         dhost.vm.network "private_network", ip: "10.100.1.11"
+        dhost.ssh.insert_key = false
+        dhost.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
+        # Force Refresh Network
+        dhost.vm.provision "shell", path: "local/vagrant_network_conf.sh"
       end
 
   # Meteor Host
@@ -68,19 +75,19 @@ Vagrant.configure(2) do |vagrant|
       meteor.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
       # Add to Network
-      meteor.vm.network "private_network", ip: "10.100.0.10"
+      meteor.vm.network "private_network", ip: "10.100.1.2"
+      meteor.vm.provision "shell", path: "local/vagrant_network_conf.sh"
 
       # Configure All Hosts via Ansible
       meteor.vm.provision :ansible do |ansible|
         ansible.playbook = "./setup.yml"
         ansible.limit = 'all'
-        ansible.inventory_path = "./local/vagrant_ansible_inventory"
         ansible.force_remote_user = false
         ansible.host_key_checking = false
+        ansible.inventory_path = "./local/vagrant_ansible_inventory"
         ansible.extra_vars = {
           host_key_checking: "False",
-          swarm_node_ip: "10.100.1.10",
-          etcd_interface: "eth1"
+          swarm_node_ip: "10.100.1.10"
         }
       end
 

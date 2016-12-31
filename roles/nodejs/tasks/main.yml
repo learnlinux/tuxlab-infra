@@ -3,15 +3,12 @@
 # Install meteor
 - name: install nodejs repo
   become: yes
-  become_method: sudo
-  shell: rpm -Uvh https://rpm.nodesource.com/pub_4.x/el/7/x86_64/nodesource-release-el7-1.noarch.rpm
+  shell: curl -sL https://rpm.nodesource.com/setup_7.x | bash -
 
 - name: install nodejs
   become: yes
-  become_method: sudo
   yum: name=nodejs state=latest
 
 - name: update npm
   become: yes
-  become_method: sudo
   npm: name=npm global=yes state=latest

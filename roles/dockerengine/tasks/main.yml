@@ -1,79 +1,67 @@
 ---
 
-- name: install docker-py
+- name: Create .docker folder
   become: yes
-  become_method: sudo
-  become_user: core
-  pip: name=docker-py executable=~/bin/pip
+  file:
+      path: '/root/.docker'
+      state: directory
+      mode: 0755
 
-- name: Install /etc/default/docker
-  sudo: True
+- name: Create symlinks to docker tls keys
+  become: yes
+  file:
+    src: '/etc/ssl/local/{{ item.src }}'
+    dest: '/root/.docker/{{ item.dest }}'
+    state: link
+  with_items:
+    - { src: 'ca.pem', dest: 'ca.pem' }
+    - { src: 'cert.pem', dest: 'cert.pem' }
+    - { src: 'host.pem', dest: 'key.pem' }
+
+- name: create service.d
+  become: yes
+  file:
+    path: '/etc/systemd/system/docker.service.d'
+    state: directory
+    mode: 0755
+
+- name: copy docker drop-in
+  become: yes
   template: >
-    src=docker.default.j2
-    dest=/etc/default/docker
+    src=tls-verify.conf.j2
+    dest=/etc/systemd/system/docker.service.d/tls-verify.conf
     owner=root
     group=root
     mode=0644
 
-- name: copy docker conf
+- name: create docker group
   become: yes
-  become_method: sudo
-  template: >
-    src=docker-tls-tcp-socket.j2
-    dest=/etc/systemd/system/docker-tls-tcp.socket
-    owner=root
-    group=root
-    mode=0644
+  group:
+    name: docker
+    state: present
 
-- name: check api socket status
-  command: systemctl status docker-tls-tcp.socket
-  register: api_status
-  failed_when: false
-  changed_when: false
-  ignore_errors: yes
-
-- name: enable remote api socket
+- name: add ansible user to docker group
   become: yes
-  become_method: sudo
-  service: name=docker-tls-tcp.socket enabled=yes
-  when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
-
-- name: stop docker
-  become: yes
-  become_method: sudo
-  service: name=docker state=stopped
-  when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
-
-- name: start remote api socket
-  become: yes
-  become_method: sudo
-  service: name=docker-tls-tcp.socket state=started
-  when: "'Active: inactive (dead)' in '{{ api_status.stdout }}'"
-
-- name: create tls settings directoty
-  become: yes
-  become_method: sudo
-  file: path=/etc/systemd/system/docker.service.d state=directory
-
-- name: copy tls settings
-  become: yes
-  become_method: sudo
-  template: >
-    src=tls-verify.conf
-    dest=/etc/systemd/system/docker.service.d/10-tls-verify.conf
-    owner=root
-    group=root
-    mode=0644
-
-- name: reload systemctl daemon
-  become: yes
-  become_method: sudo
-  shell: systemctl daemon-reload
+  user:
+    name: "{{ ansible_user }}"
+    append: yes
+    groups: docker
 
 - name: restart docker service
   become: yes
-  become_method: sudo
-  service: name=docker.service state=restarted
+  systemd:
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+    name: docker
 
-- name: set docker tls settings
-  shell: export DOCKER_HOST=0.0.0.0:2375 DOCKER_TLS_VERIFY=1
+- name: Save TLS Variables
+  become: yes
+  template:
+    src: dockerctl.sh.j2
+    dest: /etc/profile.d/dockerctl.sh
+    mode: 0755
+
+- name: Import TLS Variables
+  become: yes
+  shell: source /etc/profile.d/dockerctl.sh

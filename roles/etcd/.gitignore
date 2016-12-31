@@ -1,6 +1,0 @@
-.vagrant/
-.molecule/
-.cache/
-tests/.cache/
-tests/__pycache__/
-venv/

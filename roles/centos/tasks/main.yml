@@ -1,7 +1,6 @@
 ---
 - name: update packages
   become: yes
-  become_method: sudo
   yum: name=* state=latest
 
 - name: Install EPEL repo.
@@ -10,7 +9,6 @@
     state: present
   register: result
   become: yes
-  become_method: sudo
   until: '"failed" not in result'
   retries: 5
   delay: 10
@@ -22,18 +20,22 @@
     key: "{{ epel_repo_gpg_key_url }}"
     state: present
 
-- name: Flush Network Interface
+- name: Reload Network Services
   become: yes
-  become_method: sudo
-  shell: |
-    service NetworkManager stop
-    service network restart
-    chkconfig network on
+  systemd:
+    name: network
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+
+- name: Chkconfig Network
+  become: yes
+  shell: chkconfig network on
 
 - name: Install git
-  sudo: true
+  become: yes
   yum: name=git state=latest
 
 - name: Install etcd
-  sudo: true
+  become: yes
   yum: name=etcd state=latest

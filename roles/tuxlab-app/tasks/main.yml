@@ -3,31 +3,27 @@
 ## VERSION 1.4 FIXES
   - name: remove current meteor installation
     become: yes
-    become_method: sudo
     file: path=~./meteor state=absent
 
   - name: remove meteor local files
     become: yes
-    become_method: sudo
     file: path=/var/tuxlab/meteor/local state=absent
 
   - name: remove meteor dev bundle
     become: yes
-    become_method: sudo
     file: path=/var/tuxlab/meteor/dev_bundle state=absent
 
   - name: modify tuxlab ownership
+    become: yes
     file: path=/var/tuxlab state=directory owner={{ ansible_user }}
 
 ## DOWNLOAD
   - name: remove current build
     become: yes
-    become_method: sudo
     file: path={{ deploy_dir }} state=absent
 
   - name: Create {{ deploy_dir }}
     become: yes
-    become_method: sudo
     file: name={{ item }} state=directory owner={{ ansible_user }} recurse=yes
     with_items:
       - "{{ deploy_dir }}"
@@ -35,39 +31,45 @@
     when: binary_deploy
 
   - name: download binary
+    become: yes
     get_url: url={{ repo_url }} dest={{deploy_dir}}/tuxlab-app.tar.gz
     when: binary_deploy
 
   - name: unzip binary
+    become: yes
     unarchive: src={{deploy_dir}}/tuxlab-app.tar.gz dest={{deploy_app_dir}}
     when: binary_deploy
 
   - name: clone tuxlab source
+    become: yes
     git: repo={{repo_url}}
          dest={{deploy_dir}}
          accept_hostkey=yes
     when: not binary_deploy
 
   - name: grant ansible user ownership
-    file: path={{deploy_dir}} owner={{ansible_user}} recurse=yes
     become: yes
-    become_method: sudo
+    file: path={{deploy_dir}} owner={{ansible_user}} recurse=yes
 
 ## INSTALL
   - name: install npm dependencies
+    become: yes
     npm: path={{deploy_dir}} production=yes
     when: not binary_deploy
 
   - name: install typings
     become: yes
-    become_method: sudo
     npm: name=typings global=yes
+    when: not binary_deploy
 
   - name: typings install
+    become: yes
     shell: typings install chdir={{deploy_dir}}
+    when: not binary_deploy
 
 ## COPY SETTINGS
   - name: Copy settings.env.json
+    become: yes
     template: src="settings.env.json.j2"
               dest="{{deploy_dir}}/private/settings.env.json"
               mode=0644
@@ -76,13 +78,10 @@
 
   - name: create deploy_app_dir
     become: yes
-    become_method: sudo
-    shell: mkdir {{ deploy_app_dir }}
-
-  - name: modify deploy_app_dir ownership
-    become: yes
-    become_method: sudo
-    shell: chown -hR {{ ansible_user }} {{ deploy_app_dir }}
+    file:
+      path: "{{ deploy_app_dir }}"
+      owner: "{{ ansible_user }}"
+      state: directory
 
   - name: build tuxlab app
     become: true
@@ -91,17 +90,16 @@
     when: not binary_deploy
 
   - name: install forvever
+    become: yes
     npm: name=forever global=yes state=present
 
   - name: set mongodb URL
     become: yes
-    become_method: sudo
     shell: MONGO_URL={{ mongo_url }}
     when: "'security_group_meteor' in group_names"
 
   - name: start tuxlab app
     become: yes
-    become_method: sudo
     shell:  >
       PORT=80
       ROOT_URL={{ root_url }}

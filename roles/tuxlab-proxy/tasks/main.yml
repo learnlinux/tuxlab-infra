@@ -1,24 +1,21 @@
 ---
-
-- name: pull alpine container images with redrouter
-  git: repo=https://github.com/learnlinux/tuxlab-ssh-proxy.git dest=/home/core/tuxlab-ssh-proxy
-
-- name: copying Settings
+- name: copy tuxlab-proxy settings
   become: yes
-  become_method: sudo
-  template: src=settings.json.j2 dest=/home/core/tuxlab-ssh-proxy/src/settings.json owner=root group=root mode=0644
+  template: src=settings.json.j2 dest=/root/tuxlab-proxy-settings.json owner=root group=root mode=0644
 
-- name: copying SSL keys
+#TODO https://github.com/ansible/ansible-modules-core/issues/5515
+- name: pull ssh-proxy image
   become: yes
-  become_method: sudo
-  shell: "cp -r /etc/ssl/local/ /home/core/tuxlab-ssh-proxy/src/"
-
-- name: build tuxlab_proxy image
-  become: yes
-  become_method: sudo
-  shell: "docker build -t tuxlab_proxy /home/core/tuxlab-ssh-proxy"
+  shell: docker pull tuxlab/ssh-proxy
 
 - name: start reverse proxy container
   become: yes
-  become_method: sudo
-  shell: "docker run --name host-proxy --restart on-failure --net=host -d tuxlab_proxy"
+  docker_container:
+    name: host-proxy
+    image: tuxlab/ssh-proxy
+    state: started
+    restart_policy: on-failure
+    network_mode: host
+    volumes:
+      - /root/tuxlab-proxy-settings.json:/settings.json:ro
+      - /etc/ssl/local:/ssl:ro
