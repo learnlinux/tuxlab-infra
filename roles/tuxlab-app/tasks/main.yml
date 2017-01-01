@@ -74,6 +74,12 @@
               dest="{{deploy_dir}}/private/settings.env.json"
               mode=0644
 
+  - name: Copy settings.domain.json
+    become: yes
+    template: src="settings.domain.json.j2"
+              dest="{{deploy_dir}}/private/settings.domain.json"
+              mode=0644
+
 ## BUILD AND RUN
 
   - name: create deploy_app_dir
