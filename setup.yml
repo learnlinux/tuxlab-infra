@@ -20,7 +20,6 @@
     hosts: tuxlab-meteor:security_group_meteor
     become_method: sudo
     vars:
-      ansible_ssh_user: "{{ 'ec2-user' if 'security_group_meteor' in group_names else 'vagrant' }}"
       etcd_interface: eth1
     vars_files:
       - config.yml
@@ -87,8 +86,6 @@
   - name: Configure Meteor Applications
     hosts: tuxlab-meteor:security_group_meteor
     become_method: sudo
-    vars:
-      ansible_ssh_user: "{{ 'ec2-user' if 'security_group_meteor' in group_names  else 'vagrant' }}"
     vars_files:
       - config.yml
     roles:

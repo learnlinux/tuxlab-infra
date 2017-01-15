@@ -1,0 +1,4 @@
+mongo_url: "{{ MONGO_ROOT }}"
+mongo_pass: "{{ MONGO_PASS }}"
+mongo_user: "{{ MONGO_USER }}"
+mongo_database: "{{ MONGO_USER }}"

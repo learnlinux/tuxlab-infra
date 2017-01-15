@@ -27,23 +27,18 @@
 
   - name: create directories
     become: yes
-    file: name={{ item }} state=directory owner={{ ansible_user }} recurse=yes
+    file: name={{ item }} state=directory owner={{ ansible_user }}
     with_items:
       - "{{ source_dir }}"
+      - "{{ source_dir }}/private"
       - "{{ deploy_dir }}"
 
-  - name: copy tuxlab-app
+  - name: pull tuxlab-app
     become: yes
-    copy:
+    synchronize:
       src: "{{ local_dir }}"
       dest: "{{ source_dir }}"
-
-  - name: grant ansible user ownership
-    become: yes
-    file: path={{item}} owner={{ansible_user}} recurse=yes
-    with_items:
-      - "{{ source_dir }}"
-      - "{{ deploy_dir }}"
+      verify_host: no
 
 # INSTALL FOREVER
   - name: install forvever
@@ -68,7 +63,7 @@
   - name: build tuxlab app
     become: true
     become_user: "{{ ansible_user }}"
-    shell: /usr/local/bin/meteor build --directory {{deploy_app_dir}} chdir={{deploy_dir}}
+    shell: "/usr/local/bin/meteor build --directory {{deploy_dir}} chdir={{source_dir}}"
 
   - name: set mongodb url
     become: yes
@@ -81,6 +76,6 @@
       PORT=80
       ROOT_URL={{ root_url }}
       MAIL_URL={{ mail_url }}
-      forever start "{{ deploy_app_dir }}"bundle/main.js
+      forever start "{{ deploy_dir }}/bundle/main.js"
     async: 10
     poll: 1

@@ -12,5 +12,5 @@ mail_url: "{{ MONGO_EMAIL }}"
 local_dir: app/
 
 # Meteor Settings
-source_dir: /var/tuxlab/
-deploy_dir: /var/www/
+source_dir: /var/tuxlab
+deploy_dir: /var/www
