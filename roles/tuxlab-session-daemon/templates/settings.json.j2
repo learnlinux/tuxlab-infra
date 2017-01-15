@@ -1,4 +1,9 @@
 {
-  "etcd_host_ip": "{{ ansible_host }}",
-  "etcd_host_port": "2379"
+  "docker_ip": "{{ swarm_node_ip }}",
+  "docker_port" : 4000,
+  "mongo_url": "mongodb://{{ MONGO_USER }}:{{ MONGO_PASS }}@{{ MONGO_URL }}",
+  "ssl_path_ca": "/ssl/ca.pem",
+  "ssl_path_cert": "/ssl/cert.pem",
+  "ssl_path_key": "/ssl/key.pem",
+  "poll_interval" : 60
 }
