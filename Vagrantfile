@@ -37,7 +37,7 @@ Vagrant.configure(2) do |vagrant|
       dswarm.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
       # Force Refresh Network
-      dswarm.vm.provision "shell", path: "local/vagrant_network_conf.sh"
+      #dswarm.vm.provision "shell", path: "local/vagrant_network_conf.sh"
     end
 
     # TuxLab Swarm Host
@@ -63,7 +63,7 @@ Vagrant.configure(2) do |vagrant|
         dhost.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
         # Force Refresh Network
-        dhost.vm.provision "shell", path: "local/vagrant_network_conf.sh"
+        #dhost.vm.provision "shell", path: "local/vagrant_network_conf.sh"
       end
 
   # Meteor Host

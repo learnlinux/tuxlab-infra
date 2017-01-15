@@ -5,12 +5,12 @@ root_url: "http://cmu.tuxlab.org"
 mongo_url: "mongodb://{{ MONGO_USER }}:{{ MONGO_PASS }}@{{ MONGO_URL }}"
 mail_url: "{{ MONGO_EMAIL }}"
 
-# Github Settings
-# If you wish to use the latest from the master branch, use repo_url.
-# if instead you want to use a pre-compiled binary, use binary_url.
-binary_deploy: "{{ APP_REPO_BIN is defined }}"
-repo_url: "{{ APP_REPO_BIN if binary_deploy else APP_REPO_GIT }}"
+# Source Settings
+# Ansible will install the version of TuxLab stored in the /app directory.
+# By default, this is a git submodule of the tuxlab-app repository,
+# but you can easily modify this in whatever way you see fit.
+local_dir: app/
 
 # Meteor Settings
-deploy_dir: /var/tuxlab/
-deploy_app_dir: /var/www/
+source_dir: /var/tuxlab/
+deploy_dir: /var/www/

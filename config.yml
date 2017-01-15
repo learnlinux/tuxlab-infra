@@ -17,12 +17,6 @@
    SSL_ORG_UNIT: TuxLab
 
 ###############################
-#      APP CONFIGURATION      #
-###############################
-   APP_REPO_GIT: https://github.com/learnlinux/tuxlab-app
-   #APP_REPO_BIN: https://api.github.com/repos/learnlinux/tuxlab/tarball/v1.0.0 USE IF WANT BINARY INSTALL
-
-###############################
 #    LABENV CONFIGURATION     #
 ###############################
    LAB_IMAGES:

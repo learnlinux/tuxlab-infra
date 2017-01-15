@@ -17,89 +17,60 @@
     become: yes
     file: path=/var/tuxlab state=directory owner={{ ansible_user }}
 
-## DOWNLOAD
-  - name: remove current build
+## COPY FILES
+  - name: remove existing files
     become: yes
-    file: path={{ deploy_dir }} state=absent
+    file: path={{ item }} state=absent
+    with_items:
+      - "{{ source_dir }}"
+      - "{{ deploy_dir }}"
 
-  - name: Create {{ deploy_dir }}
+  - name: create directories
     become: yes
     file: name={{ item }} state=directory owner={{ ansible_user }} recurse=yes
     with_items:
+      - "{{ source_dir }}"
       - "{{ deploy_dir }}"
-      - "{{ deploy_app_dir }}"
-    when: binary_deploy
 
-  - name: download binary
+  - name: copy tuxlab-app
     become: yes
-    get_url: url={{ repo_url }} dest={{deploy_dir}}/tuxlab-app.tar.gz
-    when: binary_deploy
-
-  - name: unzip binary
-    become: yes
-    unarchive: src={{deploy_dir}}/tuxlab-app.tar.gz dest={{deploy_app_dir}}
-    when: binary_deploy
-
-  - name: clone tuxlab source
-    become: yes
-    git: repo={{repo_url}}
-         dest={{deploy_dir}}
-         accept_hostkey=yes
-    when: not binary_deploy
+    copy:
+      src: "{{ local_dir }}"
+      dest: "{{ source_dir }}"
 
   - name: grant ansible user ownership
     become: yes
-    file: path={{deploy_dir}} owner={{ansible_user}} recurse=yes
+    file: path={{item}} owner={{ansible_user}} recurse=yes
+    with_items:
+      - "{{ source_dir }}"
+      - "{{ deploy_dir }}"
 
-## INSTALL
-  - name: install npm dependencies
-    become: yes
-    npm: path={{deploy_dir}} production=yes
-    when: not binary_deploy
-
-  - name: install typings
-    become: yes
-    npm: name=typings global=yes
-    when: not binary_deploy
-
-  - name: typings install
-    become: yes
-    shell: typings install chdir={{deploy_dir}}
-    when: not binary_deploy
-
-## COPY SETTINGS
-  - name: Copy settings.env.json
-    become: yes
-    template: src="settings.env.json.j2"
-              dest="{{deploy_dir}}/private/settings.env.json"
-              mode=0644
-
-  - name: Copy settings.domain.json
-    become: yes
-    template: src="settings.domain.json.j2"
-              dest="{{deploy_dir}}/private/settings.domain.json"
-              mode=0644
-
-## BUILD AND RUN
-
-  - name: create deploy_app_dir
-    become: yes
-    file:
-      path: "{{ deploy_app_dir }}"
-      owner: "{{ ansible_user }}"
-      state: directory
-
-  - name: build tuxlab app
-    become: true
-    become_user: "{{ ansible_user }}"
-    shell: /usr/local/bin/meteor build --directory {{deploy_app_dir}} chdir={{deploy_dir}}
-    when: not binary_deploy
-
+# INSTALL FOREVER
   - name: install forvever
     become: yes
     npm: name=forever global=yes state=present
 
-  - name: set mongodb URL
+## COPY SETTINGS
+  - name: Copy settings.env.json
+    become: yes
+    template:
+      src: "{{item}}.j2"
+      dest: "{{source_dir}}/private/{{item}}"
+      force: yes
+      mode: 0644
+    with_items:
+      - "settings.domain.json"
+      - "settings.env.json"
+      - "settings.labvm.json"
+      - "settings.login.json"
+
+## BUILD AND RUN
+  - name: build tuxlab app
+    become: true
+    become_user: "{{ ansible_user }}"
+    shell: /usr/local/bin/meteor build --directory {{deploy_app_dir}} chdir={{deploy_dir}}
+
+  - name: set mongodb url
     become: yes
     shell: MONGO_URL={{ mongo_url }}
     when: "'security_group_meteor' in group_names"
