@@ -5,9 +5,9 @@ build:
         packages: virtualbox vagrant make dkms
 
     - script:
-        name: install vagrant
+        name: finalize installation of vagrant
         shell: |
-          VBoxManage --version
+          info $(VBoxManage --versionVBoxManage --version)
 
     - script:
         name: create environment
