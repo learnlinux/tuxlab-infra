@@ -9,10 +9,11 @@ addons:
       - sshpass
       - vagrant
       - virtualbox
+      - virtualbox-dkms
       - virtualbox-guest-additions-iso
 before_install:
   - sudo vagrant plugin install vagrant-vbguest
-  - sudo modprobe guest-iso vboxnetflt vboxdrv
+  - sudo modprobe vboxnetflt vboxdrv
 install:
   - make up
 build:
