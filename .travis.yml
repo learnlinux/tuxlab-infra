@@ -8,13 +8,13 @@ addons:
       - ansible
       - sshpass
       - vagrant
+      - linux-headers-generic
       - virtualbox
+      - virtualbox-dkms
       - virtualbox-guest-additions-iso
 before_install:
-  - sudo apt-get -y install linux-headers-$(uname -r)
-  - VBoxManage -v
   - sudo vagrant plugin install vagrant-vbguest
-  - sudo modprobe guest-iso vboxnetflt vboxdrv
+  - VBoxManage -v
 install:
   - make up
 build:
