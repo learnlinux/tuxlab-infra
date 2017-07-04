@@ -2,7 +2,12 @@ box: ubuntu
 build:
   steps:
     - install-packages:
-        packages: virtualbox vagrant make
+        packages: virtualbox vagrant make dkms
+
+    - script:
+        name: install vagrant
+        shell: |
+          VBoxManage --version
 
     - script:
         name: create environment
