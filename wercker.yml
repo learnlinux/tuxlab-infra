@@ -7,7 +7,7 @@ build:
     - script:
         name: finalize installation of vagrant
         shell: |
-          info $(VBoxManage --versionVBoxManage --version)
+          info $(VBoxManage --version)
 
     - script:
         name: create environment
