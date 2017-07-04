@@ -7,8 +7,7 @@ build:
     - script:
         name: finalize installation of vagrant
         shell: |
-          echo "Virtualbox Version:"
-          echo "$(VBoxManage --version)"
+          sudo apt-get install linux-headers-generic
 
     - script:
         name: create environment
