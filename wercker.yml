@@ -1,4 +1,4 @@
-box: debian-vagrant
+box: jesselang/debian-vagrant
 
 build:
   steps:
