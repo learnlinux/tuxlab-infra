@@ -1,8 +1,7 @@
 language: generic
 group: stable
 os: linux
-dist: trusty
-sudo: required
+dist: precise
 addons:
   apt:
     packages:
@@ -13,12 +12,10 @@ addons:
       - linux-image-generic
       - linux-headers-generic
       - virtualbox
-      - virtualbox-dkms
       - virtualbox-guest-additions-iso
 before_install:
   - sudo dpkg-reconfigure virtualbox-dkms
   - sudo dpkg-reconfigure virtualbox
-  - sudo /etc/init.d/virtualbox restart
   - sudo vagrant plugin install vagrant-vbguest
   - VBoxManage -v
 install:
