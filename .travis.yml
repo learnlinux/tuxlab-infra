@@ -8,11 +8,14 @@ addons:
       - ansible
       - sshpass
       - vagrant
+      - linux-generic
+      - linux-image-generic
       - linux-headers-generic
       - virtualbox
       - virtualbox-dkms
       - virtualbox-guest-additions-iso
 before_install:
+  - sudo dpkg-reconfigure virtualbox-dkms
   - sudo vagrant plugin install vagrant-vbguest
   - VBoxManage -v
 install:
