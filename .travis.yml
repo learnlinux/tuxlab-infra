@@ -6,8 +6,10 @@ before_install:
   - brew install make
   - brew install ansible
   - brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
-  - brew install virtualbox
-  - brew install vagrant
+  - brew tap phinze/homebrew-cask
+  - brew install brew-cask
+  - brew cask install virtualbox
+  - brew cask install vagrant
 install:
   - sudo make up
 build:
