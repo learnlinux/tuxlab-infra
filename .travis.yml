@@ -1,4 +1,4 @@
-language: generic
+language: ruby
 group: stable
 dist: trusty
 os: linux
@@ -9,10 +9,12 @@ addons:
       - sshpass
       - vagrant
       - virtualbox
-      - virtualbox-dkms
       - virtualbox-guest-additions-iso
 before_install:
+  - sudo apt-get -y install linux-headers-$(uname -r)
+  - VBoxManage -v
   - sudo vagrant plugin install vagrant-vbguest
+  - sudo modprobe guest-iso vboxnetflt vboxdrv
 install:
   - make up
 build:
