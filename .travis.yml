@@ -1,6 +1,16 @@
+language: generic
+group: stable
+dist: trusty
+os: linux
+addons:
+  apt:
+    packages:
+      - ansible
+      - sshpass
+      - vagrant
+      - virtualbox
+      - virtualbox-guest-additions-iso
 before_install:
-  - sudo apt-get update -q
-  - sudo apt-get install -q ansible sshpass vagrant=1.8.5 virtualbox virtualbox-guest-additions-iso --fix-missing
   - sudo vagrant plugin install vagrant-vbguest
   - sudo modprobe netadp netflt guest-iso vboxdrv
 install:
