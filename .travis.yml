@@ -17,7 +17,7 @@ before_install:
   - sudo wget -nv https://releases.hashicorp.com/vagrant/1.9.6/vagrant_1.9.6_x86_64.deb
   - sudo dpkg -i vagrant_1.9.6_x86_64.deb
   - sudo vagrant plugin install vagrant-vbguest
-  - VBoxMa
+  - VBoxManage --version
 install:
   - make up
 build:
