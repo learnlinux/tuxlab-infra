@@ -2,6 +2,7 @@ language: generic
 group: stable
 os: osx
 before_install:
+  - brew update
   - brew install make
   - brew install ansible
   - brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
