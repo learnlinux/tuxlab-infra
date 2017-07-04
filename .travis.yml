@@ -12,7 +12,7 @@ addons:
       - virtualbox-guest-additions-iso
 before_install:
   - sudo vagrant plugin install vagrant-vbguest
-  - sudo modprobe vboxnetadp vboxnetflt guest-iso vboxdrv
+  - sudo modprobe guest-iso vboxnetflt vboxdrv
 install:
   - make up
 build:
