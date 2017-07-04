@@ -2,12 +2,15 @@ box: ubuntu
 build:
   steps:
     - install-packages:
-        packages: virtualbox vagrant make dkms
+        packages: virtualbox vagrant make dkms linux-headers-generic
 
-    - script:
-        name: finalize installation of vagrant
-        shell: |
-          sudo apt-get install linux-headers-generic
+    -script:
+        name: configure vagrant
+        code: |
+          sudo dpkg-reconfigure virtualbox-dkms
+          sudo dpkg-reconfigure virtualbox
+          sudo modprobe vboxdrv
+          sudo modprobe vboxnetflt
 
     - script:
         name: create environment
