@@ -1,11 +1,9 @@
-box: jesselang/debian-vagrant
-
+box: wercker-vagrant
 build:
   steps:
     - script:
         name: create environment
         code: make up
-
 test:
   steps:
     - script:
