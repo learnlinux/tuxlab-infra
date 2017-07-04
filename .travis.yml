@@ -1,24 +1,12 @@
 language: generic
 group: stable
-os: linux
-dist: precise
-sudo: required
-addons:
-  apt:
-    packages:
-      - ansible
-      - sshpass
-      - linux-generic
-      - linux-image-generic
-      - linux-headers-generic
-      - virtualbox
-      - virtualbox-ose-dkms
-      - virtualbox-guest-additions-iso
+os: osx
 before_install:
-  - sudo wget -nv https://releases.hashicorp.com/vagrant/1.9.6/vagrant_1.9.6_x86_64.deb
-  - sudo dpkg -i vagrant_1.9.6_x86_64.deb
-  - sudo vagrant plugin install vagrant-vbguest
-  - VBoxManage --version
+  - brew install make
+  - brew install ansible
+  - brew install https://raw.githubusercontent.com/kadwanev/bigboybrew/master/Library/Formula/sshpass.rb
+  - brew install virtualbox
+  - brew install vagrant
 install:
   - sudo make up
 build:
