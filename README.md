@@ -1,4 +1,8 @@
 # TuxLab
+[![wercker status](https://app.wercker.com/status/f7c7fb7c77eaaee3af3b97d05c162e3c/s/master "wercker status")](https://app.wercker.com/project/byKey/f7c7fb7c77eaaee3af3b97d05c162e3c)
+
+
+
 TuxLab is an open source platform for creating Interactive Linux Courses.  This repository
 contains the infrastructure configuration (done using Ansible).  It will automatically
 create the necessary network configuration, security groups, provision and install Ansible

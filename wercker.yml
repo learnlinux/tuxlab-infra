@@ -7,7 +7,7 @@ build:
     - script:
         name: finalize installation of vagrant
         shell: |
-          info "$(VBoxManage --version)"
+          VBoxManage --version > $WERCKER_REPORT_ARTIFACTS_DIR/test.log
 
     - script:
         name: create environment
