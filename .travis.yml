@@ -1,6 +1,8 @@
 before_install:
   - sudo apt-get update -q
-  - sudo apt-get install -q virtualbox vagrant --fix-missing
+  - sudo apt-get install -q ansible sshpass vagrant virtualbox virtualbox-guest-additions-iso --fix-missing
+  - sudo vagrant plugin install vagrant-vbguest
+  - sudo modprobe netadp netflt guest-iso vboxdrv 
 install:
   - make up
 build:
