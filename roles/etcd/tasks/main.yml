@@ -1,4 +1,5 @@
 ---
+
 - name: add etcd systemd service
   become: yes
   template: src=etcd.j2

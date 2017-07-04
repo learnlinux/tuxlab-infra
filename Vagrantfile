@@ -17,6 +17,7 @@ Vagrant.configure(2) do |vagrant|
   # TuxLab Swarm Controller
     vagrant.vm.define "dswarm" do |dswarm|
       dswarm.vm.box = "centos/atomic-host"
+      dswarm.vm.box_version = "7.20161006"
 
       # Disable Guest Additions Installing
           dswarm.vm.provider :virtualbox do |v|
@@ -28,8 +29,9 @@ Vagrant.configure(2) do |vagrant|
           if Vagrant.has_plugin?("vagrant-vbguest") then
             dswarm.vbguest.auto_update = false
           end
+
       # Disable Folder Syncing
-      dswarm.vm.synced_folder ".", "/vagrant", disabled: true
+      dswarm.vm.synced_folder '.', '/home/vagrant/sync', disabled: true
 
       # Setup Network and SSH
       dswarm.vm.network "private_network", ip: "10.100.1.10"
@@ -43,6 +45,7 @@ Vagrant.configure(2) do |vagrant|
     # TuxLab Swarm Host
       vagrant.vm.define "dhost" do |dhost|
         dhost.vm.box = "centos/atomic-host"
+        dhost.vm.box_version = "7.20161006"
 
         # Disable Guest Additions Installing
             dhost.vm.provider :virtualbox do |v|
@@ -55,7 +58,7 @@ Vagrant.configure(2) do |vagrant|
               dhost.vbguest.auto_update = false
             end
         # Disable Folder Syncing
-        dhost.vm.synced_folder ".", "/vagrant", disabled: true
+        dhost.vm.synced_folder '.', '/home/vagrant/sync', disabled: true
 
         # Setup Network and SSH
         dhost.vm.network "private_network", ip: "10.100.1.11"
@@ -70,6 +73,10 @@ Vagrant.configure(2) do |vagrant|
     vagrant.vm.define "meteor" do |meteor|
       meteor.vm.box = "centos/7"
 
+      # Disable Folder Syncing
+      meteor.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # Set Key
       meteor.ssh.username="vagrant"
       meteor.ssh.insert_key = false
       meteor.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'

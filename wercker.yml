@@ -1,0 +1,13 @@
+box: debian-vagrant
+
+build:
+  steps:
+    - script:
+        name: create environment
+        code: make up
+
+test:
+  steps:
+    - script:
+        name: run tests
+        code: make test > $WERCKER_REPORT_ARTIFACTS_DIR/test_results.log

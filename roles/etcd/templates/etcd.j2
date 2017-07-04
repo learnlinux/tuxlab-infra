@@ -17,7 +17,7 @@ After=network.target
 
 [Service]
 Type=notify
-User={{ etcd_user }}
+User=root
 ExecStart={{ etcd_cmd }} \
 						{% if etcd_discovery != none -%}
 						-discovery {{ etcd_discovery }} \
@@ -54,7 +54,8 @@ ExecStart={{ etcd_cmd }} \
 Restart=always
 RestartSec=10s
 LimitNOFILE=40000
-TimeoutStartSec=0
+TimeoutStartSec=180
+StandardOutput=journal
 
 [Install]
 WantedBy=multi-user.target
