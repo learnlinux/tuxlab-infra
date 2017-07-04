@@ -2,11 +2,11 @@ box: ubuntu
 build:
   steps:
     - install-packages:
-        packages: virtualbox vagrant
+        packages: virtualbox vagrant make
 
     - script:
         name: create environment
-        code: make up
+        code: vagrant up
 
     - script:
         name: run tests

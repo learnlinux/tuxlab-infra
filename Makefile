@@ -15,7 +15,7 @@ up:
 	vagrant up;
 
 # Test Application
-test: destroy up
+test: 
 	vagrant ssh meteor --command "cd /var/www && forever stopall";
 	vagrant ssh meteor --command "cd /var/tuxlab && /usr/local/bin/meteor npm install && /usr/local/bin/meteor npm test";
 
