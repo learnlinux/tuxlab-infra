@@ -12,6 +12,7 @@ addons:
       - linux-image-generic
       - linux-headers-generic
       - virtualbox
+      - virtualbox-ose-dkms
       - virtualbox-guest-additions-iso
 before_install:
   - sudo wget -nv https://releases.hashicorp.com/vagrant/1.9.6/vagrant_1.9.6_x86_64.deb
@@ -19,6 +20,6 @@ before_install:
   - sudo vagrant plugin install vagrant-vbguest
   - VBoxManage --version
 install:
-  - make up
+  - sudo make up
 build:
-  - make test
+  - sudo make test
