@@ -1,7 +1,8 @@
-language: ruby
+language: generic
 group: stable
-dist: precise
 os: linux
+dist: trusty
+sudo: required
 addons:
   apt:
     packages:
