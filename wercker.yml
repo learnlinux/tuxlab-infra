@@ -2,17 +2,20 @@ box: ubuntu
 build:
   steps:
     - install-packages:
-        packages: "virtualbox vagrant make dkms linux-headers-generic"
-    -script:
+        packages: virtualbox vagrant make dkms linux-headers-generic
+
+    - script:
         name: configure vagrant
         code: |
           sudo dpkg-reconfigure virtualbox-dkms
           sudo dpkg-reconfigure virtualbox
           sudo modprobe vboxdrv
           sudo modprobe vboxnetflt
+
     - script:
         name: create environment
         code: vagrant up
+        
     - script:
         name: run tests
         code: make test > $WERCKER_REPORT_ARTIFACTS_DIR/test_results.log
