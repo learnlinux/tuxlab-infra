@@ -2,7 +2,7 @@ box: ubuntu
 build:
   steps:
     - install-packages:
-        packages: virtualbox vagrant make dkms linux-headers-generic
+        packages: "virtualbox vagrant make dkms linux-headers-generic"
 
     -script:
         name: configure vagrant
