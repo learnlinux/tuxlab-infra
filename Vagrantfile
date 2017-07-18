@@ -6,6 +6,10 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 
+unless Vagrant.has_plugin?("vagrant-hostsupdater")
+  raise 'vagrant-hostsupdater is not installed!'
+end
+
 Vagrant.configure(2) do |vagrant|
 
   # Provider Setup
@@ -35,6 +39,8 @@ Vagrant.configure(2) do |vagrant|
 
       # Setup Network and SSH
       dswarm.vm.network "private_network", ip: "10.100.1.10"
+      dswarm.hostsupdater.aliases = ["dswarm.tuxlab.local"]
+
       dswarm.ssh.insert_key = false
       dswarm.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
@@ -45,7 +51,7 @@ Vagrant.configure(2) do |vagrant|
     # TuxLab Swarm Host
       vagrant.vm.define "dhost" do |dhost|
         dhost.vm.box = "centos/atomic-host"
-        dhost.vm.box_version = "7.20161006"
+        dhost.vm.box_version = "1706.01"
 
         # Disable Guest Additions Installing
             dhost.vm.provider :virtualbox do |v|
@@ -62,6 +68,8 @@ Vagrant.configure(2) do |vagrant|
 
         # Setup Network and SSH
         dhost.vm.network "private_network", ip: "10.100.1.11"
+        dhost.hostsupdater.aliases = ["dhost.tuxlab.local"]
+
         dhost.ssh.insert_key = false
         dhost.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
@@ -73,6 +81,11 @@ Vagrant.configure(2) do |vagrant|
     vagrant.vm.define "meteor" do |meteor|
       meteor.vm.box = "centos/7"
 
+      meteor.vm.provider :virtualbox do |v|
+        v.memory = 2048
+        v.cpus = 2
+      end
+
       # Disable Folder Syncing
       meteor.vm.synced_folder ".", "/vagrant", disabled: true
 
@@ -83,6 +96,8 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       meteor.vm.network "private_network", ip: "10.100.1.2"
+      meteor.hostsupdater.aliases = ["meteor.tuxlab.local"]
+
       meteor.vm.provision "shell", path: "local/vagrant_network_conf.sh"
 
       # Configure All Hosts via Ansible
@@ -92,6 +107,7 @@ Vagrant.configure(2) do |vagrant|
         ansible.force_remote_user = false
         ansible.host_key_checking = false
         ansible.inventory_path = "./local/vagrant_ansible_inventory"
+        ansible.verbose = true
         ansible.extra_vars = {
           host_key_checking: "False",
           swarm_node_ip: "10.100.1.10"

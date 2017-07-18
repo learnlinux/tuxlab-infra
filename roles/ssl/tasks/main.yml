@@ -73,7 +73,10 @@
 # Create SSL Folder on hosts
 - name: Create Key Directory
   become: yes
-  file: path=/etc/ssl/local state=directory
+  file:
+    path: /etc/ssl/local
+    state: directory
+    recurse: true
 
 - name: Add SANs to openssl.cnf
   become: yes
@@ -137,4 +140,26 @@
 
 - name: Updated Trusted Certificates
   become: yes
-  shell: update-ca-trust
+  shell: update-ca-trust extract
+
+###############################
+#          SETUP NSS          #
+###############################
+
+- name: Create NSS Directory
+  become: yes
+  file:
+    path: /etc/ssl/nss
+    state: directory
+
+- name: Create NSS Database
+  become: yes
+  shell: certutil -N -d /etc/ssl/nss --empty-password
+
+- name: Create PK12
+  become: yes
+  shell: "openssl pkcs12 -export -in /etc/ssl/local/cert.pem -inkey /etc/ssl/local/host.pem -out host.p12 -name tuxlab-key -passout pass:"
+
+- name: Add Client Key to NSS
+  become: yes
+  shell: pk12util -i host.p12 -d /etc/ssl/nss -W ""

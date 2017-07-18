@@ -46,7 +46,7 @@
     npm: name=forever global=yes state=present
 
 ## COPY SETTINGS
-  - name: Copy settings.env.json
+  - name: Copy settings
     become: yes
     template:
       src: "{{item}}.j2"
@@ -57,7 +57,6 @@
       - "settings.domain.json"
       - "settings.env.json"
       - "settings.labvm.json"
-      - "settings.login.json"
 
 ## BUILD AND RUN
   - name: build tuxlab app

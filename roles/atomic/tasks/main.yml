@@ -3,11 +3,6 @@
 - name: Confirm host connection works
   ping:
 
-# Download Atomic Upgrades
-- name: updating atomic host
-  become: yes
-  shell: atomic host upgrade
-
 # Changes SSHD Socket Port to 2222
 - name: change ssh port
   become: yes

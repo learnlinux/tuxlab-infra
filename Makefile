@@ -10,14 +10,16 @@ aws:
 	ansible-playbook site.yml;
 
 # Up Vagrantfile
-up:
+up: destroy
 	rm ~/.ssh/known_hosts | true;
+	# git submodule update --recursive --remote;
 	vagrant up;
 
 # Test Application
-test: destroy up
+test:
 	vagrant ssh meteor --command "cd /var/www && forever stopall";
-	vagrant ssh meteor --command "cd /var/tuxlab && /usr/local/bin/meteor npm install && /usr/local/bin/meteor npm test";
+	vagrant ssh meteor --command "cd /var/tuxlab && cp -rf /tuxlab-sync /var/tuxlab";
+	vagrant ssh meteor --command "cd /var/tuxlab && /usr/local/bin/meteor npm install && /usr/local/bin/meteor npm run test:infra";
 
 # Down Vagrantfile
 destroy:

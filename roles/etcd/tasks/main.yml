@@ -22,4 +22,4 @@
 
 - name: Import SSL Variables
   become: yes
-  shell: source /etc/profile.d/etcdctl.sh
+  shell: . /etc/profile.d/etcdctl.sh
