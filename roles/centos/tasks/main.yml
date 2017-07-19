@@ -38,4 +38,4 @@
 
 - name: Install etcd
   become: yes
-  yum: name=etcd state=latest
+  yum: name=etcd-2.3.7 state=latest

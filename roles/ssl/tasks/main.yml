@@ -140,21 +140,11 @@
 
 - name: Updated Trusted Certificates
   become: yes
-  shell: update-ca-trust extract
+  shell: update-ca-trust
 
 ###############################
 #          SETUP NSS          #
 ###############################
-
-- name: Create NSS Directory
-  become: yes
-  file:
-    path: /etc/ssl/nss
-    state: directory
-
-- name: Create NSS Database
-  become: yes
-  shell: certutil -N -d /etc/ssl/nss --empty-password
 
 - name: Create PK12
   become: yes
@@ -162,4 +152,4 @@
 
 - name: Add Client Key to NSS
   become: yes
-  shell: pk12util -i host.p12 -d /etc/ssl/nss -W ""
+  shell: pk12util -i host.p12 -d /etc/pki/nssdb/ -W ""

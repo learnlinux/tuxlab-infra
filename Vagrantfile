@@ -83,7 +83,7 @@ Vagrant.configure(2) do |vagrant|
 
       meteor.vm.provider :virtualbox do |v|
         v.memory = 2048
-        v.cpus = 2
+        v.cpus = 1
       end
 
       # Disable Folder Syncing
@@ -107,7 +107,7 @@ Vagrant.configure(2) do |vagrant|
         ansible.force_remote_user = false
         ansible.host_key_checking = false
         ansible.inventory_path = "./local/vagrant_ansible_inventory"
-        ansible.verbose = true
+        #ansible.verbose = true
         ansible.extra_vars = {
           host_key_checking: "False",
           swarm_node_ip: "10.100.1.10"

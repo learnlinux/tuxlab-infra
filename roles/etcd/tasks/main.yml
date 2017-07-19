@@ -6,12 +6,17 @@
             dest=/etc/systemd/system/etcd.service
             mode=0644
 
-- name: Enable etcd
+- name: Daemon Reload
   become: yes
-  shell: |
-    systemctl daemon-reload
-    systemctl enable etcd.service
-    systemctl start etcd.service &
+  shell: systemctl daemon-reload
+
+- name: ETCD Enable
+  become: yes
+  shell: systemctl enable etcd.service
+
+- name: ETCD Start
+  become: yes
+  shell: systemctl start etcd.service &
 
 - name: Save SSL Variables
   become: yes
