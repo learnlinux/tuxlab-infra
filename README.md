@@ -1,4 +1,5 @@
 # TuxLab
+
 TuxLab is an open source platform for creating Interactive Linux Courses.  This repository
 contains the infrastructure configuration (done using Ansible).  It will automatically
 create the necessary network configuration, security groups, provision and install Ansible
