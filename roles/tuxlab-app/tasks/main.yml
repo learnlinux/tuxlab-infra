@@ -17,64 +17,11 @@
     become: yes
     file: path=/var/tuxlab state=directory owner={{ ansible_user }}
 
-## COPY FILES
-  - name: remove existing files
-    become: yes
-    file: path={{ item }} state=absent
-    with_items:
-      - "{{ source_dir }}"
-      - "{{ deploy_dir }}"
+## RUN SETUP
+  - name: Production Setup
+    include: "production.yml"
+    when: (not (vagrant_sync is defined)) or (not vagrant_sync)
 
-  - name: create directories
-    become: yes
-    file: name={{ item }} state=directory owner={{ ansible_user }}
-    with_items:
-      - "{{ source_dir }}"
-      - "{{ source_dir }}/private"
-      - "{{ deploy_dir }}"
-
-  - name: pull tuxlab-app
-    become: yes
-    synchronize:
-      src: "{{ local_dir }}"
-      dest: "{{ source_dir }}"
-      verify_host: no
-
-# INSTALL FOREVER
-  - name: install forvever
-    become: yes
-    npm: name=forever global=yes state=present
-
-## COPY SETTINGS
-  - name: Copy settings
-    become: yes
-    template:
-      src: "{{item}}.j2"
-      dest: "{{source_dir}}/private/{{item}}"
-      force: yes
-      mode: 0644
-    with_items:
-      - "settings.domain.json"
-      - "settings.env.json"
-      - "settings.labvm.json"
-
-## BUILD AND RUN
-  - name: build tuxlab app
-    become: true
-    become_user: "{{ ansible_user }}"
-    shell: "/usr/local/bin/meteor build --directory {{deploy_dir}} chdir={{source_dir}}"
-
-  - name: set mongodb url
-    become: yes
-    shell: MONGO_URL={{ mongo_url }}
-    when: "'security_group_meteor' in group_names"
-
-  - name: start tuxlab app
-    become: yes
-    shell:  >
-      PORT=80
-      ROOT_URL={{ root_url }}
-      MAIL_URL={{ mail_url }}
-      forever start "{{ deploy_dir }}/bundle/main.js"
-    async: 10
-    poll: 1
+  - name: Vagrant Setup
+    include: "vagrant.yml"
+    when: (vagrant_sync is defined) and vagrant_sync

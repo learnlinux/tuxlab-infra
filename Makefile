@@ -15,11 +15,15 @@ up: destroy
 	# git submodule update --recursive --remote;
 	vagrant up;
 
+# Run Meteor
+run:
+	vagrant rsync meteor
+	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && /usr/local/bin/meteor";
+
 # Test Application
 test:
-	vagrant ssh meteor --command "cd /var/www && forever stopall";
-	vagrant ssh meteor --command "cd /var/tuxlab && cp -rf /tuxlab-sync /var/tuxlab";
-	vagrant ssh meteor --command "cd /var/tuxlab && /usr/local/bin/meteor npm install && /usr/local/bin/meteor npm run test:infra";
+	vagrant rsync meteor
+	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && /usr/local/bin/meteor npm test:infra";
 
 # Down Vagrantfile
 destroy:

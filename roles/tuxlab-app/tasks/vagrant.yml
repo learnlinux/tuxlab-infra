@@ -1,0 +1,20 @@
+## COPY SETTINGS
+
+  - name: Create directory
+    become: yes
+    file:
+      state: directory
+      path: "{{vagrant_dir}}/private/"
+      mode: 0655
+
+  - name: Copy settings
+    become: yes
+    template:
+      src: "{{item}}.j2"
+      dest: "{{vagrant_dir}}/private/{{item}}"
+      force: yes
+      mode: 0655
+    with_items:
+      - "settings.domain.json"
+      - "settings.env.json"
+      - "settings.labvm.json"

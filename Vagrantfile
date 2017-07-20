@@ -10,13 +10,17 @@ unless Vagrant.has_plugin?("vagrant-hostsupdater")
   raise 'vagrant-hostsupdater is not installed!'
 end
 
+unless Vagrant.has_plugin?("vagrant-vbguest")
+  raise 'vagrant-vbguest is not installed!'
+end
+
 Vagrant.configure(2) do |vagrant|
 
   # Provider Setup
     vagrant.vm.provider "virtualbox" do |v|
       v.memory = 1024
       v.cpus = 1
-      v.customize ["modifyvm", :id, "--hwvirtex", "off"]
+      v.customize ["modifyvm", :id, "--hwvirtex", "on"]
     end
 
   # TuxLab Swarm Controller
@@ -89,6 +93,8 @@ Vagrant.configure(2) do |vagrant|
 
       # Disable Folder Syncing
       meteor.vm.synced_folder ".", "/vagrant", disabled: true
+      meteor.vm.synced_folder "./app", "/tuxlab-sync", type: "rsync", rsync__exclude: [".git",".meteor/local/","private/","node_modules/"]
+
 
       # Set Key
       meteor.ssh.username="vagrant"
@@ -111,7 +117,8 @@ Vagrant.configure(2) do |vagrant|
         #ansible.verbose = true
         ansible.extra_vars = {
           host_key_checking: "False",
-          swarm_node_ip: "10.100.1.10"
+          swarm_node_ip: "10.100.1.10",
+          vagrant_sync: true
         }
       end
 
