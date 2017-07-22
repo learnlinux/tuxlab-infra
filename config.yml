@@ -2,9 +2,9 @@
 ###############################
 #    DOMAIN CONFIGURATION     #
 ###############################
-   TUX_DOMAIN: cmu.tuxlab.org
+   TUX_DOMAIN: tuxlab.local
    TUX_ORG: Carnegie Mellon University
-   TUX_HOMEPAGE: http://cmu.tuxlab.org/
+   TUX_HOMEPAGE: http://tuxlab.local/
    TUX_EMAIL: service@tuxlab.org
 
 ###############################

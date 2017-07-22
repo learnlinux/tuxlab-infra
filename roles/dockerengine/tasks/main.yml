@@ -11,25 +11,18 @@
   become: yes
   file:
     src: '/etc/ssl/local/{{ item.src }}'
-    dest: '/root/.docker/{{ item.dest }}'
+    dest: '/etc/docker/{{ item.dest }}'
     state: link
   with_items:
     - { src: 'ca.pem', dest: 'ca.pem' }
     - { src: 'cert.pem', dest: 'cert.pem' }
     - { src: 'host.pem', dest: 'key.pem' }
 
-- name: create service.d
-  become: yes
-  file:
-    path: '/etc/systemd/system/docker.service.d'
-    state: directory
-    mode: 0755
-
-- name: copy docker drop-in
+- name: copy docker configuration
   become: yes
   template: >
-    src=tls-verify.conf.j2
-    dest=/etc/systemd/system/docker.service.d/tls-verify.conf
+    src=docker.j2
+    dest=/etc/sysconfig/docker
     owner=root
     group=root
     mode=0644

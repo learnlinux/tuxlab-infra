@@ -16,11 +16,7 @@
       - /etc/ssl/local:/certs:ro
     command: >
       join
-      --addr={{ ansible_host }}:2375
-      --tlsverify
-      --tlscacert=/certs/ca.pem
-      --tlscert=/certs/cert.pem
-      --tlskey=/certs/host.pem
+      --addr={{ ansible_host }}:2376
       --discovery-opt kv.cacertfile=/certs/ca.pem
       --discovery-opt kv.certfile=/certs/cert.pem
       --discovery-opt kv.keyfile=/certs/host.pem

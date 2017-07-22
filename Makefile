@@ -17,13 +17,14 @@ up: destroy
 
 # Run Meteor
 run:
+	rm -rf /etc/
 	vagrant rsync meteor
 	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && /usr/local/bin/meteor";
 
 # Test Application
 test:
 	vagrant rsync meteor
-	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && /usr/local/bin/meteor npm test:infra";
+	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && /usr/local/bin/meteor npm test";
 
 # Down Vagrantfile
 destroy:

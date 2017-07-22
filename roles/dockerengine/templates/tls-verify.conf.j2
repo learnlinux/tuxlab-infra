@@ -1,2 +1,0 @@
-[Service]
-Environment="DOCKER_OPTS=-H=unix:///var/run/docker.sock -H={{ ansible_host }}:2375 --selinux-enabled --log-driver=journald --tlsverify --tlscacert=/etc/docker/ca.pem --tlscert=/etc/docker/cert.pem --tlskey=/etc/docker/key.pem"

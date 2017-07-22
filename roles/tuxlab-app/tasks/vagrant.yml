@@ -5,7 +5,8 @@
     file:
       state: directory
       path: "{{vagrant_dir}}/private/"
-      mode: 0655
+      mode: 0755
+      owner: vagrant
 
   - name: Copy settings
     become: yes
@@ -13,7 +14,7 @@
       src: "{{item}}.j2"
       dest: "{{vagrant_dir}}/private/{{item}}"
       force: yes
-      mode: 0655
+      mode: 0755
     with_items:
       - "settings.domain.json"
       - "settings.env.json"

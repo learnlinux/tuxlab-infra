@@ -1,10 +1,9 @@
 #-*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
+unless Vagrant.has_plugin?("vagrant-hosts")
+  raise 'vagrant-hosts is not installed!'
+end
 
 unless Vagrant.has_plugin?("vagrant-hostsupdater")
   raise 'vagrant-hostsupdater is not installed!'
@@ -45,7 +44,13 @@ Vagrant.configure(2) do |vagrant|
       # Setup Network and SSH
       dswarm.vm.network "private_network", ip: "10.100.1.10"
       dswarm.hostsupdater.aliases = ["dswarm.tuxlab.local"]
+      dswarm.vm.provision :hosts do |provisioner|
+        provisioner.autoconfigure = true
+        provisioner.sync_hosts = true
+        provisioner.add_host '10.100.1.10', ['dswarm.tuxlab.local']
+      end
 
+      # Use Private Key
       dswarm.ssh.insert_key = false
       dswarm.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
@@ -56,7 +61,7 @@ Vagrant.configure(2) do |vagrant|
     # TuxLab Swarm Host
       vagrant.vm.define "dhost" do |dhost|
         dhost.vm.box = "centos/atomic-host"
-        dhost.vm.box_version = "1706.01"
+        dhost.vm.box_version = "7.20161006"
 
         # Disable Guest Additions Installing
             dhost.vm.provider :virtualbox do |v|
@@ -74,6 +79,11 @@ Vagrant.configure(2) do |vagrant|
         # Setup Network and SSH
         dhost.vm.network "private_network", ip: "10.100.1.11"
         dhost.hostsupdater.aliases = ["dhost.tuxlab.local"]
+        dhost.vm.provision :hosts do |provisioner|
+          provisioner.autoconfigure = true
+          provisioner.sync_hosts = true
+          provisioner.add_host '10.100.1.11', ['dhost.tuxlab.local']
+        end
 
         dhost.ssh.insert_key = false
         dhost.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
@@ -103,7 +113,12 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       meteor.vm.network "private_network", ip: "10.100.1.2"
-      meteor.hostsupdater.aliases = ["meteor.tuxlab.local"]
+      meteor.hostsupdater.aliases = ["meteor.tuxlab.local", "tuxlab.local"]
+      meteor.vm.provision :hosts do |provisioner|
+        provisioner.autoconfigure = true
+        provisioner.sync_hosts = true
+        provisioner.add_host '10.100.1.11', ['tuxlab.local', 'meteor.tuxlab.local']
+      end
 
       meteor.vm.provision "shell", path: "local/vagrant_network_conf.sh"
 
