@@ -89,7 +89,6 @@
     vars_files:
       - config.yml
     roles:
-      - nodejs
       - meteor
       - tuxlab-app
 

@@ -24,7 +24,7 @@
 # INSTALL FOREVER
   - name: install forvever
     become: yes
-    npm: name=forever global=yes state=present
+    shell: meteor npm install -g forever
 
 ## COPY SETTINGS
   - name: Copy settings
