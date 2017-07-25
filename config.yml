@@ -17,41 +17,13 @@
    SSL_ORG_UNIT: TuxLab
 
 ###############################
+#    AUTHENTICATION OPTIONS   #
+###############################
+
+
+
+###############################
 #    LABENV CONFIGURATION     #
 ###############################
    LAB_IMAGES:
     - 'tuxlab/labvm-alpine'
-
-###############################
-#    MONGODB CONFIGURATION    #
-###############################
-
-   MONGO_ROOT: ds025792.mlab.com:25792
-   MONGO_URL: ds025792.mlab.com:25792/tuxlab
-   MONGO_USER: tuxlab
-   MONGO_PASS: [REDACTED]
-   MONGO_EMAIL: smtp://smtp.tuxlab.org/
-
-###############################
-#      AWS CONFIGURATION      #
-###############################
-   EC2_REGION: us-east-1
-   EC2_AZ: us-east-1a
-
-  # Ansible Tower
-   TOWER_IMAGE: ami-ebedc8fc
-   TOWER_INSTANCE_TYPE: m3.medium
-
-  # Docker Swarm Manager Settings
-   SWARM_IMAGE: ami-cfeca0d8
-   SWARM_INSTANCE_TYPE: t2.medium
-
-  # Docker Host Settings
-   DOCKER_IMAGE: ami-cfeca0d8
-   DOCKER_INSTANCE_TYPE: t2.medium
-   DOCKER_MAX_INSTANCES: 1
-
-  # Meteor Server Settings
-   METEOR_IMAGE: ami-6d1c2007
-   METEOR_INSTANCE_TYPE: t2.medium
-   METEOR_MAX_INSTANCES: 1

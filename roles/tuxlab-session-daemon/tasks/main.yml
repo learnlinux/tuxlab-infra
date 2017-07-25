@@ -4,7 +4,6 @@
   become: yes
   template: src=settings.json.j2 dest=/root/tuxlab-sessiond-settings.json
 
-#TODO: https://github.com/ansible/ansible-modules-core/issues/5515
 - name: pull session-daemon image
   become: yes
   shell: docker pull tuxlab/session-daemon

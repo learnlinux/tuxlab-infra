@@ -11,11 +11,7 @@
   - name: Copy settings
     become: yes
     template:
-      src: "{{item}}.j2"
-      dest: "{{vagrant_dir}}/private/{{item}}"
+      src: "settings.json.j2"
+      dest: "{{vagrant_dir}}/private/settings.json"
       force: yes
       mode: 0755
-    with_items:
-      - "settings.domain.json"
-      - "settings.env.json"
-      - "settings.labvm.json"

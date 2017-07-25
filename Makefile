@@ -19,7 +19,7 @@ up: destroy
 run:
 	rm ~/.ssh/known_hosts | true;
 	vagrant rsync meteor
-	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && ROOT_URL=http://tuxlab.local:3000 /usr/local/bin/meteor";
+	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && ROOT_URL=http://tuxlab.local:3000 /usr/local/bin/meteor --settings ./private/settings.json";
 
 # Test Application
 test:

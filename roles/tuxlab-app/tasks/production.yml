@@ -30,20 +30,16 @@
   - name: Copy settings
     become: yes
     template:
-      src: "{{item}}.j2"
-      dest: "{{source_dir}}/private/{{item}}"
+      src: "settings.json.j2"
+      dest: "{{source_dir}}/private/settings.json"
       force: yes
       mode: 0644
-    with_items:
-      - "settings.domain.json"
-      - "settings.env.json"
-      - "settings.labvm.json"
 
 ## BUILD AND RUN
   - name: build tuxlab app
     become: true
     become_user: "{{ ansible_user }}"
-    shell: "/usr/local/bin/meteor build --directory {{deploy_dir}} chdir={{source_dir}}"
+    shell: "/usr/local/bin/meteor build --settings {{source_dir}}/private/settings.json --directory {{deploy_dir}} chdir={{source_dir}}"
 
   - name: set mongodb url
     become: yes
