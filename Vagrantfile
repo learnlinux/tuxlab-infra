@@ -113,7 +113,7 @@ Vagrant.configure(2) do |vagrant|
 
       # Add to Network
       meteor.vm.network "private_network", ip: "10.100.1.2"
-      meteor.hostsupdater.aliases = ["meteor.tuxlab.local", "tuxlab.local"]
+      meteor.hostsupdater.aliases = ["tuxlab.local", "meteor.tuxlab.local"]
       meteor.vm.provision :hosts do |provisioner|
         provisioner.autoconfigure = true
         provisioner.sync_hosts = true
