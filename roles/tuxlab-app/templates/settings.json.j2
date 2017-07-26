@@ -1,22 +1,47 @@
 {
-  "domain" : {
-    "domain_root" : "{{ TUX_DOMAIN }}",
-    "domain_org" : "{{ TUX_ORG }}",
-    "ssh_dns_root" : "ssh.{{ TUX_DOMAIN }}",
-    "ssl_key" : "/etc/ssl/local/host.pem",
-    "ssl_cert" : "/etc/ssl/local/cert.pem",
-    "ssl_ca" : "/etc/ssl/local/ca.pem"
+  "public" : {
+    "oAuth" : {
+
+      {% if AUTH_GOOGLE is defined and AUTH_GOOGLE %}
+      "google" : {
+        "domain" :  "{{ AUTH_GOOGLE_DOMAIN }}"
+      }
+      {% endif %}
+
+    }
   },
-  "env" : {
-    "swarm_node_ip" : "{{ swarm_node_ip }}",
-    "swarm_node_port" : "4000",
-    "etcd_node_proto" : "https",
-    "etcd_node_ip" : "{{ swarm_node_ip }}",
-    "etcd_node_port" : "2379"
-  },
-  "labvm" : {
-    "session_idle_timeout":"14400",
-    "labruntime_idle_timeout":"14400",
-    "labruntime_init_timeout":"5000"
+
+  "private" : {
+    "oAuth" : {
+
+      {% if AUTH_GOOGLE is defined and AUTH_GOOGLE %}
+      "google" : {
+        "clientId" : "{{ AUTH_GOOGLE_CLIENTID }}",
+        "secret" : "{{ AUTH_GOOGLE_SECRET }}",
+        "domain" : "{{ AUTH_GOOGLE_DOMAIN }}"
+      }
+      {% endif %}
+
+    },
+    "domain" : {
+      "domain_root" : "{{ TUX_DOMAIN }}",
+      "domain_org" : "{{ TUX_ORG }}",
+      "ssh_dns_root" : "ssh.{{ TUX_DOMAIN }}",
+      "ssl_key" : "/etc/ssl/local/host.pem",
+      "ssl_cert" : "/etc/ssl/local/cert.pem",
+      "ssl_ca" : "/etc/ssl/local/ca.pem"
+    },
+    "env" : {
+      "swarm_node_ip" : "{{ swarm_node_ip }}",
+      "swarm_node_port" : "4000",
+      "etcd_node_proto" : "https",
+      "etcd_node_ip" : "{{ swarm_node_ip }}",
+      "etcd_node_port" : "2379"
+    },
+    "labvm" : {
+      "session_idle_timeout":"14400",
+      "labruntime_idle_timeout":"14400",
+      "labruntime_init_timeout":"5000"
+    }
   }
 }

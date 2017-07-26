@@ -21,15 +21,3 @@
 ###############################
    LAB_IMAGES:
     - 'tuxlab/labvm-alpine'
-
-###############################
-#      AUTH CONFIGURATION     #
-###############################
-
-  # SETUP ON GOOGLE
-  # Authorized Origins: http://cmu.tuxlab.org
-  # Redirect URL: http://cmu.tuxlab.org/_oauth/google?close
-   AUTH_GOOGLE: true
-   AUTH_GOOGLE_CLIENTID: 445449178719-bo39meu0kin7akfi46nl0e1e1540lc2u.apps.googleusercontent.com
-   AUTH_GOOGLE_SECRET: AXGTICuk0E71DnyT5gFtgrYD
-   AUTH_GOOGLE_DOMAIN: andrew.cmu.edu

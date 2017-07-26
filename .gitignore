@@ -1,6 +1,6 @@
-# AWS Settings
-aws/keys/*
-
 # Vagrant Settings
 *.retry
 .vagrant/
+
+# Config
+config.yml
