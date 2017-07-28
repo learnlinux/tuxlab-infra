@@ -32,4 +32,4 @@
    AUTH_GOOGLE: true
    AUTH_GOOGLE_CLIENTID: 445449178719-bo39meu0kin7akfi46nl0e1e1540lc2u.apps.googleusercontent.com
    AUTH_GOOGLE_SECRET: AXGTICuk0E71DnyT5gFtgrYD
-   AUTH_GOOGLE_DOMAIN: andrew.cmu.edu
+   AUTH_GOOGLE_DOMAIN: "@andrew.cmu.edu"

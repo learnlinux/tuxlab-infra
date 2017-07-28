@@ -17,7 +17,7 @@
   #   - Sync Chronyd
   #   - Start ETCD Clustering
   - name: Prepare Meteor Hosts
-    hosts: tuxlab-meteor:security_group_meteor
+    hosts: tuxlab-meteor
     become_method: sudo
     vars:
       etcd_interface: eth1
@@ -35,7 +35,7 @@
   #    - Configure ETCD
   #    - Configure Docker
   - name: Configure Swarm Engine
-    hosts: tuxlab-swarm-host:tuxlab-swarm-manager:security_group_docker_host:security_group_docker_manager
+    hosts: tuxlab-swarm-host:tuxlab-swarm-manager
     become_method: sudo
     gather_facts: no
     vars_files:
@@ -54,7 +54,7 @@
   #    - Configure ETCD
   #    - Configure Docker
   - name: Configure Swarm Hosts
-    hosts: tuxlab-swarm-host:security_group_docker_host
+    hosts: tuxlab-swarm-host
     become_method: sudo
     gather_facts: no
     vars_files:
@@ -64,7 +64,7 @@
       - tuxlab-labvm
 
   - name: Configure Swarm Manager
-    hosts: tuxlab-swarm-manager:security_group_docker_manager
+    hosts: tuxlab-swarm-manager
     become_method: sudo
     gather_facts: no
     vars_files:
@@ -74,7 +74,7 @@
       - tuxlab-dns
 
   - name: Configure Swarm Hosts
-    hosts: tuxlab-swarm-host:security_group_docker_host
+    hosts: tuxlab-swarm-host
     become_method: sudo
     gather_facts: no
     vars_files:
@@ -84,17 +84,10 @@
       - tuxlab-session-daemon
 
   - name: Configure Meteor Applications
-    hosts: tuxlab-meteor:security_group_meteor
+    hosts: tuxlab-meteor
     become_method: sudo
     vars_files:
       - config.yml
     roles:
       - meteor
       - tuxlab-app
-
-  # Install Mongo Client for Logging
-  - name: Install mongo client on tower
-    hosts: security_group_tower
-    become_method: sudo
-    roles:
-      - tuxlab-mongo

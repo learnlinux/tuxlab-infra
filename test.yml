@@ -1,0 +1,27 @@
+---
+  - name: Ensure Appropriate SSH Port
+    hosts: tuxlab-swarm-host
+    gather_facts: no
+    tasks:
+      - set_fact:
+          ansible_port: 2222
+
+  - name: Validate ETCD Cluster
+    hosts: tuxlab-swarm-manager
+    tasks:
+
+      - shell: etcdctl cluster-health
+        register: result
+
+      - debug:
+          var: result.stdout
+
+  - name: Validate Docker Swarm
+    hosts: tuxlab-swarm-manager
+    tasks:
+
+      - shell: docker -H {{ ansible_host }}:4000 info
+        register: result
+
+      - debug:
+          var: result.stdout
