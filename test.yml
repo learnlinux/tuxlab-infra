@@ -7,14 +7,23 @@
           ansible_port: 2222
 
   - name: Validate ETCD Cluster
-    hosts: tuxlab-swarm-manager
+    hosts: all
     tasks:
 
       - shell: etcdctl cluster-health
         register: result
 
       - debug:
+          verbosity: 2
           var: result.stdout
+
+      - shell: etcdctl cluster-health > /dev/null; echo $?
+        register: result
+
+      - assert:
+          that:
+            - "result.stdout == 0"
+          msg: "etcdctl reported an unhealthy cluster"
 
   - name: Validate Docker Swarm
     hosts: tuxlab-swarm-manager

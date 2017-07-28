@@ -1,5 +1,0 @@
----
-- name: install mongodb
-  become: yes
-  become_method: sudo
-  yum: name=mongodb state=latest
