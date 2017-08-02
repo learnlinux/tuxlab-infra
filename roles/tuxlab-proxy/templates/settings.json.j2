@@ -1,26 +1,27 @@
 {
   "etcd_conf" : {
-    "etcd_hosts" : ["172.17.0.1:2379"],
+    "etcd_hosts" : ["https://{{ ansible_host }}:2379"],
     "etcd_conn_opts" : {
-      "cert" : "/ssl/cert.pem",
-      "key" : "/ssl/key.pem",
-      "cacert" : "/ssl/ca.pem"
+      "cert" : "/usr/lib/tuxlab/ssl/cert.pem",
+      "key" : "/usr/lib/tuxlab/ssl/host.pem",
+      "cacert" : "/usr/lib/tuxlab/ssl/ca.pem"
     }
   },
   "docker_conf" : {
     "docker_url" : "tcp://{{ ansible_host }}:2375",
     "docker_args" : {
-      "cert" : "/ssl/cert.pem",
-      "key" : "/ssl/key.pem",
-      "cacert" : "/ssl/ca.pem"
+      "cert" : "/usr/lib/tuxlab/ssl/cert.pem",
+      "key" : "/usr/lib/tuxlab/ssl/host.pem",
+      "cacert" : "/usr/lib/tuxlab/ssl/ca.pem"
     }
   },
-  "wetty_conf" : {
+  "xterm_conf" : {
     "host" : "0.0.0.0",
     "port" : 80
   },
   "ssh_conf" : {
     "host" : "0.0.0.0",
-    "port" : 22
+    "port" : 22,
+    "key" : "/usr/lib/tuxlab/ssl/host.key"
   }
 }

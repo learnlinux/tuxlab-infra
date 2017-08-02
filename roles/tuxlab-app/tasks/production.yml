@@ -22,7 +22,7 @@
       verify_host: no
 
 # INSTALL FOREVER
-  - name: install forvever
+  - name: install forever
     become: yes
     shell: meteor npm install -g forever
 

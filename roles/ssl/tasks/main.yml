@@ -104,6 +104,10 @@
     -config /etc/pki/tls/openssl.cnf
   register: CSR
 
+- name: Convert PKCS8 to PKCS1 Alternative
+  become: true
+  shell: openssl rsa -in /etc/ssl/local/host.pem -out /etc/ssl/local/host.key
+
 ###############################
 #          SIGN CSR           #
 ###############################

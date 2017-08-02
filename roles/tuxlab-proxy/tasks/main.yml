@@ -1,9 +1,27 @@
 ---
+
+- name: create tuxlab settings directory
+  become: yes
+  file:
+    path: /etc/tuxlab-proxy/
+    state: directory
+    mode: 0755
+
 - name: copy tuxlab-proxy settings
   become: yes
-  template: src=settings.json.j2 dest=/root/tuxlab-proxy-settings.json owner=root group=root mode=0644
+  template:
+    src: settings.json.j2
+    dest: /etc/tuxlab-proxy/settings.json
+    mode: 0755
 
-#TODO https://github.com/ansible/ansible-modules-core/issues/5515
+- name: update permissions
+  become: true
+  shell: chmod +rwx {{item}}
+  with_items:
+    - /etc/ssl/local/
+    - /etc/tuxlab-proxy/
+
+#TODO https://github.com/ansible/ansible-mod   ~/tuxlab-proxy-settings.json~/tuxlab-proxy-settings.json~/tuxlab-proxy-settings.jsonules-core/issues/5515
 - name: pull ssh-proxy image
   become: yes
   shell: docker pull tuxlab/ssh-proxy
@@ -14,8 +32,8 @@
     name: host-proxy
     image: tuxlab/ssh-proxy
     state: started
-    restart_policy: on-failure
+    restart_policy: always
     network_mode: host
     volumes:
-      - /root/tuxlab-proxy-settings.json:/settings.json:ro
-      - /etc/ssl/local:/ssl:ro
+      - /etc/tuxlab-proxy/settings.json:/usr/lib/tuxlab/settings.json:ro
+      - /etc/ssl/local/:/usr/lib/tuxlab/ssl/:ro

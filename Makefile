@@ -16,9 +16,16 @@ run:
 
 # Test Application
 test:
-	ansible-playbook ./test.yml --inventory ./local/vagrant_ansible_inventory
 	vagrant rsync meteor
 	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && /usr/local/bin/meteor npm test";
+
+# Access Various Containers
+meteor:
+	vagrant ssh meteor; exit 0;
+dswarm:
+	vagrant ssh dswarm; exit 0;
+dhost:
+	ssh -i ~/.vagrant.d/insecure_private_key -p 2222 -o UserKnownHostsFile=/dev/null vagrant@10.100.1.11; exit 0;
 
 # Down Vagrantfile
 destroy:
