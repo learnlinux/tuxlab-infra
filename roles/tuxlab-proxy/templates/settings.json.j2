@@ -1,18 +1,20 @@
 {
   "etcd_conf" : {
-    "etcd_hosts" : ["https://{{ ansible_host }}:2379"],
+    "etcd_hosts" : "https://{{ ansible_host }}:2379",
     "etcd_conn_opts" : {
       "cert" : "/usr/lib/tuxlab/ssl/cert.pem",
       "key" : "/usr/lib/tuxlab/ssl/host.pem",
-      "cacert" : "/usr/lib/tuxlab/ssl/ca.pem"
+      "ca" : "/usr/lib/tuxlab/ssl/ca.pem"
     }
   },
   "docker_conf" : {
-    "docker_url" : "tcp://{{ ansible_host }}:2375",
     "docker_args" : {
+      "protocol" : "https",
+      "host" : "{{ ansible_host }}",
+      "port" : "2376",
       "cert" : "/usr/lib/tuxlab/ssl/cert.pem",
       "key" : "/usr/lib/tuxlab/ssl/host.pem",
-      "cacert" : "/usr/lib/tuxlab/ssl/ca.pem"
+      "ca" : "/usr/lib/tuxlab/ssl/ca.pem"
     }
   },
   "xterm_conf" : {

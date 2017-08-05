@@ -9,7 +9,6 @@
   - name: Validate ETCD Cluster
     hosts: all
     tasks:
-
       - shell: etcdctl cluster-health
         register: result
 
@@ -30,7 +29,16 @@
     tasks:
 
       - shell: docker -H {{ ansible_host }}:4000 info
+        become: yes
         register: result
 
+      - debug:
+          var: result.stdout
+
+  - name: Validate Proxy
+    hosts: tuxlab-swarm-host
+    tasks:
+
+      - shell: etcdctl ls
       - debug:
           var: result.stdout
