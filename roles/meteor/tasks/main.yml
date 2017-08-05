@@ -6,6 +6,8 @@
 - name: install meteor
   become: yes
   shell: curl https://install.meteor.com/ | /bin/sh
+  args:
+    warn: false
   when: meteor_status.stdout == "false"
 
 - name: install g++

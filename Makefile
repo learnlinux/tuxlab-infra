@@ -2,6 +2,10 @@
 #          TUXLAB INFRASTRUCTURE         #
 ##########################################
 
+# Setup Development Environment
+setup:
+	"10.100.1.10" >> /etc/resolver/ssh.tuxlab.local;
+
 # Up Vagrantfile
 up: destroy
 	rm ~/.ssh/known_hosts | true;
