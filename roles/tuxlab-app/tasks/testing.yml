@@ -1,16 +1,10 @@
-# Install NodeJS
-  - name: Install NodeJS
-    yum:
-      name: nodejs
-      state: present
-
-# COPY FILES
+## COPY FILES
   - name: remove existing files
     become: yes
     file: path={{ item }} state=absent
     with_items:
-      - "{{ source_dir }}/"
-      - "{{ deploy_dir }}/"
+      - "{{ source_dir }}"
+      - "{{ deploy_dir }}"
 
   - name: create directories
     become: yes
@@ -20,7 +14,13 @@
       - "{{ source_dir }}/private"
       - "{{ deploy_dir }}"
 
-# COPY SETTINGS
+  - name: pull tuxlab-app
+    synchronize:
+      src: "{{ local_dir }}"
+      dest: "{{ source_dir }}"
+      verify_host: no
+
+## COPY SETTINGS
   - name: Copy settings
     template:
       src: "settings.json.j2"
@@ -28,30 +28,32 @@
       force: yes
       mode: 0644
 
-# COPY BINARY
-  - name: Copy Node Binary
-    become: yes
-    unarchive:
-      src: "{{ node_binary }}"
-      dest: "{{ deploy_dir }}"
-      remote_src: yes
+## RUN
+  - name: npm install
+    shell: "/usr/local/bin/meteor npm install"
+    args:
+      chdir: "{{source_dir}}"
 
-# COPY SERVICE
+## COPY SERVICE
   - name: Copy Service
     become: yes
     template:
-      src: "tuxlab.service.j2"
-      dest: "/etc/systemd/system/tuxlab.service"
+      src: "tuxlab-test.service.j2"
+      dest: "/etc/systemd/system/tuxlab-test.service"
       mode: 0644
 
   - name: Daemon Reload
     become: yes
     shell: systemctl daemon-reload
 
-# START SERVICE
+## START SERVICE
   - name: Start TuxLab Service
     become: yes
     service:
-       name: tuxlab
+       name: tuxlab-test
        state: started
        enabled: yes
+## REDIRECT
+  - name: Forward Ports
+    become: yes
+    shell: "iptables -A PREROUTING -t nat -i {{ etcd_interface }} -p tcp --dport 80 -j REDIRECT --to-port 3000"

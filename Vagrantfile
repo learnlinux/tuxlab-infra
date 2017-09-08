@@ -1,6 +1,7 @@
 #-*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# Validate Plugins
 unless Vagrant.has_plugin?("vagrant-hosts")
   raise 'vagrant-hosts is not installed!'
 end
@@ -12,6 +13,13 @@ end
 unless Vagrant.has_plugin?("vagrant-vbguest")
   raise 'vagrant-vbguest is not installed!'
 end
+
+# Startup Script
+$script = <<SCRIPT
+/bin/sleep 5;
+sudo systemctl restart network || true;
+/bin/sleep 5;
+SCRIPT
 
 Vagrant.configure(2) do |vagrant|
 
@@ -25,7 +33,7 @@ Vagrant.configure(2) do |vagrant|
   # TuxLab Swarm Controller
     vagrant.vm.define "dswarm" do |dswarm|
       dswarm.vm.box = "centos/atomic-host"
-      dswarm.vm.box_version = "7.20161006"
+      dswarm.vm.box_version = "1706.01"
 
       # Disable Guest Additions Installing
           dswarm.vm.provider :virtualbox do |v|
@@ -55,13 +63,13 @@ Vagrant.configure(2) do |vagrant|
       dswarm.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
       # Force Refresh Network
-      dswarm.vm.provision "shell", path: "local/vagrant_network_conf.sh"
+      dswarm.vm.provision "shell", inline: $script
     end
 
     # TuxLab Swarm Host
       vagrant.vm.define "dhost" do |dhost|
         dhost.vm.box = "centos/atomic-host"
-        dhost.vm.box_version = "7.20161006"
+        dhost.vm.box_version = "1706.01"
 
         # Disable Guest Additions Installing
             dhost.vm.provider :virtualbox do |v|
@@ -89,7 +97,7 @@ Vagrant.configure(2) do |vagrant|
         dhost.ssh.private_key_path = '~/.vagrant.d/insecure_private_key'
 
         # Force Refresh Network
-        dhost.vm.provision "shell", path: "local/vagrant_network_conf.sh"
+        dhost.vm.provision "shell", inline: $script
       end
 
   # Meteor Host
@@ -120,7 +128,7 @@ Vagrant.configure(2) do |vagrant|
         provisioner.add_host '10.100.1.11', ['tuxlab.local', 'meteor.tuxlab.local']
       end
 
-      meteor.vm.provision "shell", path: "local/vagrant_network_conf.sh"
+      meteor.vm.provision "shell", inline: $script
 
       # Configure All Hosts via Ansible
       meteor.vm.provision :ansible do |ansible|
@@ -130,11 +138,6 @@ Vagrant.configure(2) do |vagrant|
         ansible.host_key_checking = false
         ansible.inventory_path = "./local/vagrant_ansible_inventory"
         #ansible.verbose = true
-        ansible.extra_vars = {
-          host_key_checking: "False",
-          swarm_node_ip: "10.100.1.10",
-          vagrant_sync: true
-        }
       end
 
     end

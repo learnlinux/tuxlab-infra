@@ -2,7 +2,7 @@
 
 # Configure Options
 - name: create skydns config
-  shell: ". /etc/profile.d/etcdctl.sh && etcdctl set skydns/config '{\"domain\" : \"{{TUX_DOMAIN}}\", \"hostmaster\" : \"{{ TUX_EMAIL }}\"}'"
+  shell: ". /etc/profile.d/etcdctl.sh && etcdctl --no-sync set skydns/config '{\"domain\" : \"{{TUX_DOMAIN}}\", \"hostmaster\" : \"{{ TUX_EMAIL }}\"}'"
 
 #TODO https://github.com/ansible/ansible-modules-core/issues/5515
 - name: pull dns image

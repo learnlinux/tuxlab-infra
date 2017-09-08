@@ -2,11 +2,25 @@
 
 - name: stop etcd systemd service
   become: yes
-  shell: systemctl stop etcd.service
+  service:
+    name: etcd
+    state: stopped
+
+- name: clear data directory
+  become: yes
+  file:
+    path: "{{ etcd_data_dir }}"
+    state: absent
+
+- name: re-add data directory
+  become: yes
+  file:
+    path: "{{ etcd_data_dir }}"
+    state: directory
 
 - name: add etcd systemd service
   become: yes
-  template: src=etcd.j2
+  template: src=etcd.service.j2
             dest=/etc/systemd/system/etcd.service
             mode=0644
 
@@ -16,11 +30,10 @@
 
 - name: ETCD Enable
   become: yes
-  shell: systemctl enable etcd.service
-
-- name: ETCD Start
-  become: yes
-  shell: systemctl start etcd.service &
+  service:
+    name: etcd
+    state: started
+    enabled: yes
 
 - name: Save SSL Variables
   become: yes

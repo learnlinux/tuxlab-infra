@@ -1,0 +1,20 @@
+[Unit]
+Description=TuxLab Production Service
+After=network.target
+
+[Service]
+Type=notify
+User=centos
+WorkingDirectory={{ source_dir }}
+Environment=ROOT_URL={{ root_url }}
+Environment=MAIL_URL={{ mail_url }}
+ExecStart=/usr/local/bin/meteor --port 3000 --settings ./private/settings.json
+Restart=always
+RestartSec=10s
+LimitNOFILE=40000
+TimeoutStartSec=180
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

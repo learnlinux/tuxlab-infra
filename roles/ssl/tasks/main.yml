@@ -84,7 +84,7 @@
     dest: /etc/pki/tls/openssl.cnf
     insertafter: "^keyUsage = nonRepudiation, digitalSignature, keyEncipherment"
     regexp: "^subjectAltName="
-    line: "subjectAltName=DNS:{{TUX_DOMAIN}},IP:127.0.0.1,IP:{{ansible_host}}"
+    line: "subjectAltName=DNS:{{TUX_DOMAIN}},IP:127.0.0.1,IP:{{ansible_host}},IP:{{ hostvars[inventory_hostname]['ansible_' + etcd_interface]['ipv4']['address'] }}"
 
 - name: Enabling SAN extension in openssl.cnf
   become: yes
@@ -112,10 +112,11 @@
 #          SIGN CSR           #
 ###############################
 - name: Sign CSR
-  shell: "echo '{{ CSR.stdout }}' | openssl ca -batch -config ./openssl.cnf -in /dev/stdin -extensions server_cert -notext -days 365"
-  args:
-    chdir: "~/.tuxlab/ca"
-  delegate_to: localhost
+  local_action:
+    module: shell
+    _raw_params: "echo '{{ CSR.stdout }}' | openssl ca -batch -config ./openssl.cnf -in /dev/stdin -extensions server_cert -notext -days 365"
+    args:
+      chdir: "~/.tuxlab/ca"
   register: CRT
 
 ###############################
@@ -154,6 +155,16 @@
   become: yes
   shell: "openssl pkcs12 -export -in /etc/ssl/local/cert.pem -inkey /etc/ssl/local/host.pem -out host.p12 -name tuxlab-key -passout pass:"
 
+- name: Remove Old Certificate
+  become: yes
+  shell: certutil -d sql:/etc/pki/nssdb -D -n "demo.tuxlab.org - Carnegie Mellon University"
+  ignore_errors: yes
+
+- name: Remove Old Key
+  become: yes
+  shell: certutil -d sql:/etc/pki/nssdb -D -n "tuxlab-key"
+  ignore_errors: yes
+
 - name: Add Client Key to NSS
   become: yes
-  shell: pk12util -i host.p12 -d /etc/pki/nssdb/ -W ""
+  shell: pk12util -i host.p12 -d sql:/etc/pki/nssdb -W ""

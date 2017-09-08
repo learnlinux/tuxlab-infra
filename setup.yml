@@ -2,12 +2,25 @@
   # This playbook is executed by Vagrant or  Ansible Tower to configure
   # new hosts once they have been provisioned.
 
+  # Get Variables
+  - name: Get Config
+    hosts: all
+    gather_facts: no
+    tasks:
+      - include_vars: config.yml
+        ignore_errors: yes
+
+  # Reconfigure SSHD on Hosts
+  - name: Prepare Swarm Hosts
+    hosts: tuxlab-swarm-host
+    gather_facts: no
+    roles:
+      - sshd
+
   # Generate ETCD Discovery Tokens
   - name: Setup ETCD Discovery
     hosts: all
     become_method: sudo
-    vars_files:
-      - config.yml
     roles:
       - etcd-discovery
 
@@ -19,74 +32,59 @@
   - name: Prepare Meteor Hosts
     hosts: tuxlab-meteor
     become_method: sudo
-    vars:
-      etcd_interface: eth1
-    vars_files:
-      - config.yml
+    serial: 1
     roles:
       - centos
       - chronyd
       - ssl
-      - etcd
 
-  # Configure Swarm Engine
-  #    - Update Atomic
+  # Prepare Atomic Hosts
   #    - Create and Sign SSL Certificates
-  #    - Configure ETCD
-  #    - Configure Docker
-  - name: Configure Swarm Engine
+  - name: Prepare Atomic Hosts
     hosts: tuxlab-swarm-host:tuxlab-swarm-manager
     become_method: sudo
-    gather_facts: no
-    vars_files:
-      - config.yml
-    vars:
-      etcd_interface: enp0s8
+    serial: 1
     roles:
-      - atomic
       - ssl
-      - etcd
-      - dockerengine
 
-  # Configure Swarm Engine
-  #    - Update Atomic
-  #    - Create and Sign SSL Certificates
-  #    - Configure ETCD
-  #    - Configure Docker
+  # Configure ETCD Cluster
+  #    - Wait for ETCD Cluster to Come Online
+  - name: Configure ETCD Cluster
+    hosts: all
+    roles:
+      - etcd
+
+  # Configure Swarm Hosts
+  #    - Pull LabVM Images
+  #    - Configure Docker Hosts
   - name: Configure Swarm Hosts
     hosts: tuxlab-swarm-host
     become_method: sudo
-    gather_facts: no
-    vars_files:
-      - config.yml
     roles:
+      - dockerengine
       - dockerhost
       - tuxlab-labvm
 
+  # Configure Swarm Manager
+  #    - Pull DNS Image
+  #    - Configure Docker Swarm
   - name: Configure Swarm Manager
     hosts: tuxlab-swarm-manager
     become_method: sudo
-    gather_facts: no
-    vars_files:
-      - config.yml
     roles:
+      - dockerengine
       - dockerswarm
       - tuxlab-dns
 
   - name: Configure Swarm Hosts
     hosts: tuxlab-swarm-host
     become_method: sudo
-    gather_facts: no
-    vars_files:
-      - config.yml
     roles:
       - tuxlab-proxy
 
   - name: Configure Meteor Applications
     hosts: tuxlab-meteor
     become_method: sudo
-    vars_files:
-      - config.yml
     roles:
       - meteor
       - tuxlab-app

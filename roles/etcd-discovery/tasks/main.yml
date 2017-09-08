@@ -1,5 +1,9 @@
 ---
 
+ - name: Clear TuxLab directory
+   run_once: true
+   local_action: file path=~/.tuxlab state=absent
+
  - name: Create TuxLab directory
    run_once: true
    local_action: file path=~/.tuxlab state=directory mode=0755

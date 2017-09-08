@@ -20,8 +20,12 @@
 ## RUN SETUP
   - name: Production Setup
     include: "production.yml"
-    when: (not (vagrant_sync is defined)) or (not vagrant_sync)
+    when: deployment_method == "production" | default(true)
+
+  - name: Testing Setup
+    include: "testing.yml"
+    when: deployment_method == "testing" | default(false)
 
   - name: Vagrant Setup
     include: "vagrant.yml"
-    when: (vagrant_sync is defined) and vagrant_sync
+    when:  deployment_method == "vagrant" | default(false)

@@ -6,6 +6,7 @@
    TUX_ORG: Carnegie Mellon University
    TUX_HOMEPAGE: http://tuxlab.local/
    TUX_EMAIL: service@tuxlab.org
+   TUX_EMAIL_URL: smtp://mail.tuxlab.local
 
 ###############################
 #     SSL CONFIGURATION       #

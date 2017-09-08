@@ -18,6 +18,11 @@ run:
 	vagrant rsync meteor
 	vagrant ssh meteor --command "cd /tuxlab-sync && /usr/local/bin/meteor npm install && ROOT_URL=http://tuxlab.local:3000 /usr/local/bin/meteor --settings ./private/settings.json";
 
+# Build Application
+build:
+	mkdir -p ./build
+	cd app && meteor build --verbose ../build
+
 # Test Application
 test:
 	vagrant rsync meteor
@@ -31,10 +36,8 @@ dswarm:
 dhost:
 	ssh -i ~/.vagrant.d/insecure_private_key -p 2222 -o UserKnownHostsFile=/dev/null vagrant@10.100.1.11; exit 0;
 
-# Down Vagrantfile
 destroy:
 	vagrant destroy --force;
 	rm -rf .vagrant/;
-	rm -rf ~/.tuxlab;
 
-.PHONY: up run test destroy
+.PHONY: build up run test meteor dswarm dhost destroy

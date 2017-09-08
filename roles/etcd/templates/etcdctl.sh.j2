@@ -1,4 +1,4 @@
-export ETCDCTL_ENDPOINT="{{ etcd_client_url_scheme }}://{{ hostvars[inventory_hostname]['ansible_' + etcd_client_interface]['ipv4']['address'] }}:{{ etcd_client_port }}"
+export ETCDCTL_ENDPOINT="{{ etcd_client_url_scheme }}://{{ hostvars[inventory_hostname]['ansible_' + etcd_interface]['ipv4']['address'] }}:{{ etcd_client_port }}"
 export ETCDCTL_KEY_FILE="{{ etcd_peer_key_file }}"
 export ETCDCTL_CERT_FILE="{{ etcd_peer_cert_file }}"
 export ETCDCTL_CA_FILE="{{ etcd_peer_trusted_ca_file }}"

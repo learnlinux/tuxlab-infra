@@ -3,9 +3,15 @@
 # Ansible will install the version of TuxLab stored in the /app directory.
 # By default, this is a git submodule of the tuxlab-app repository,
 # but you can easily modify this in whatever way you see fit.
+
+# Source Settings
 local_dir: app/
 vagrant_dir: "/tuxlab-sync"
 
-# Meteor Settings
+# Dist Settings
 source_dir: /var/tuxlab
 deploy_dir: /var/www
+
+# Execution Settings
+root_url: "{{ TUX_HOMEPAGE }}"
+mail_url: "{{ TUX_EMAIL_URL }}"
