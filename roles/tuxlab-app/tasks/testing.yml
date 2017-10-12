@@ -1,7 +1,7 @@
 ## COPY FILES
   - name: remove existing files
     become: yes
-    file: path={{ item }} state=absent
+    shell: rm -rf {{ item }}
     with_items:
       - "{{ source_dir }}"
       - "{{ deploy_dir }}"
