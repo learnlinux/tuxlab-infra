@@ -8,6 +8,7 @@ User=centos
 WorkingDirectory={{ source_dir }}
 Environment=ROOT_URL={{ root_url }}
 Environment=MAIL_URL={{ mail_url }}
+Environment=TUXLAB_FIXTURES=true
 ExecStart=/usr/local/bin/meteor --port 3000 --settings ./private/settings.json
 Restart=always
 RestartSec=10s

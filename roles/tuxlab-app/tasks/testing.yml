@@ -3,8 +3,8 @@
     become: yes
     shell: rm -rf {{ item }}
     with_items:
-      - "{{ source_dir }}"
-      - "{{ deploy_dir }}"
+      - "{{ source_dir }}/"
+      - "{{ deploy_dir }}/"
 
   - name: create directories
     become: yes
@@ -53,6 +53,7 @@
        name: tuxlab-test
        state: started
        enabled: yes
+
 ## REDIRECT
   - name: Forward Ports
     become: yes
