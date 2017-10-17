@@ -2,7 +2,7 @@
 
 meteor ansible_host=10.100.1.2 ansible_port=22 ansible_user='vagrant' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key' etcd_interface=eth1
 dswarm ansible_host=10.100.1.10 ansible_port=22 ansible_user='vagrant' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key' etcd_interface=enp0s8
-dhost ansible_host=10.100.1.11 ansible_port=22 ansible_user='vagrant' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key' etcd_interface=enp0s8
+dhost ansible_host=10.100.1.11 ansible_port=2222 ansible_user='vagrant' ansible_ssh_private_key_file='~/.vagrant.d/insecure_private_key' etcd_interface=enp0s8
 
 [all:vars]
 swarm_node_ip='10.100.1.10'
