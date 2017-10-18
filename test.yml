@@ -9,36 +9,38 @@
   - name: Validate ETCD Cluster
     hosts: all
     tasks:
-      - shell: etcdctl cluster-health
+      - name: Check ETCD Health
+        uri:
+          url: https://localhost:2379
+          client_cert: /etc/ssl/local/ca.pem
+          client_key: /etc/ssl/local/host.pem
+          return_content: true
         register: result
+        failed_when: (result.json is not defined) or (!result.json.health)
 
       - debug:
-          verbosity: 2
-          var: result.stdout
-
-      - shell: etcdctl cluster-health > /dev/null; echo $?
-        register: result
-
-      - assert:
-          that:
-            - "result.stdout == 0"
-          msg: "etcdctl reported an unhealthy cluster"
+          var: result.json
 
   - name: Validate Docker Swarm
     hosts: tuxlab-swarm-manager
     tasks:
 
-      - shell: docker -H {{ ansible_host }}:4000 info
-        become: yes
-        register: result
+      - name: Check Docker Swarm Health
+        uri:
+          url: https://localhost:4000/_ping
+          client_cert: /etc/ssl/local/ca.pem
+          client_key: /etc/ssl/local/host.pem
+          return_content: true
+          status_code: 200
 
-      - debug:
-          var: result.stdout
-
-  - name: Validate Proxy
+  - name: Validate Proxy is Running
     hosts: tuxlab-swarm-host
     tasks:
 
-      - shell: etcdctl ls
-      - debug:
-          var: result.stdout
+      - name:
+        uri:
+          url: https://localhost:2376/v1.24/containers/host-proxy/json
+          client_cert: /etc/ssl/local/ca.pem
+          client_key: /etc/ssl/local/host.pem
+          return_content: true
+        failed_when: (result.json is not defined) or (!result.json.State.Running)
